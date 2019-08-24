@@ -1,0 +1,10 @@
+## Interface: 30300
+## X-Compatible-With: 40000
+## Author: Xus (Xussie of Kazzak EU)
+## Title: Forte|c802459ffShaman|r
+## Notes: Forte Shaman Module
+## SavedVariables:
+## OptionalDeps:Forte_Casting, Forte_Timer, Forte_Cooldown
+## Dependencies:Forte_Core
+Localization.lua
+Forte_Shaman.lua

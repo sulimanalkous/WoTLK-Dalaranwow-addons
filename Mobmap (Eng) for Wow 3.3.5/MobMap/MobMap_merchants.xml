@@ -1,0 +1,1052 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="MobMap_merchants.lua"/>
+
+	<Frame name="MobMapMerchantListEntryTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="240" y="40"/>
+		</Size>
+		<Frames>
+			<Button name="$parentMerchantName" inherits="MobMapTopTextButtonTemplate">
+				<Size>
+					<AbsDimension x="240" y="38"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MobMap_DisplayMerchantDetails(self:GetParent().merchantid);
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentMerchantSubtitle" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="">
+					<Size>
+						<AbsDimension x="240" y="10"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentMerchantName" relativePoint="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="26"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+				</FontString>
+				<FontString name="$parentMerchantZone" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="">
+					<Size>
+						<AbsDimension x="240" y="10"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOP" relativeTo="$parentMerchantSubtitle" relativePoint="BOTTOM">
+							<Offset>
+								<AbsDimension x="0" y="-1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				getglobal(self:GetName().."MerchantNameText"):SetWidth(240);
+				getglobal(self:GetName().."MerchantNameText"):SetHeight(38);
+				getglobal(self:GetName().."MerchantSubtitle"):SetWidth(240);
+				getglobal(self:GetName().."MerchantSubtitle"):SetHeight(10);
+				getglobal(self:GetName().."MerchantZone"):SetWidth(240);
+				getglobal(self:GetName().."MerchantZone"):SetHeight(10);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Frame name="MobMapMerchantItemTemplate" virtual="true">	
+		<Size>
+			<AbsDimension x="153" y="43"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentSlotTexture" file="Interface\Buttons\UI-EmptySlot">
+					<Size>
+						<AbsDimension x="64" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="-13" y="13"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentNameFrame" file="Interface\MerchantFrame\UI-Merchant-LabelSlots">
+					<Size>
+						<AbsDimension x="128" y="78"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentSlotTexture" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="-9" y="-18"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentName" inherits="GameFontNormalSmall" text="Item Name" justifyH="LEFT" nonspacewrap="true">
+					<Size>
+						<AbsDimension x="100" y="30"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentSlotTexture" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="-5" y="7"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentItemButton" inherits="ItemButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MobMap_MerchantItem_OnClick(self);
+					</OnClick>
+					<OnEnter>
+						if(self:GetAlpha()>0 and self:GetParent().itemstring~=nil) then
+							MobMapTooltip:SetOwner(self, "ANCHOR_RIGHT");
+							MobMap_DisplayItemTooltip(MobMapTooltip, self:GetParent().itemid);
+						end
+					</OnEnter>
+					<OnLeave>
+						MobMapTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Frame name="$parentMoneyFrame" inherits="SmallMoneyFrameTemplate">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parentNameFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="2" y="31"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						SmallMoneyFrame_OnLoad(self);
+						MoneyFrame_SetType(self, "STATIC");
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentAltCurrencyFrame" inherits="MobMapSmallAlterateCurrencyFrameTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parentNameFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="2" y="31"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				self:SetScale(0.90);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Button name="MobMapSmallDenominationTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="32" y="13"/>
+		</Size>
+		<Scripts>
+			<OnEnter>
+				MobMapTooltip:SetOwner(self, "ANCHOR_RIGHT");
+				if(self.tokenname~=nil) then
+					MobMapTooltip:AddLine(self.tokenname);
+					MobMapTooltip:Show();
+				end
+			</OnEnter>
+			<OnLeave>
+				MobMapTooltip:Hide();
+				ResetCursor();
+			</OnLeave>
+		</Scripts>
+		<ButtonText name="$parentText">
+			<Anchors>
+				<Anchor point="LEFT">
+					<Offset>
+						<AbsDimension x="-13" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</ButtonText>
+		<NormalTexture name="$parentTexture">
+			<Size>
+				<AbsDimension x="13" y="13"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT"/>
+			</Anchors>
+		</NormalTexture>
+		<NormalFont style="NumberFontNormalRight"/>
+		<PushedTextOffset>
+			<AbsDimension x="0" y="0"/>
+		</PushedTextOffset>
+	</Button>
+	<Frame name="MobMapSmallAlterateCurrencyFrameTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="128" y="13"/>
+		</Size>
+		<Frames>
+			<Button name="$parentPoints" inherits="MobMapSmallDenominationTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT">
+						<Offset>
+							<AbsDimension x="13" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnEnter>
+							MobMapTooltip:SetOwner(self, "ANCHOR_RIGHT");
+							MobMapTooltip:SetText(self.pointType);
+					</OnEnter>
+					<OnLeave>
+							MobMapTooltip:Hide();
+							ResetCursor();
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="$parentItem1" inherits="MobMapSmallDenominationTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentPoints" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem2" inherits="MobMapSmallDenominationTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentItem1" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="4" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentItem3" inherits="MobMapSmallDenominationTemplate" hidden="true">
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentItem2" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="4" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnEnter>
+			</OnEnter>
+		</Scripts>
+	</Frame>
+	
+	<Frame name="MobMapMerchantListFrame" hidden="true" parent="MobMapFrame">
+		<Size>
+			<AbsDimension x="600" y="400"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="MobMapFrame" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-80"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<EditBox name="MobMapMerchantListNameFilter" letters="100" historyLines="0" autoFocus="false">
+				<Size>
+					<AbsDimension x="160" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="96" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-5" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="10" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+						<FontString name="$parentText" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_MERCHANT_NAME_FILTER_BOX_TEXT">
+							<Size>
+								<AbsDimension x="100" y="12"/>
+							</Size>
+							 <Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-10" y="-5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnterPressed>
+						self:ClearFocus();
+					</OnEnterPressed>
+					<OnEscapePressed>
+						self:ClearFocus();
+					</OnEscapePressed>
+					<OnTextChanged>
+					</OnTextChanged> 
+					<OnEditFocusLost>
+						self:HighlightText(0, 0);
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						self:HighlightText();
+					</OnEditFocusGained>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+
+			<EditBox name="MobMapMerchantListSubtitleFilter" letters="100" historyLines="0" autoFocus="false">
+				<Size>
+					<AbsDimension x="160" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMerchantListNameFilter" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-21"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-5" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="10" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+						<FontString name="$parentText" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_MERCHANT_SUBTITLE_FILTER_BOX_TEXT">
+							<Size>
+								<AbsDimension x="100" y="12"/>
+							</Size>
+							 <Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-10" y="-5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnterPressed>
+						self:ClearFocus();
+					</OnEnterPressed>
+					<OnEscapePressed>
+						self:ClearFocus();
+					</OnEscapePressed>
+					<OnTextChanged>
+					</OnTextChanged> 
+					<OnEditFocusLost>
+						self:HighlightText(0, 0);
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						self:HighlightText();
+					</OnEditFocusGained>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+
+			<EditBox name="MobMapMerchantListZoneFilter" letters="100" historyLines="0" autoFocus="false">
+				<Size>
+					<AbsDimension x="160" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMerchantListSubtitleFilter" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-21"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-5" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="10" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="$parentCurrentZoneButton" inherits="MobMapSmallRightTextButtonTemplate">
+						<Size>
+							<AbsDimension x="40" y="12"/>
+						</Size>
+						 <Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="-10" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								self:SetText(MOBMAP_QUEST_ZONE_FILTER_BOX_TEXT);
+							</OnLoad>
+							<OnClick>
+								MobMapMerchantListZoneFilter:SetText(GetRealZoneText());
+							</OnClick>
+							<OnEnter>
+								GameTooltip_AddNewbieTip(self,"MobMap",1.0,1.0,1.0,MOBMAP_ZONE_QUICKBUTTON_INFO,1);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnEnterPressed>
+						self:ClearFocus();
+					</OnEnterPressed>
+					<OnEscapePressed>
+						self:ClearFocus();
+					</OnEscapePressed>
+					<OnTextChanged>
+						MobMap_MerchantListZoneFilter_OnTextChanged();
+					</OnTextChanged> 
+					<OnEditFocusLost>
+						self:HighlightText(0, 0);
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						self:HighlightText();
+					</OnEditFocusGained>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+
+			<Button name="MobMapMerchantListItemFilter" inherits="MobMapSmallCenteredTextButtonTemplate">
+				<Size>
+					<AbsDimension x="230" y="12"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="30" y="-86"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:SetText(MOBMAP_MERCHANT_ITEM_FILTER_TEXT);
+						getglobal(self:GetName().."Text"):SetWidth(230);
+						self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+					</OnLoad>
+					<OnClick>
+						if(arg1=="LeftButton") then
+							MobMap_OpenMerchantItemSelection();
+						end
+						if(arg1=="RightButton") then
+							MobMap_ClearMerchantItemSelection();
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self,"MobMap",1.0,1.0,1.0,MOBMAP_MERCHANT_ITEM_FILTER_INFO,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+			<ScrollFrame name="MobMapMerchantListScrollFrame" inherits="MobMapQuestListScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="240" y="230"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMerchantListFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="18" y="-108"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(self, offset, 22, MobMap_UpdateMerchantList);
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+
+			<Frame name="MobMapMerchant1" inherits="MobMapMerchantListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="18" y="-126"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapMerchant2" inherits="MobMapMerchantListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapMerchant1" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapMerchant3" inherits="MobMapMerchantListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapMerchant2" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapMerchant4" inherits="MobMapMerchantListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapMerchant3" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapMerchant5" inherits="MobMapMerchantListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapMerchant4" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapMerchant6" inherits="MobMapMerchantListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapMerchant5" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapMerchant7" inherits="MobMapMerchantListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapMerchant6" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapMerchant8" inherits="MobMapMerchantListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapMerchant7" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapMerchant9" inherits="MobMapMerchantListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapMerchant8" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapMerchant10" inherits="MobMapMerchantListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapMerchant9" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapMerchant11" inherits="MobMapMerchantListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapMerchant10" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapMerchant12" inherits="MobMapMerchantListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapMerchant11" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapMerchant13" inherits="MobMapMerchantListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapMerchant12" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapMerchant14" inherits="MobMapMerchantListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapMerchant13" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapMerchant15" inherits="MobMapMerchantListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapMerchant14" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+
+			<Frame name="MobMapMerchantListMerchantDetailFrame" visible="false">
+				<Size>
+					<AbsDimension x="300" y="320"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="287" y="-12"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Frames>
+					<Button name="$parentMerchantName" inherits="MobMapCenteredTextButtonTemplate">
+						<Size>
+							<AbsDimension x="300" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								MobMap_ShowPanel("MobMapMobSearchFrame");
+								MobMap_ShowMobByID(self.npcid);
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentMerchantSubtitle" inherits="MobMapSmallCenteredTextButtonTemplate">
+						<Size>
+							<AbsDimension x="300" y="16"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentMerchantName" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(self:GetName().."Text"):SetWidth(300);
+								getglobal(self:GetName().."Text"):SetHeight(16);
+								self:Disable();
+							</OnLoad>
+						</Scripts>
+					</Button>
+					<Frame name="MobMapMerchantItem1" inherits="MobMapMerchantItemTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="10" y="-64"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapMerchantItem2" inherits="MobMapMerchantItemTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="MobMapMerchantItem1" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="10" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapMerchantItem3" inherits="MobMapMerchantItemTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapMerchantItem1" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-16"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapMerchantItem4" inherits="MobMapMerchantItemTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="MobMapMerchantItem3" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="10" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapMerchantItem5" inherits="MobMapMerchantItemTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapMerchantItem3" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-16"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapMerchantItem6" inherits="MobMapMerchantItemTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="MobMapMerchantItem5" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="10" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapMerchantItem7" inherits="MobMapMerchantItemTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapMerchantItem5" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-16"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapMerchantItem8" inherits="MobMapMerchantItemTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="MobMapMerchantItem7" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="10" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapMerchantItem9" inherits="MobMapMerchantItemTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapMerchantItem7" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-16"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapMerchantItem10" inherits="MobMapMerchantItemTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="MobMapMerchantItem9" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="10" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapMerchantItem11" inherits="MobMapMerchantItemTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapMerchantItem9" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-16"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapMerchantItem12" inherits="MobMapMerchantItemTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="MobMapMerchantItem11" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="10" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapMerchantItem13" inherits="MobMapMerchantItemTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapMerchantItem11" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-16"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapMerchantItem14" inherits="MobMapMerchantItemTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="MobMapMerchantItem13" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="10" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapMerchantItem15" inherits="MobMapMerchantItemTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapMerchantItem13" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-16"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapMerchantItem16" inherits="MobMapMerchantItemTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="MobMapMerchantItem15" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="10" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapMerchantItem17" inherits="MobMapMerchantItemTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapMerchantItem15" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-16"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapMerchantItem18" inherits="MobMapMerchantItemTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="MobMapMerchantItem17" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="10" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapMerchantItem19" inherits="MobMapMerchantItemTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapMerchantItem17" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-16"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapMerchantItem20" inherits="MobMapMerchantItemTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="MobMapMerchantItem19" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="10" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapMerchantItem21" inherits="MobMapMerchantItemTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapMerchantItem19" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-16"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapMerchantItem22" inherits="MobMapMerchantItemTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="MobMapMerchantItem21" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="10" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapMerchantItem23" inherits="MobMapMerchantItemTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapMerchantItem21" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-16"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapMerchantItem24" inherits="MobMapMerchantItemTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="MobMapMerchantItem23" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="10" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+
+					<Button name="MobMapMerchantPrevPageButton">
+						<Size>
+							<AbsDimension x="32" y="32"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="6" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString inherits="GameFontNormal" justifyH="LEFT" text="PREV">
+									<Anchors>
+										<Anchor point="LEFT" relativeTo="MobMapMerchantPrevPageButton" relativePoint="RIGHT"/>
+									</Anchors>
+								</FontString>
+								<Texture file="Interface\Buttons\UI-PageButton-Background">
+									<Size>
+										<AbsDimension x="32" y="32"/>
+									</Size>
+									<Anchors>
+										<Anchor point="CENTER">
+											<Offset>
+												<AbsDimension x="0" y="1"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnClick>
+								MobMap_MerchantPrevPageButton_OnClick();
+							</OnClick>
+						</Scripts>
+						<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Up"/>
+						<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Down"/>
+						<DisabledTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Disabled"/>
+						<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+					</Button>
+					<Button name="MobMapMerchantNextPageButton">
+						<Size>
+							<AbsDimension x="32" y="32"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-6" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<FontString inherits="GameFontNormal" justifyH="RIGHT" text="NEXT">
+									<Anchors>
+										<Anchor point="RIGHT" relativeTo="MobMapMerchantNextPageButton" relativePoint="LEFT">
+											<Offset>
+												<AbsDimension x="-3" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+								<Texture file="Interface\Buttons\UI-PageButton-Background">
+									<Size>
+										<AbsDimension x="32" y="32"/>
+									</Size>
+									<Anchors>
+										<Anchor point="CENTER">
+											<Offset>
+												<AbsDimension x="0" y="1"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnClick>
+								MobMap_MerchantNextPageButton_OnClick();
+							</OnClick>
+						</Scripts>
+						<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+						<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+						<DisabledTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Disabled"/>
+						<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+					</Button>
+					
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						MobMapMerchantListMerchantDetailFrame:Hide();
+					</OnLoad>
+					<OnUpdate>
+						MobMap_MerchantDetailFrame_OnUpdate();
+					</OnUpdate>
+					<OnShow>
+						MobMap_UpdateMerchantList();
+						MobMap_UpdateMerchantItemDisplay();
+					</OnShow>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				MobMap_MerchantListFrame_OnShow();
+			</OnShow>
+			<OnUpdate>
+				MobMap_MerchantListFrame_OnUpdate();
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+</Ui>

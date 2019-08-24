@@ -1,0 +1,7 @@
+## Interface: 30300
+## Title: MobMapDatabaseStub6
+## Notes: This is a load-on-demand addon stub for the MobMap mob name database.
+## RequiredDeps: MobMap
+## LoadOnDemand: 1
+..\MobMap\MobMapDatabase_mobnames.lua
+..\MobMap\MobMap_mobnames.lua

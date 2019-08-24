@@ -1,0 +1,1430 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="MobMap_itemdropdata.lua"/>
+
+	<Frame name="MobMapDropListItemNameEntryTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="236" y="18"/>
+		</Size>
+		<Frames>
+			<Button name="$parentItemName" inherits="MobMapTopTextButtonTemplate">
+				<Size>
+					<AbsDimension x="236" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MobMap_DropListSelectItem(self);
+					</OnClick>
+					<OnEnter>
+						if(self:GetParent().itemid~=nil) then
+							MobMapTooltip:SetOwner(self, "ANCHOR_TOPRIGHT");
+							MobMap_DisplayItemTooltip(MobMapTooltip, self:GetParent().itemid, self:GetParent().ihid);
+						end
+					</OnEnter>
+					<OnLeave>
+						MobMapTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				getglobal(self:GetName().."ItemNameText"):SetWidth(236);
+				getglobal(self:GetName().."ItemNameText"):SetHeight(18);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Button name="MobMapDropListBossNameEntryTemplate" hidden="true" virtual="true">
+		<Size>
+			<AbsDimension x="250" y="18"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentSubText" inherits="GameFontNormalSmall" justifyH="LEFT"/>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				self:SetFrameLevel(self:GetFrameLevel() + 1);
+			</OnLoad>
+			<OnClick>
+				MobMap_DropListBossNameEntry_OnClick(self);
+			</OnClick>
+			<OnEnter>
+			</OnEnter>
+			<OnLeave>
+			</OnLeave>
+		</Scripts>
+		<NormalTexture file="Interface\Buttons\UI-MinusButton-UP">
+			<Size>
+				<AbsDimension x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT">
+					<Offset>
+						<AbsDimension x="3" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</NormalTexture>
+		<HighlightTexture name="$parentHighlight" file="Interface\Buttons\UI-PlusButton-Hilight" alphaMode="ADD">
+			<Size>
+				<AbsDimension x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT">
+					<Offset>
+						<AbsDimension x="3" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightTexture>
+		<DisabledTexture file="Interface\Buttons\UI-PlusButton-Disabled">
+			<Size>
+				<AbsDimension x="16" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT">
+					<Offset>
+						<AbsDimension x="3" y="0"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</DisabledTexture>
+		<ButtonText name="$parentText" inherits="GameFontNormal" justifyH="LEFT">
+			<Size>
+				<AbsDimension x="0" y="0"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentHighlight" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="2" y="1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</ButtonText>
+		<NormalFont style="GameFontNormal" justifyH="LEFT"/>
+		<HighlightFont style="GameFontHighlight" justifyH="LEFT"/>
+		<DisabledFont style="GameFontDisable" justifyH="LEFT"/>
+	</Button>
+
+	<Frame name="MobMapDropRateEntryTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="270" y="33"/>
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentChance" inherits="GameFontNormal" text="100.0%" justifyH="RIGHT" justifyV="TOP">
+					<Size>
+						<AbsDimension x="60" y="18"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-16" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1.0" g="1.0" b="1.0"/>
+				</FontString>
+				<FontString name="$parentZoneAndLevel" inherits="GameFontNormalSmall" text="Zangarmarschen, Stufe 63-65" justifyH="LEFT" justifyV="TOP">
+					<Size>
+						<AbsDimension x="220" y="8"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1.0" g="1.0" b="1.0"/>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentMobName" inherits="MobMapTopTextButtonTemplate">
+				<Size>
+					<AbsDimension x="200" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnShow>
+						getglobal(self:GetName().."Text"):SetWidth(210);
+					</OnShow>
+					<OnClick>
+						MobMap_DropListSelectDropChance(self);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Frame name="$parentBigraid">
+				<Size>
+					<AbsDimension x="13" y="13"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-12" y="-14"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture file="Interface\Icons\achievement_dungeon_classicdungeonmaster">
+							<Size>
+								<AbsDimension x="13" y="13"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self,"MobMap",1.0,1.0,1.0,MOBMAP_DROP_RATE_DATABASE_BIGRAID_ONLY_INFO,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentHeroic">
+				<Size>
+					<AbsDimension x="13" y="13"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-12" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture file="Interface\Icons\spell_holy_championsgrace">
+							<Size>
+								<AbsDimension x="13" y="13"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self,"MobMap",1.0,1.0,1.0,MOBMAP_DROP_RATE_DATABASE_HEROIC_ONLY_INFO,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				getglobal(self:GetName().."MobNameText"):SetWidth(220);
+				getglobal(self:GetName().."MobNameText"):SetHeight(18);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<ScrollFrame name="MobMapDropListScrollFrameTemplate" inherits="FauxScrollFrameTemplate" virtual="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-ScrollBar">
+					<Size>
+						<AbsDimension x="24" y="120"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="1" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.46875" top="0.0234375" bottom="0.9609375"/>
+				</Texture>
+				<Texture name="$parentInnerTexture" file="Interface\ClassTrainerFrame\UI-ClassTrainer-ScrollBar">
+					<Size>
+						<AbsDimension x="24" y="200"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="1" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.53125" right="1.0" top="0.03125" bottom="0.7"/>
+				</Texture>
+				<Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-ScrollBar">
+					<Size>
+						<AbsDimension x="24" y="123"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="1" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.53125" right="1.0" top="0.03125" bottom="1.0"/>
+				</Texture>
+			</Layer>
+		</Layers>
+	</ScrollFrame>
+
+	<Frame name="MobMapBossLootTableEntryTemplate" virtual="true">	
+		<Size>
+			<AbsDimension x="344" y="50"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentSlotTexture" file="Interface\Buttons\UI-EmptySlot">
+					<Size>
+						<AbsDimension x="64" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="-13" y="13"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentNameFrame" file="Interface\MerchantFrame\UI-Merchant-LabelSlots">
+					<Size>
+						<AbsDimension x="280" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentSlotTexture" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="-9" y="-9"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentName" inherits="GameFontNormal" text="Item Name" justifyH="LEFT" justifyV="TOP">
+					<Size>
+						<AbsDimension x="202" y="58"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentSlotTexture" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="-5" y="-10"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentChance" inherits="GameFontNormal" text="22.5%" justifyH="RIGHT" justifyV="TOP">
+					<Size>
+						<AbsDimension x="100" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMRIGHT" relativeTo="$parentNameFrame" relativePoint="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="-46" y="18"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1.0" g="1.0" b="1.0"/>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentItemButton" inherits="ItemButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent"/>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MobMap_BossLootItem_OnClick(self);
+					</OnClick>
+					<OnLoad>	
+					</OnLoad>
+					<OnEnter>
+						if(self:GetParent().itemid~=nil) then
+							MobMapTooltip:SetOwner(self, "ANCHOR_TOPRIGHT");
+							MobMap_DisplayItemTooltip(MobMapTooltip, self:GetParent().itemid, self:GetParent().ihid);
+						end
+					</OnEnter>
+					<OnLeave>
+						MobMapTooltip:Hide();
+					</OnLeave>
+					<OnHide>
+					</OnHide>
+				</Scripts>
+			</Button>
+			<Frame name="$parentBigraid">
+				<Size>
+					<AbsDimension x="13" y="13"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentNameFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-61" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture file="Interface\Icons\achievement_dungeon_classicdungeonmaster">
+							<Size>
+								<AbsDimension x="13" y="13"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self,"MobMap",1.0,1.0,1.0,MOBMAP_DROP_RATE_DATABASE_BIGRAID_ONLY_INFO,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentHeroic">
+				<Size>
+					<AbsDimension x="13" y="13"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parentNameFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-46" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture file="Interface\Icons\spell_holy_championsgrace">
+							<Size>
+								<AbsDimension x="13" y="13"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self,"MobMap",1.0,1.0,1.0,MOBMAP_DROP_RATE_DATABASE_HEROIC_ONLY_INFO,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				self:SetScale(0.90);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Frame name="MobMapDropListFrame" hidden="true" parent="MobMapFrame">
+		<Size>
+			<AbsDimension x="600" y="400"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="MobMapFrame" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-80"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="OVERLAY">
+			</Layer>
+		</Layers>
+		<Frames>
+			<CheckButton name="MobMapDropListSortByItems">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_DROP_LIST_SORT_BY_ITEMS">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_drop_list_sorting=0;
+						else
+							mobmap_drop_list_sorting=1;
+						end
+						MobMap_DropListSortingOptions_Update();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+
+			<CheckButton name="MobMapDropListSortByBosses">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapDropListSortByItems" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="120" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_DROP_LIST_SORT_BY_BOSSES">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_drop_list_sorting=1;
+						else
+							mobmap_drop_list_sorting=0;
+						end
+						MobMap_DropListSortingOptions_Update();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+
+			<Frame name="MobMapDropListByItem" hidden="true">
+				<Size>
+					<AbsDimension x="600" y="400"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString inherits="GameFontNormalSmall" text="MOBMAP_DROP_LIST_MOB_LIST_HEADER_TEXT" justifyH="LEFT" justifyV="TOP">
+							<Size>
+								<AbsDimension x="270" y="18"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="296" y="-14"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<EditBox name="MobMapDropListItemNameFilter" letters="100" historyLines="0" autoFocus="false">
+						<Size>
+							<AbsDimension x="160" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="96" y="-36"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+									<Size>
+										<AbsDimension x="8" y="20"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT">
+											<Offset>
+												<AbsDimension x="-5" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+								</Texture>
+								<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+									<Size>
+										<AbsDimension x="8" y="20"/>
+									</Size>
+									<Anchors>
+										<Anchor point="RIGHT">
+											<Offset>
+												<AbsDimension x="0" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+								</Texture>
+								<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+									<Size>
+										<AbsDimension x="10" y="20"/>
+									</Size>
+									<Anchors>
+										<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+										<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+									</Anchors>
+									<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+								</Texture>
+								<FontString name="$parentText" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_DROP_ITEM_NAME_FILTER_BOX_TEXT">
+									<Size>
+										<AbsDimension x="100" y="12"/>
+									</Size>
+									 <Anchors>
+										<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="-10" y="-5"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnEnterPressed>
+								self:ClearFocus();
+							</OnEnterPressed>
+							<OnEscapePressed>
+								self:ClearFocus();
+							</OnEscapePressed>
+							<OnTextChanged>
+								MobMap_RefreshDropItemNameList();
+							</OnTextChanged> 
+							<OnEditFocusLost>
+								self:HighlightText(0, 0);
+							</OnEditFocusLost>
+							<OnEditFocusGained>
+								self:HighlightText();
+							</OnEditFocusGained>
+						</Scripts>
+						<FontString inherits="ChatFontNormal"/>
+					</EditBox>
+
+					<ScrollFrame name="MobMapDropListItemScrollFrame" inherits="MobMapDropListScrollFrameTemplate">
+						<Size>
+							<AbsDimension x="240" y="274"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="18" y="-64"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnVerticalScroll>
+								FauxScrollFrame_OnVerticalScroll(self, offset, 22, MobMap_UpdateDropItemNameList);
+							</OnVerticalScroll>
+						</Scripts>
+					</ScrollFrame>
+
+					<Frame name="MobMapDropListFrameItemHighlightFrame" hidden="true">
+						<Size>
+							<AbsDimension x="240" y="18"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<Texture name="MobMapDropItemHighlight" file="Interface\Buttons\UI-Listbox-Highlight2"/>
+							</Layer>
+						</Layers>
+					</Frame>
+
+					<Frame name="MobMapDropListItem1" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="18" y="-64"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem2" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem1" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem3" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem2" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem4" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem3" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem5" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem4" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem6" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem5" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem7" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem6" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem8" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem7" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem9" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem8" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem10" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem9" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem11" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem10" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem12" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem11" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem13" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem12" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem14" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem13" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem15" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem14" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem16" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem15" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem17" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem16" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem18" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem17" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem19" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem18" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem20" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem19" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem21" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem20" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem22" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem21" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem23" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem22" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem24" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem23" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem25" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem24" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem26" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem25" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem27" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem26" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem28" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem27" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem29" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem28" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem30" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem29" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem31" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem30" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem32" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem31" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem33" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem32" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem34" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem33" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem35" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem34" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem36" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem35" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropListItem37" inherits="MobMapDropListItemNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListItem36" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+
+					<ScrollFrame name="MobMapDropListMobScrollFrame" inherits="MobMapDropListScrollFrameTemplate">
+						<Size>
+							<AbsDimension x="548" y="300"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="18" y="-38"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnVerticalScroll>
+								FauxScrollFrame_OnVerticalScroll(self, offset, 22, MobMap_UpdateDropChanceList);
+							</OnVerticalScroll>
+						</Scripts>
+					</ScrollFrame>
+
+					<Button name="MobMapDropListMoreButton" inherits="MobMapSmallRightTextButtonTemplate" hidden="true">
+						<Size>
+							<AbsDimension x="40" y="12"/>
+						</Size>
+						 <Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="578" y="-13"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								self:SetText(MOBMAP_MORE_BUTTON_TEXT);
+							</OnLoad>
+							<OnClick>
+								MobMap_ShowPanel("MobMapPickupListFrame");
+								MobMap_DoAnyPickupDatabaseSearch(MobMapDropListFrame.selecteditemname);
+							</OnClick>
+							<OnEnter>
+								GameTooltip_AddNewbieTip(self,"MobMap",1.0,1.0,1.0,MOBMAP_DROP_RATE_DATABASE_MORE_BUTTON_INFO,1);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Button>
+
+					<Frame name="MobMapDropRateEntry1" inherits="MobMapDropRateEntryTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="296" y="-38"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropRateEntry2" inherits="MobMapDropRateEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropRateEntry1" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropRateEntry3" inherits="MobMapDropRateEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropRateEntry2" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropRateEntry4" inherits="MobMapDropRateEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropRateEntry3" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropRateEntry5" inherits="MobMapDropRateEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropRateEntry4" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropRateEntry6" inherits="MobMapDropRateEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropRateEntry5" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropRateEntry7" inherits="MobMapDropRateEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropRateEntry6" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropRateEntry8" inherits="MobMapDropRateEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropRateEntry7" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropRateEntry9" inherits="MobMapDropRateEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropRateEntry8" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropRateEntry10" inherits="MobMapDropRateEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropRateEntry9" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropRateEntry11" inherits="MobMapDropRateEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropRateEntry10" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropRateEntry12" inherits="MobMapDropRateEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropRateEntry11" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropRateEntry13" inherits="MobMapDropRateEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropRateEntry12" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropRateEntry14" inherits="MobMapDropRateEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropRateEntry13" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropRateEntry15" inherits="MobMapDropRateEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropRateEntry14" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropRateEntry16" inherits="MobMapDropRateEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropRateEntry15" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropRateEntry17" inherits="MobMapDropRateEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropRateEntry16" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropRateEntry18" inherits="MobMapDropRateEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropRateEntry17" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropRateEntry19" inherits="MobMapDropRateEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropRateEntry18" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropRateEntry20" inherits="MobMapDropRateEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropRateEntry19" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapDropRateEntry21" inherits="MobMapDropRateEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropRateEntry20" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+				</Frames>
+				<Scripts>
+					<OnShow>
+						MobMap_DropListFrame_OnShow();
+					</OnShow>
+				</Scripts>
+			</Frame>
+
+			<Frame name="MobMapDropListByBosses" hidden="true">
+				<Size>
+					<AbsDimension x="600" y="400"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentName" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalLarge" text="">
+							<Size>
+								<AbsDimension x="300" y="20"/>
+							</Size>
+							 <Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="-20" y="-10"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentSubtitle" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="">
+							<Size>
+								<AbsDimension x="300" y="16"/>
+							</Size>
+							 <Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="$parentName" relativePoint="BOTTOMRIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentLevel" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="">
+							<Size>
+								<AbsDimension x="300" y="12"/>
+							</Size>
+							 <Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="$parentSubtitle" relativePoint="BOTTOMRIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentLootTableTitle" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_BOSS_LOOTTABLE_TITLE">
+							<Size>
+								<AbsDimension x="300" y="16"/>
+							</Size>
+							 <Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="$parentLevel" relativePoint="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="0" y="-22"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="MobMapDropListBoss1" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="18" y="-40"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss2" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss1" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss3" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss2" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss4" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss3" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss5" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss4" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss6" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss5" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss7" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss6" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss8" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss7" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss9" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss8" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss10" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss9" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss11" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss10" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss12" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss11" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss13" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss12" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss14" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss13" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss15" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss14" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss16" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss15" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss17" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss16" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss18" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss17" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss19" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss18" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss20" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss19" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss21" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss20" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss22" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss21" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss23" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss22" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss24" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss23" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss25" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss24" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss26" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss25" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss27" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss26" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss28" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss27" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss29" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss28" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss30" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss29" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss31" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss30" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss32" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss31" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss33" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss32" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss34" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss33" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss35" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss34" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss36" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss35" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss37" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss36" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+					<Button name="MobMapDropListBoss38" inherits="MobMapDropListBossNameEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapDropListBoss37" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Button>
+
+					<ScrollFrame name="MobMapDropListBossScrollFrame" inherits="MobMapDropListScrollFrameTemplate">
+						<Size>
+							<AbsDimension x="240" y="300"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="18" y="-38"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnVerticalScroll>
+								FauxScrollFrame_OnVerticalScroll(self, offset, 22, MobMap_UpdateBossNameList);
+							</OnVerticalScroll>
+						</Scripts>
+					</ScrollFrame>
+
+					<Frame name="MobMapBossLootTableEntry1" inherits="MobMapBossLootTableEntryTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="330" y="-120"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapBossLootTableEntry2" inherits="MobMapBossLootTableEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapBossLootTableEntry1" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapBossLootTableEntry3" inherits="MobMapBossLootTableEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapBossLootTableEntry2" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapBossLootTableEntry4" inherits="MobMapBossLootTableEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapBossLootTableEntry3" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapBossLootTableEntry5" inherits="MobMapBossLootTableEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapBossLootTableEntry4" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapBossLootTableEntry6" inherits="MobMapBossLootTableEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapBossLootTableEntry5" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapBossLootTableEntry7" inherits="MobMapBossLootTableEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapBossLootTableEntry6" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapBossLootTableEntry8" inherits="MobMapBossLootTableEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapBossLootTableEntry7" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapBossLootTableEntry9" inherits="MobMapBossLootTableEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapBossLootTableEntry8" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapBossLootTableEntry10" inherits="MobMapBossLootTableEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapBossLootTableEntry9" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapBossLootTableEntry11" inherits="MobMapBossLootTableEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapBossLootTableEntry10" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapBossLootTableEntry12" inherits="MobMapBossLootTableEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapBossLootTableEntry11" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapBossLootTableEntry13" inherits="MobMapBossLootTableEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapBossLootTableEntry12" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+					<Frame name="MobMapBossLootTableEntry14" inherits="MobMapBossLootTableEntryTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="MobMapBossLootTableEntry13" relativePoint="BOTTOM"/>
+						</Anchors>
+					</Frame>
+
+					<ScrollFrame name="MobMapDropListBossLootTableScrollFrame" inherits="MobMapDropListScrollFrameTemplate">
+						<Size>
+							<AbsDimension x="284" y="250"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="280" y="-88"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnVerticalScroll>
+								FauxScrollFrame_OnVerticalScroll(self, offset, 22, MobMap_UpdateBossLootTable);
+							</OnVerticalScroll>
+						</Scripts>
+					</ScrollFrame>
+
+				</Frames>
+				<Scripts>
+					<OnShow>
+						MobMap_DropListByBosses_OnShow();
+						MobMap_UpdateBossNameList();
+						MobMap_UpdateBossLootTable();
+					</OnShow>
+					<OnUpdate>
+						MobMap_BossLootTable_OnUpdate();
+					</OnUpdate>
+				</Scripts>
+			</Frame>
+
+		</Frames>
+		<Scripts>
+			<OnShow>
+				MobMap_DropListSortingOptions_Update();
+			</OnShow>
+			<OnUpdate>
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+</Ui>

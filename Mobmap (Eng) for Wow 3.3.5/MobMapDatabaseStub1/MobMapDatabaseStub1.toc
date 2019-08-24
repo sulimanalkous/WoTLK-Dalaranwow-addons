@@ -1,0 +1,7 @@
+## Interface: 30300
+## Title: MobMapDatabaseStub1
+## Notes: This is a load-on-demand addon stub for the MobMap position database.
+## RequiredDeps: MobMap
+## LoadOnDemand: 1
+..\MobMap\MobMapDatabase_positions.lua
+..\MobMap\MobMap_positions.xml

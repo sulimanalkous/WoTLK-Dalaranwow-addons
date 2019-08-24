@@ -1,0 +1,7 @@
+## Interface: 30300
+## Title: MobMapDatabaseStub13
+## Notes: This is a load-on-demand addon stub for the MobMap item tooltip database.
+## RequiredDeps: MobMap
+## LoadOnDemand: 1
+..\MobMap\MobMap_itemtooltip.lua
+..\MobMap\MobMapDatabase_itemtooltipdata.lua

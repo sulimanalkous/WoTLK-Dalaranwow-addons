@@ -1,0 +1,28 @@
+## Interface: 30300
+## X-Compatible-With: 40000
+## Title: Magic Runes
+## Notes: Deathknight Rune Display
+## Author: NeoTron
+## Version: 1.0.72
+## DefaultState: enabled
+## X-Category: Combat
+## X-eMail: neotron@gmail.com
+## LoadManagers: AddonLoader
+## OptionalDeps: Ace3, LibBars-1.0, LibSharedMedia-3.0, AceGUI-3.0-SharedMediaWidgets, SharedMedia, SharedMedia-Blizzard, ButtonFacade, LibMagicUtil-1.0
+## SavedVariables: MagicRunesDB
+## X-LoadOn-Class: DEATHKNIGHT
+## X-Curse-Packaged-Version: r72
+## X-Curse-Project-Name: Magic Runes
+## X-Curse-Project-ID: magicrunes
+## X-Curse-Repository-ID: wow/magicrunes/mainline
+
+# Library files
+embeds.xml
+Locales.xml
+MagicRunes.lua
+RuneConfig.lua
+Presets.lua
+modules.xml
+
+
+

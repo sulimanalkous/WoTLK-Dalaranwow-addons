@@ -1,0 +1,7 @@
+## Interface: 30300
+## Title: MobMapDatabaseStub5
+## Notes: This is a load-on-demand addon stub for the MobMap item name helper database.
+## RequiredDeps: MobMap
+## LoadOnDemand: 1
+..\MobMap\MobMapDatabase_itemnamehelper.lua
+..\MobMap\MobMap_itemnamehelper.xml

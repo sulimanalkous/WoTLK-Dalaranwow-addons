@@ -1,0 +1,6 @@
+## Interface: 30300
+## Title: MobMapDatabaseStub8
+## Notes: This is a load-on-demand addon stub for the MobMap pickup database access components.
+## RequiredDeps: MobMap
+## LoadOnDemand: 1
+..\MobMap\MobMap_pickupdb.xml

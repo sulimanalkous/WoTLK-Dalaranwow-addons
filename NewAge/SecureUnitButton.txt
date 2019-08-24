@@ -1,0 +1,16 @@
+
+function PlayerContainer_OnLoad(self)
+	UnitFrame_Initialize(self, "player");
+	local showmenu = function()
+		ToggleDropDownMenu(1, nil, PlayerFrameDropDown, "PlayerContainer", 106, 27);
+	end
+	SecureUnitButton_OnLoad(self, "player", showmenu);
+end
+
+function PlayerFrameDropDown_OnLoad (self)
+	UIDropDownMenu_Initialize(self, PlayerFrameDropDown_Initialize, "MENU");
+end
+
+function PlayerFrameDropDown_Initialize ()
+  UnitPopup_ShowMenu(PlayerFrameDropDown, "SELF", "player");
+end

@@ -1,0 +1,18 @@
+## Interface: 30300
+## X-Compatible-With: 40000
+## Title: Magic Runes: Rune Bars [beta version]
+## Notes: An new rune bar display for Magic Runes - Still IN DEVELOPMENT
+## Author: NeoTron
+## Version: 1.0.72
+## DefaultState: enabled
+## X-Category: Combat
+## X-eMail: neotron@gmail.com
+## LoadManagers: AddonLoader
+## RequiredDeps: MagicRunes
+## X-LoadOn-Class: DEATHKNIGHT
+## X-Curse-Packaged-Version: r72
+## X-Curse-Project-Name: Magic Runes
+## X-Curse-Project-ID: magicrunes
+## X-Curse-Repository-ID: wow/magicrunes/mainline
+
+RuneBars.lua

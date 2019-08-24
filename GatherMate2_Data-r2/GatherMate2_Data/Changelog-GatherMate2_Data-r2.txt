@@ -1,0 +1,23 @@
+------------------------------------------------------------------------
+r2 | kagaro | 2010-10-11 14:03:18 +0000 (Mon, 11 Oct 2010) | 1 line
+Changed paths:
+   A /trunk/.pkgmeta
+   A /trunk/ArchaeologyData.lua
+   A /trunk/FishData.lua
+   A /trunk/GasData.lua
+   A /trunk/GatherMateData.lua
+   A /trunk/GatherMate_Data.toc
+   A /trunk/HerbalismData.lua
+   A /trunk/MiningData.lua
+   A /trunk/TreasureData.lua
+
+Initial import. data files are empty right now.
+------------------------------------------------------------------------
+r1 | root | 2010-10-10 20:04:26 +0000 (Sun, 10 Oct 2010) | 1 line
+Changed paths:
+   A /branches
+   A /tags
+   A /trunk
+
+"gathermate2_data/mainline: Initial Import"
+------------------------------------------------------------------------

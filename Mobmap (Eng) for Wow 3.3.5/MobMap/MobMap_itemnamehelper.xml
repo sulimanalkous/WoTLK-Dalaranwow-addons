@@ -1,0 +1,327 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="MobMap_itemnamehelper.lua"/>
+	
+	<Frame name="MobMapItemNameSelectionEntryTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="280" y="18"/>
+		</Size>
+		<Frames>
+			<Button name="$parentItemName" inherits="MobMapTopTextButtonTemplate">
+				<Size>
+					<AbsDimension x="280" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MobMap_SelectItem(self);
+					</OnClick>
+					<OnEnter>
+						if(self:GetParent().itemid~=nil) then
+							if(GetItemInfo(self:GetParent().itemid)~=nil or mobmap_request_item_details==true) then
+								MobMapTooltip:SetOwner(self, "ANCHOR_TOPRIGHT");							
+								MobMap_DisplayItemTooltip(MobMapTooltip, self:GetParent().itemid);
+							end
+						end
+					</OnEnter>
+					<OnLeave>
+						MobMapTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				getglobal(self:GetName().."ItemNameText"):SetWidth(280);
+				getglobal(self:GetName().."ItemNameText"):SetHeight(18);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+	
+	<Frame name="MobMapItemNameSelectionFrame" toplevel="true" frameStrata="FULLSCREEN_DIALOG" hidden="true" enableMouse="true" movable="true">
+		<TitleRegion setAllPoints="true"/>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Size>
+			<AbsDimension x="340" y="300"/>
+		</Size>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Frames>
+			<Frame name="$parentBackground">
+				<Size>
+					<AbsDimension x="320" y="276"/>
+				</Size>
+				<Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="10" y="-12"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture>
+							<Color r="0.0" g="0.0" b="0.0" a="0.7"/>
+						</Texture>
+					</Layer>
+				</Layers>				
+			</Frame>
+			<Frame name="$parentTitle">
+				<Size>
+					<AbsDimension x="300" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentText" justifyH="CENTER" justifyV="TOP" hidden="false" inherits="GameFontNormal" text="MOBMAP_ITEM_SELECTION_FRAME_TITLE">
+							<Size>
+								<AbsDimension x="300" y="20"/>
+							</Size>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<EditBox name="$parentNameFilter" letters="100" historyLines="0" autoFocus="false">
+				<Size>
+					<AbsDimension x="200" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="70" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-5" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="10" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+						<FontString name="$parentText" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_ITEM_SEARCH_NAME_SEARCH_BOX_TEXT">
+							<Size>
+								<AbsDimension x="100" y="12"/>
+							</Size>
+							 <Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-10" y="-5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnterPressed>
+						self:ClearFocus();
+					</OnEnterPressed>
+					<OnEscapePressed>
+						self:ClearFocus();
+					</OnEscapePressed>
+					<OnTextChanged>
+						MobMap_RefreshItemNameSelectionFrame();
+					</OnTextChanged>
+					<OnEditFocusLost>
+						self:HighlightText(0, 0);
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						self:HighlightText();
+					</OnEditFocusGained>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+
+			<Frame name="$parentItemHighlightFrame" hidden="true">
+				<Size>
+					<AbsDimension x="280" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="MobMapItemHighlight" file="Interface\Buttons\UI-Listbox-Highlight2"/>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<Frame name="MobMapItemSelection1" inherits="MobMapItemNameSelectionEntryTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="18" y="-80"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapItemSelection2" inherits="MobMapItemNameSelectionEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapItemSelection1" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapItemSelection3" inherits="MobMapItemNameSelectionEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapItemSelection2" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapItemSelection4" inherits="MobMapItemNameSelectionEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapItemSelection3" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapItemSelection5" inherits="MobMapItemNameSelectionEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapItemSelection4" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapItemSelection6" inherits="MobMapItemNameSelectionEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapItemSelection5" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapItemSelection7" inherits="MobMapItemNameSelectionEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapItemSelection6" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapItemSelection8" inherits="MobMapItemNameSelectionEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapItemSelection7" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapItemSelection9" inherits="MobMapItemNameSelectionEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapItemSelection8" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+
+			<ScrollFrame name="MobMapItemNameSelectionFrameScrollFrame" inherits="MobMapQuestListScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="286" y="200"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="18" y="-58"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(self, offset, 22, MobMap_UpdateItemNameSelectionFrame);
+					</OnVerticalScroll>
+					<OnShow>
+						MobMap_RefreshItemNameSelectionFrame();
+					</OnShow>
+				</Scripts>
+			</ScrollFrame>
+
+			<Button name="$parentOKButton" inherits="UIPanelButtonTemplate" text="MOBMAP_OK">
+				<Size>
+					<AbsDimension x="100" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="$parent" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="-70" y="20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MobMap_CallSelectionFunc();
+						self:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentAbortButton" inherits="UIPanelButtonTemplate" text="MOBMAP_ABORT">
+				<Size>
+					<AbsDimension x="100" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="$parent" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="70" y="20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						self:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				tinsert(UISpecialFrames,self:GetName());
+			</OnLoad>
+			<OnShow>
+				self:SetScale(UIParent:GetScale());
+			</OnShow>
+			<OnEvent>
+			</OnEvent>
+			<OnUpdate>
+			</OnUpdate>
+    	</Scripts>
+	</Frame>
+
+</Ui>

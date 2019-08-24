@@ -1,0 +1,889 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="MobMap_pickupdb.lua"/>
+
+	<Frame name="MobMapPickupListItemNameEntryTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="236" y="18"/>
+		</Size>
+		<Frames>
+			<Button name="$parentItemName" inherits="MobMapTopTextButtonTemplate">
+				<Size>
+					<AbsDimension x="236" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MobMapPickupItemButton_ProcessClick(self:GetParent():GetName());
+					</OnClick>
+					<OnEnter>
+						MobMapTooltip:SetOwner(self, "ANCHOR_TOPRIGHT");
+						MobMap_DisplayItemTooltip(MobMapTooltip, self:GetParent().itemid, self:GetParent().ihid);
+					</OnEnter>
+					<OnLeave>
+						MobMapTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				getglobal(self:GetName().."ItemNameText"):SetWidth(236);
+				getglobal(self:GetName().."ItemNameText"):SetHeight(18);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Button name="MobMapPickupListZoneButtonTemplate" hidden="false" virtual="true">
+		<Size>
+			<AbsDimension x="256" y="16"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentSubText" inherits="GameFontNormalSmall" justifyH="LEFT"/>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				self:SetFrameLevel(self:GetFrameLevel() + 1);
+			</OnLoad>
+			<OnClick>
+				MobMapPickupListZoneButton_ProcessClick(self:GetName());
+			</OnClick>
+			<OnEnter>
+				getglobal(self:GetName().."SubText"):SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+			</OnEnter>
+			<OnLeave>
+				getglobal(self:GetName().."SubText"):SetTextColor(self.r, self.g, self.b);
+			</OnLeave>
+		</Scripts>
+		<ButtonText name="$parentText" inherits="GameFontNormal" justifyH="LEFT" text="">
+			<Size>
+				<AbsDimension x="0" y="0"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentHighlight" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="2" y="1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</ButtonText>
+		<NormalFont inherits="GameFontNormal" justifyH="RIGHT"/>
+		<HighlightFont inherits="GameFontHighlight" justifyH="RIGHT"/>
+		<DisabledFont inherits="GameFontDisable" justifyH="RIGHT"/>
+	</Button>
+
+	<Frame name="MobMapPickupListFrame" hidden="true" parent="MobMapFrame">
+		<Size>
+			<AbsDimension x="600" y="400"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="MobMapFrame" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-80"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString inherits="GameFontNormalSmall" text="MOBMAP_PICKUP_LIST_ZONE_HEADER_TEXT" justifyH="LEFT" justifyV="TOP">
+					<Size>
+						<AbsDimension x="270" y="24"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="296" y="-14"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1.0" g="1.0" b="1.0"/>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="MobMapPickupListTypeFilter" inherits="UIDropDownMenuTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="46" y="-12"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentText" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_PICKUP_TYPE_FILTER_BOX_TEXT">
+							<Size>
+								<AbsDimension x="100" y="12"/>
+							</Size>
+							 <Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="12" y="-8"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						MobMapPickupTypeFilter_OnLoad();
+					</OnLoad>
+					<OnShow>
+					</OnShow>
+				</Scripts>
+			</Frame>
+
+			<EditBox name="MobMapPickupListNameFilter" letters="100" historyLines="0" autoFocus="false">
+				<Size>
+					<AbsDimension x="180" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="70" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-5" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="10" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+						<FontString name="$parentText" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_RECIPE_NAME_FILTER_BOX_TEXT">
+							<Size>
+								<AbsDimension x="100" y="12"/>
+							</Size>
+							 <Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-10" y="-5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnterPressed>
+						self:ClearFocus();
+					</OnEnterPressed>
+					<OnEscapePressed>
+						self:ClearFocus();
+					</OnEscapePressed>
+					<OnTextChanged>
+						MobMap_RefreshPickupItemList();
+					</OnTextChanged> 
+					<OnEditFocusLost>
+						self:HighlightText(0, 0);
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						self:HighlightText();
+					</OnEditFocusGained>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+
+			<ScrollFrame name="MobMapPickupItemListScrollFrame" inherits="MobMapQuestListScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="242" y="280"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="18" y="-58"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(self, offset, 22, MobMap_UpdatePickupItemList);
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+
+			<Frame name="MobMapPickupItem1" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="18" y="-78"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem2" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem1" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem3" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem2" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem4" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem3" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem5" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem4" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem6" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem5" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem7" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem6" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem8" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem7" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem9" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem8" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem10" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem9" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem11" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem10" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem12" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem11" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem13" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem12" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem14" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem13" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem15" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem14" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem16" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem15" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem17" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem16" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem18" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem17" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem19" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem18" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem20" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem19" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem21" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem20" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem22" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem21" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem23" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem22" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem24" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem23" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem25" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem24" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem26" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem25" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem27" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem26" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem28" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem27" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem29" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem28" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem30" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem29" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem31" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem30" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem32" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem31" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem33" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem32" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem34" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem33" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem35" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem34" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapPickupItem36" inherits="MobMapPickupListItemNameEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapPickupItem35" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+
+			<Frame name="$parentItemHighlightFrame" hidden="true">
+				<Size>
+					<AbsDimension x="240" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="MobMapPickupItemHighlight" file="Interface\Buttons\UI-Listbox-Highlight2"/>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<CheckButton name="$parentShowAllCheckButton">
+                <Size>
+                    <AbsDimension x="20" y="20"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="446" y="-44"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <FontString inherits="GameFontHighlightSmall" text="MOBMAP_PICKUP_LIST_SHOW_ALL_ZONES_CHECK_BUTTON">
+                            <Anchors>
+                                <Anchor point="LEFT" relativePoint="RIGHT">
+                                    <Offset>
+                                        <AbsDimension x="0" y="1"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Scripts>
+                    <OnClick>
+                        if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							MobMap_UpdatePickupListAllZoneDisplay();
+							MobMapPickupListFrame.selectedzone=nil;
+                        else
+							MobMap_HidePickupListAllZoneDisplay();
+							MobMapPickupListFrame.selectedzone=nil;
+                        end
+                    </OnClick>
+                </Scripts>
+                <NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+                <PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+                <HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+                <CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+                <DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+            </CheckButton>
+			
+			<Button name="$parentMoreButton" inherits="MobMapSmallRightTextButtonTemplate" hidden="true">
+				<Size>
+					<AbsDimension x="40" y="12"/>
+				</Size>
+				 <Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="560" y="-28"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:SetText(MOBMAP_MORE_BUTTON_TEXT);
+					</OnLoad>
+					<OnClick>
+						MobMap_ShowPanel("MobMapDropListFrame");
+						MobMap_DoDropRateItemSearch(MobMapPickupListFrame.selecteditemname);
+					</OnClick>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self,"MobMap",1.0,1.0,1.0,MOBMAP_PICKUP_DATABASE_MORE_BUTTON_INFO,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+			<Button name="MobMapPickupListZone1" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-46" y="-78"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone2" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone1" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone3" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone2" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone4" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone3" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone5" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone4" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone6" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone5" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone7" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone6" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone8" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone7" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone9" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone8" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone10" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone9" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone11" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone10" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone12" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone11" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone13" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone12" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone14" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone13" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone15" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone14" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone16" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone15" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone17" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone16" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone18" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone17" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone19" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone18" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone20" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone19" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone21" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone20" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone22" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone21" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone23" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone22" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone24" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone23" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone25" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone24" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone26" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone25" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone27" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone26" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone28" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone27" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone29" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone28" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone30" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone29" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone31" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone30" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone32" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone31" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone33" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone32" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone34" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone33" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone35" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone34" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapPickupListZone36" inherits="MobMapPickupListZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapPickupListZone35" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<Frame name="$parentZoneHighlightFrame" hidden="true">
+				<Size>
+					<AbsDimension x="240" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="MobMapPickupZoneHighlight" file="Interface\Buttons\UI-Listbox-Highlight2"/>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<ScrollFrame name="MobMapPickupZoneListScrollFrame" inherits="MobMapQuestListScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="548" y="280"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="18" y="-58"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(self, offset, 22, MobMap_UpdatePickupZoneList);
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+			
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				FauxScrollFrame_Update(MobMapPickupItemListScrollFrame, 0, 14, 22);
+				FauxScrollFrame_Update(MobMapPickupZoneListScrollFrame, 0, 14, 22);
+			</OnLoad>
+			<OnShow>
+				MobMap_UpdatePickupItemList();
+			</OnShow>
+			<OnUpdate>
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+</Ui>

@@ -1,0 +1,11 @@
+New Update:
+
+Add the following new stats:
+  Melee Damage per Second (Main Haind & Off Hand)
+  Ranged Damage per Second
+  Armor Reduction
+
+Add the following info in percent for the playe:
+  Speed
+  Health
+  Power (Mana) <-- Not convert to percent yet

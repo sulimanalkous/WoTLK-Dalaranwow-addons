@@ -1,0 +1,600 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="MobMap_questtracker.lua"/>
+
+	<FontString name="MobMapQuestTrackerTargetFontTemplate" inherits="GameFontNormalSmall" virtual="true" justifyH="LEFT">
+		<Size>
+			<AbsDimension x="0" y="13"/>
+		</Size>
+	</FontString>
+
+	<Frame name="MobMapQuestTrackerFrameGroupLineTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="200" y="16"/>
+		</Size>
+		<Frames>
+			<Button name="$parentExpandButton" hidden="false">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="$parentTexture" file="Interface\AddOns\MobMap\trackergroupexpand">
+							<Size>
+								<AbsDimension x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT" />
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						MobMap_QuestTracker_ExpandGroup(self:GetParent().titlebutton:GetText());
+					</OnClick>
+				</Scripts>
+				<HighlightTexture name="$parentHighlight" file="Interface\AddOns\MobMap\trackergroupexpandglow" alphaMode="ADD" >
+				</HighlightTexture>
+			</Button>
+			<Button name="$parentCollapseButton" hidden="false">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="$parentTexture" file="Interface\AddOns\MobMap\trackergroupcollapse">
+							<Size>
+								<AbsDimension x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT" />
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						MobMap_QuestTracker_CollapseGroup(self:GetParent().titlebutton:GetText());
+					</OnClick>
+				</Scripts>
+				<HighlightTexture name="$parentHighlight" file="Interface\AddOns\MobMap\trackergroupcollapseglow" alphaMode="ADD" >
+				</HighlightTexture>
+			</Button>
+			<Button name="$parentTitleButton" hidden="false">
+				<Size>
+					<AbsDimension x="200" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="16" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						if(getglobal(self:GetParent():GetName().."CollapseButton"):IsVisible()) then
+							MobMap_QuestTracker_CollapseGroup(self:GetParent().titlebutton:GetText());
+						else
+							MobMap_QuestTracker_ExpandGroup(self:GetParent().titlebutton:GetText());
+						end
+					</OnClick>
+				</Scripts>	
+				<NormalFont style="GameFontNormalLeft"/>
+				<HighlightFont style="GameFontHighlightLeft"/>
+				<DisabledFont style="GameFontHighlightLeft"/>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<Frame name="MobMapQuestTrackerFrameQuestLineTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="200" y="16"/>
+		</Size>
+		<Frames>
+			<Button name="$parentInfoButton" hidden="false">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="4" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="$parentTexture" file="Interface\AddOns\MobMap\trackerquestionmark">
+							<Size>
+								<AbsDimension x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT" />
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						MobMap_ShowQuestDetailsByBlizzID(self:GetParent().blizzid);
+					</OnClick>
+				</Scripts>
+				<HighlightTexture name="$parentHighlight" file="Interface\AddOns\MobMap\trackerquestionmarkglow" alphaMode="ADD" >
+				</HighlightTexture>
+			</Button>
+			<Button name="$parentBlizzInfoButton" hidden="false">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="16" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="$parentTexture" file="Interface\AddOns\MobMap\blizzardquestinfobutton">
+							<Size>
+								<AbsDimension x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT" />
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						WorldMap_OpenToQuest(self:GetParent().blizzid);
+					</OnClick>
+				</Scripts>
+				<HighlightTexture name="$parentHighlight" file="Interface\AddOns\MobMap\blizzardquestinfobuttonup" alphaMode="ADD" >
+				</HighlightTexture>
+			</Button>
+			<Button name="$parentTitleButton" hidden="false">
+				<Size>
+					<AbsDimension x="200" y="14"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="32" y="1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<ButtonText name="$parentNormalText" nonspacewrap="true">
+					<Size>
+						<AbsDimension x="0" y="10"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors> 
+				</ButtonText>
+				<Scripts>
+					<OnClick>
+						if(IsShiftKeyDown()) then
+							ChatEdit_InsertLink(self:GetParent().questLink);
+						else
+							MobMap_QuestTracker_ShowQuestLogEntry(self:GetParent().index);
+						end
+					</OnClick>
+					<OnEnter>
+						MobMap_QuestTracker_ShowQuestObjectiveTooltip(self:GetParent(), self:GetParent().blizzid);
+					</OnEnter>
+					<OnLeave>
+						MobMapQuestTooltip:Hide();
+					</OnLeave>
+				</Scripts>	
+				<NormalFont style="GameFontNormalLeft"/>
+				<HighlightFont style="GameFontHighlightLeft"/>
+				<DisabledFont style="GameFontHighlightLeft"/>
+			</Button>
+			<Button name="$parentItemButton" inherits="WatchFrameItemButtonTemplate">
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parent" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="-48" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:SetScale(0.5);
+					</OnLoad>
+				</Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<Frame name="MobMapQuestTrackerFrameTargetLineTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="200" y="16"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">	
+				<FontString name="$parentText" inherits="MobMapQuestTrackerTargetFontTemplate" justifyH="LEFT" justifyV="MIDDLE" text="" maxLines="10">
+					<Size>
+						<AbsDimension x="200" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+							<Offset>
+								<AbsDimension x="48" y="1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<FontString name="$parentDistance" inherits="MobMapQuestTrackerTargetFontTemplate" justifyH="RIGHT" text="" nonspacewrap="false">
+					<Size>
+						<AbsDimension x="60" y="14"/>
+					</Size>
+					<Anchors>
+						<Anchor point="RIGHT" relativeTo="$parent" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="0" y="1"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+				<Texture name="$parentCheck" file="Interface\Buttons\UI-CheckBox-Check" hidden="true">
+					<Size>
+						<AbsDimension x="16" y="16"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT">
+							<Offset>
+								<AbsDimension x="32" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentInfoButton" hidden="false">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="32" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="$parentTexture" file="Interface\AddOns\MobMap\trackerquestionmark">
+							<Size>
+								<AbsDimension x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT" />
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						MobMap_QuestTracker_ShowTargetInfo(self:GetParent());
+					</OnClick>
+				</Scripts>
+				<HighlightTexture name="$parentHighlight" file="Interface\AddOns\MobMap\trackerquestionmarkglow" alphaMode="ADD" >
+				</HighlightTexture>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<Frame name="MobMapQuestTrackerFrame" hidden="false" clampedToScreen="true" movable="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="300" y="240"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+				<Offset>
+					<AbsDimension x="-200" y="-200"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentBackground">
+					<Color r="1.0" g="1.0" b="1.0" a="0.1"/>
+				</Texture>
+			</Layer>
+		</Layers>				
+		<Frames>			
+			<Button name="$parentToggleButton" hidden="false" clampedToScreen="true" parent="MobMapQuestTrackerFrame">
+				<Size>
+					<AbsDimension x="16" y="10"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapQuestTrackerFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-22" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="$parentTexture" file="Interface\AddOns\MobMap\trackerminimizebutton">
+							<Size>
+								<AbsDimension x="16" y="10"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT" />
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="0.7"/>
+							<TexCoords left="0" right="1.0" top="0.1875" bottom="0.8125" />
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>				
+					</OnLoad>
+					<OnMouseDown>
+						if(not mobmap_questtracker_status.locked) then
+							MobMapQuestTrackerFrame:StartMoving();
+							local x,y = GetCursorPosition();
+							self.oldx=math.floor(x+0.5);
+							self.oldy=math.floor(y+0.5);
+						end
+					</OnMouseDown>
+					<OnMouseUp>
+						if(not mobmap_questtracker_status.locked) then
+							MobMapQuestTrackerFrame:StopMovingOrSizing();
+							MobMapQuestTrackerFrame:ClearAllPoints();
+							MobMap_QuestTracker_Reanchor();
+						end
+					</OnMouseUp>
+					<OnClick>
+						if(not mobmap_questtracker_status.locked) then
+							local x,y = GetCursorPosition();
+							if(math.floor(x+0.5)~=self.oldx or math.floor(y+0.5)~=self.oldy) then return; end
+						end
+						if(IsShiftKeyDown()) then
+							if(not mobmap_questtracker_status.locked) then
+								mobmap_questtracker_status.locked=true;
+								MobMap_DisplayMessage(MOBMAP_QUEST_TRACKER_LOCK_ON);
+								MobMapQuestTrackerFrameResizeButton:Hide();
+							else
+								mobmap_questtracker_status.locked=false;
+								MobMap_DisplayMessage(MOBMAP_QUEST_TRACKER_LOCK_OFF);
+								MobMapQuestTrackerFrameResizeButton:Show();
+							end
+						else
+							if(IsAltKeyDown()) then
+								mobmap_use_questtracker=false;
+								MobMap_QuestTracker_Setup();
+							else
+								MobMap_QuestTracker_Toggle();
+							end
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_BOTTOMLEFT");
+						GameTooltip:ClearLines();
+						GameTooltip:AddLine("MobMap");
+						GameTooltip:AddLine(MOBMAP_QUEST_TRACKER_TOGGLE_INFO, 1.0, 1.0, 1.0, 1.0, 1.0);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<HighlightTexture name="$parentHighlight" file="Interface\AddOns\MobMap\trackerminimizebuttonglow" alphaMode="ADD" >
+					<TexCoords left="0" right="1.0" top="0.1875" bottom="0.8125" />
+				</HighlightTexture>
+			</Button>
+			<Button name="$parentResizeButton" hidden="false" parent="MobMapQuestTrackerFrame">
+				<Size>
+					<AbsDimension x="13" y="13"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="-1" y="-1"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="$parentTexture" file="Interface\AddOns\MobMap\trackerresize">
+							<Size>
+								<AbsDimension x="13" y="13"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT" />
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="0.3"/>
+							<TexCoords left="0.1875" right="1.0" top="0" bottom="0.8125" />
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+					</OnLoad>
+					<OnEnter>
+						MobMap_QuestTracker_ShowBackground();
+						GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT");
+						GameTooltip:ClearLines();
+						GameTooltip:AddLine("MobMap");
+						GameTooltip:AddLine(MOBMAP_QUEST_TRACKER_RESIZE_INFO, 1.0, 1.0, 1.0, 1.0, 1.0);
+						GameTooltip:Show();
+					</OnEnter>
+					<OnLeave>
+						MobMap_QuestTracker_HideBackground();
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnMouseDown>
+						if(not mobmap_questtracker_status.locked) then
+							MobMap_QuestTracker_Reanchor();
+							self:SetScript("OnUpdate", MobMap_QuestTracker_ResizeFrame);
+						end
+					</OnMouseDown>
+					<OnMouseUp>
+						if(not mobmap_questtracker_status.locked) then
+							self:SetScript("OnUpdate", nil);
+							self.oldx=nil;
+							self.oldy=nil;
+						end
+					</OnMouseUp>
+					<OnClick>
+					</OnClick>
+				</Scripts>
+				<HighlightTexture file="Interface\AddOns\MobMap\trackerresizeglow" alphaMode="ADD" >
+					<TexCoords left="0.1875" right="1.0" top="0" bottom="0.8125" />
+				</HighlightTexture>
+			</Button>
+			<ScrollFrame name="$parentScrollFrame">
+				<Size>
+					<AbsDimension x="600" y="230"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<ScrollChild>
+					<Frame name="$parentScrollChildFrame" hidden="false">
+						<Size>
+							<AbsDimension x="320" y="50"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT"/>
+						</Anchors>
+						<Frames>
+						</Frames>
+					</Frame>
+				</ScrollChild>
+				<Frames>
+					<Slider name="$parentScrollBar">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+								<Offset>
+									<AbsDimension x="6" y="-16"/>
+								</Offset>
+							</Anchor>
+							<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="6" y="16"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Size>
+							<AbsDimension x="16" y="0"/>
+						</Size>
+						<Frames>
+							<Button name="$parentScrollUpButton">
+								<Anchors>
+									<Anchor point="BOTTOM" relativePoint="TOP"/>
+								</Anchors>
+								<Size>
+									<AbsDimension x="16" y="16"/>
+								</Size>
+								<NormalTexture inherits="UIPanelScrollBarButton" file="Interface\AddOns\MobMap\trackerscrollbarscrollupbuttonup"/>
+								<HighlightTexture inherits="UIPanelScrollBarButton" file="Interface\AddOns\MobMap\trackerscrollbarscrollbuttonhighlight" alphaMode="ADD"/>
+								<Scripts>
+									<OnClick>
+										local parent = self:GetParent();
+										parent:SetValue(parent:GetValue() - (parent:GetHeight() / 2));
+									</OnClick>
+								</Scripts>
+							</Button>
+							<Button name="$parentScrollDownButton">
+								<Anchors>
+									<Anchor point="TOP" relativePoint="BOTTOM"/>
+								</Anchors>
+								<Size>
+									<AbsDimension x="16" y="16"/>
+								</Size>
+								<NormalTexture inherits="UIPanelScrollBarButton" file="Interface\AddOns\MobMap\trackerscrollbarscrolldownbuttonup"/>
+								<HighlightTexture inherits="UIPanelScrollBarButton" file="Interface\AddOns\MobMap\trackerscrollbarscrollbuttonhighlight" alphaMode="ADD"/>
+								<Scripts>
+									<OnClick>
+										local parent = self:GetParent();
+										parent:SetValue(parent:GetValue() + (parent:GetHeight() / 2));
+									</OnClick>
+								</Scripts>
+							</Button>
+						</Frames>
+						<Scripts>
+							<OnValueChanged>
+								self:GetParent():SetVerticalScroll(value);
+							</OnValueChanged>
+						</Scripts>
+						<ThumbTexture name="$parentThumbTexture" inherits="UIPanelScrollBarButton" file="Interface\AddOns\MobMap\trackerscrollbarknob">
+							<Size>
+								<AbsDimension x="16" y="24"/>
+							</Size>
+							<TexCoords left="0.25" right="0.75" top="0.125" bottom="0.875"/>
+						</ThumbTexture>
+					</Slider>
+				</Frames>
+				<Scripts>
+					<OnLoad>
+						ScrollFrame_OnLoad(self);
+					</OnLoad>
+					<OnScrollRangeChanged>
+						ScrollFrame_OnScrollRangeChanged(self, yrange);
+					</OnScrollRangeChanged>
+					<OnVerticalScroll>
+						MobMap_QuestTracker_ScrollBarOnVerticalScroll(self, offset);
+					</OnVerticalScroll>
+					<OnMouseWheel>
+						ScrollFrameTemplate_OnMouseWheel(self, delta);
+					</OnMouseWheel>
+					<OnUpdate>
+						MobMap_QuestTracker_ScrollBarUpdateVisibility();
+					</OnUpdate>
+				</Scripts>
+			</ScrollFrame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Font name="MobMapFinishedQuestFont" inherits="GameFontNormalLeft" virtual="true">
+		<Color r="0.0" g="0.4" b="1.0"/>
+	</Font>
+
+	<GameTooltip name="MobMapQuestTooltip" frameStrata="TOOLTIP" inherits="GameTooltipTemplate" hidden="true">
+		<Scripts>
+			<OnShow>
+				self:SetScale(UIParent:GetScale());
+			</OnShow>
+		</Scripts>
+	</GameTooltip>
+
+</Ui>

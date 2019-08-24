@@ -1,0 +1,9 @@
+## Interface: 30200
+## Title: PaperDollFrame Stats
+## Notes: Lets you add custom stat frames to the paper doll frame.
+## Author: L'ombra
+## Version: 1.1.0
+## SavedVariables: PDFStatsData
+
+core.lua
+stats.lua

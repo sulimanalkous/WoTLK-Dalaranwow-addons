@@ -1,0 +1,6 @@
+## Interface: 30300
+## Title: MobMapDatabaseStub9
+## Notes: This is a load-on-demand addon stub for the MobMap quest item pickup database.
+## RequiredDeps: MobMap
+## LoadOnDemand: 1
+..\MobMap\MobMapDatabase_questpickupdata.lua

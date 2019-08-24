@@ -1,0 +1,12 @@
+## Interface: 30300
+## Title: MobMap
+## Version: 353
+## Notes: An ingame universal database (v3.53)
+## RequiredDeps: 
+## SavedVariables: mobmap_positions,mobmap_scanning,mobmap_language,mobmap_quests,mobmap_merchantstock,mobmap_tradeskills,mobmap_loot,mobmap_game_version,mobmap_objects,mobmap_trainer,mobmap_comments,mobmap_event_objectives,mobmap_npc_spells
+## SavedVariablesPerCharacter: mobmap_enabled,mobmap_minimap,mobmap_display_database_loading_info,mobmap_button_position,mobmap_show_world_map_tooltips,mobmap_recipe_list_sorting,mobmap_request_item_details,mobmap_hide_questlog_buttons,mobmap_hide_questtracker_buttons,mobmap_window_height,mobmap_optimize_response_times,mobmap_minimap_button_visible,mobmap_hide_reagent_buttons,mobmap_outer_dot_color,mobmap_inner_dot_color,mobmap_quest_comment_identification,mobmap_flash_positions,mobmap_battlefield_minimap,mobmap_autoshow_comments,mobmap_track_quest_completion,mobmap_completed_quests,mobmap_questtracker_status,mobmap_use_questtracker,mobmap_autocreate_waypoints,mobmap_quicksearch_omit_map
+AstrolabeLoad.xml
+MobMap.xml
+MobMap_questtracker.xml
+HuffmanDecoder.lua
+MobMap_guide.xml

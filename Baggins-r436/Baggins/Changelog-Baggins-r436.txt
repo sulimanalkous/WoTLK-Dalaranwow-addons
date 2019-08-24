@@ -1,0 +1,16 @@
+------------------------------------------------------------------------
+r436 | adirelle | 2010-03-26 00:17:54 +0000 (Fri, 26 Mar 2010) | 2 lines
+Changed paths:
+   M /trunk/Baggins-Options.lua
+   M /trunk/Baggins-enUS.lua
+   M /trunk/Baggins.lua
+
+Added an option to enable quest item highlights.
+
+------------------------------------------------------------------------
+r435 | mikk | 2009-11-10 01:15:44 +0000 (Tue, 10 Nov 2009) | 1 line
+Changed paths:
+   M /trunk/Baggins.lua
+
+May fix ticket 42
+------------------------------------------------------------------------

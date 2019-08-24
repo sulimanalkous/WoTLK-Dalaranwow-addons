@@ -1,0 +1,7 @@
+## Interface: 30300
+## Title: MobMapDatabaseStub7
+## Notes: This is a load-on-demand addon stub for the MobMap drop chance database.
+## RequiredDeps: MobMap
+## LoadOnDemand: 1
+..\MobMap\MobMapDatabase_itemdropdata.lua
+..\MobMap\MobMap_itemdropdata.xml

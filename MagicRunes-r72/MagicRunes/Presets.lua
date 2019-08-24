@@ -1,0 +1,147 @@
+
+if not MagicRunes then return end -- not on a DK
+local L = LibStub("AceLocale-3.0"):GetLocale("MagicRunes", false)
+local mod = MagicRunes
+mod.presets = {
+   ["TinyBars"] = {
+      ["data"] = {
+	 ["thickness"] = 5.08,
+	 ["animateIcons"] = false,
+	 ["showIcon"] = false,
+	 ["spacing"] = 0.7100000000000009,
+	 ["orientation"] = 1,
+	 ["length"] = 113.14,
+	 ["showRemaining"] = false,
+	 ["iconScale"] = 1,
+	 ["showTimer"] = false,
+	 ["showLabel"] = false,
+	 ["bgtexture"] = "Minimalist",
+	 ["texture"] = "Minimalist",
+	 ["timerOnIcon"] = false, 
+      },
+      ["name"] = L["Tiny horizontal bars"],
+   },
+   ["IconBar"] = {
+      ["data"] = {
+	 ["thickness"] = 3.61,
+	 ["animateIcons"] = true,
+	 ["showIcon"] = true,
+	 ["spacing"] = 11.22,
+	 ["orientation"] = 1,
+	 ["length"] = 156.89,
+	 ["showRemaining"] = true,
+	 ["iconScale"] = 6.33,
+	 ["showTimer"] = false,
+	 ["showLabel"] = false,
+	 ["bgtexture"] = "Minimalist",
+	 ["texture"] = "Minimalist",
+	 ["timerOnIcon"] = false, 
+      },
+      ["name"] = L["Horizontal animated icons"],
+   },
+   ["VertLabelBars"] = {
+      ["data"] = {
+	 ["thickness"] = 17.25,
+	 ["animateIcons"] = false,
+	 ["showIcon"] = false,
+	 ["spacing"] = 0,
+	 ["orientation"] = 2,
+	 ["length"] = 113.14,
+	 ["showRemaining"] = true,
+	 ["showTimer"] = true,
+	 ["showLabel"] = true,
+	 ["iconScale"] = 4.1,
+	 ["bgtexture"] = "Minimalist",
+	 ["texture"] = "Minimalist",
+	 ["timerOnIcon"] = false, 
+      },
+      ["name"] = L["Vertical labeled bars"],
+   },
+   ["TinyVertBars"] = {
+      ["data"] = {
+	 ["thickness"] = 5.08,
+	 ["animateIcons"] = false,
+	 ["showIcon"] = false,
+	 ["spacing"] = 0.7100000000000009,
+	 ["orientation"] = 2,
+	 ["length"] = 113.14,
+	 ["showRemaining"] = true,
+	 ["iconScale"] = 1,
+	 ["showTimer"] = false,
+	 ["showLabel"] = false,
+	 ["bgtexture"] = "Minimalist",
+	 ["texture"] = "Minimalist",
+	 ["timerOnIcon"] = false, 
+      },
+      ["name"] = L["Tiny vertical bars"],
+   },
+   ["StaticLabeledBars"] = {
+      ["data"] = {
+	 ["thickness"] = 16.85,
+	 ["animateIcons"] = false,
+	 ["showIcon"] = true,
+	 ["spacing"] = 0,
+	 ["orientation"] = 1,
+	 ["length"] = 180.64,
+	 ["showRemaining"] = false,
+	 ["iconScale"] = 1,
+	 ["showTimer"] = true,
+	 ["showLabel"] = true,
+	 ["bgtexture"] = "Minimalist",
+	 ["texture"] = "Minimalist",
+	 ["timerOnIcon"] = false, 
+      },
+      ["name"] = L["Horizontal labeled bars"],
+   },
+   ["VertIconBars"] = {
+      ["data"] = {
+	 ["thickness"] = 5.08,
+	 ["animateIcons"] = true,
+	 ["showIcon"] = true,
+	 ["spacing"] = 7.079999999999998,
+	 ["orientation"] = 2,
+	 ["length"] = 113.14,
+	 ["showRemaining"] = true,
+	 ["iconScale"] = 4.1,
+	 ["showTimer"] = false,
+	 ["showLabel"] = false,
+	 ["bgtexture"] = "Minimalist",
+	 ["texture"] = "Minimalist",
+	 ["timerOnIcon"] = false, 
+      },
+      ["name"] = L["Vertical animated icons"],
+   },
+   ["HorizIconBar"] = {
+      ["name"] = L["Static icons, timer, no bars"],
+      ["data"] = {
+	 ["showTimer"] = true,
+	 ["iconScale"] = 1.02,
+	 ["alphaGCD"] = 0.43,
+	 ["showSpark"] = false,
+	 ["bgtexture"] = "Empty",
+	 ["texture"] = "Empty",
+	 ["showLabel"] = false,
+	 ["showIcon"] = true,
+	 ["spacing"] = -2.649999999999999,
+	 ["length"] = 20,
+	 ["alphaActive"] = 0.03,
+	 ["flashTimes"] = 1,
+	 ["thickness"] = 18.64,
+	 ["animateIcons"] = false,
+	 ["timerOnIcon"] = true,
+	 ["orientation"] = 2,
+	 ["flashMode"] = 3,
+	 ["showRemaining"] = true,
+	 ["fadeAlpha"] = true,
+	 ["scale"] = 1.6,
+      },
+   },
+}
+
+local presetValues = {}
+for name,data in pairs(MagicRunes.presets) do
+   presetValues[name] = data.name
+end
+
+function MagicRunes:GetPresetList() return presetValues end
+   

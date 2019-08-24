@@ -1,0 +1,20 @@
+## Interface: 30300
+## Title: ElegantUI
+## Notes: Mend defects and enhancement of informations.
+## Version: 0.1
+## Author: Haitham AL-Hunayan & Suliman AL-Kous
+## Credits: Haitham AL-Hunayan
+## Email: go2haitham@gmail.com
+## License:
+## SavedVariables: GS_Settings
+
+Initialize.lua
+Unit.lua
+Player.lua
+Pet.lua
+Target.lua
+Party.lua
+PlayerStats.lua
+informationLite.lua
+GearScoreLite.lua
+Options.lua

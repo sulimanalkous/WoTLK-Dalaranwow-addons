@@ -1,0 +1,10 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="Modules\ActionBar.lua"/>
+	<Script file="Modules\Buttons.lua"/>
+	<Script file="Modules\Pet.lua"/>
+	<Script file="Modules\Player.lua"/>
+	<Script file="Modules\Target.lua"/>
+	<Script file="Modules\SpecialFrames.lua"/>
+	<Script file="Modules\Vehicle.lua"/>
+</Ui>

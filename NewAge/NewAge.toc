@@ -1,0 +1,15 @@
+## Interface: 30300
+## Title: NewAge
+## Notes: Shows all of the stats from the dropdowns next to the paperdoll window.
+## Version: 1.0
+## Author: Haitham AL-Hunayan & Suliman AL-Kous
+## Credits: Lekyaira
+## Email: ganoran@gmail.com
+## License: GPLv3
+## SavedVariables:
+
+Initialize.lua
+Player.lua
+Target.lua
+Stats.xml
+Options.lua

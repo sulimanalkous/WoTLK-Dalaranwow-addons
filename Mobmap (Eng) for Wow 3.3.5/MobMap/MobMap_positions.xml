@@ -1,0 +1,1793 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="MobMap_positions.lua"/>
+
+	<Button name="MobMapMobButtonTemplate" hidden="true" virtual="true">
+		<Size>
+			<AbsDimension x="260" y="16"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentSubText" inherits="GameFontNormalSmall" justifyH="LEFT"/>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				self:SetFrameLevel(self:GetFrameLevel() + 1);
+			</OnLoad>
+			<OnClick>
+				MobMapButton_OnClick(self);
+			</OnClick>
+			<OnEnter>
+				getglobal(self:GetName().."SubText"):SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+			</OnEnter>
+			<OnLeave>
+				getglobal(self:GetName().."SubText"):SetTextColor(self.r, self.g, self.b);
+			</OnLeave>
+		</Scripts>
+		<ButtonText name="$parentText" inherits="GameFontNormal" justifyH="LEFT">
+			<Size>
+				<AbsDimension x="260" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentHighlight" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="2" y="1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</ButtonText>
+		<NormalFont inherits="GameFontNormal" justifyH="LEFT"/>
+		<HighlightFont inherits="GameFontHighlight" justifyH="LEFT"/>
+		<DisabledFont inherits="GameFontDisable" justifyH="LEFT"/>
+	</Button>
+
+	<Button name="MobMapZoneButtonTemplate" hidden="false" virtual="true">
+		<Size>
+			<AbsDimension x="220" y="16"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentSubText" inherits="GameFontNormalSmall" justifyH="LEFT"/>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				self:SetFrameLevel(self:GetFrameLevel() + 1);
+			</OnLoad>
+			<OnClick>
+				MobMapZoneButton_OnClick(self);
+			</OnClick>
+			<OnEnter>
+				getglobal(self:GetName().."SubText"):SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+			</OnEnter>
+			<OnLeave>
+				getglobal(self:GetName().."SubText"):SetTextColor(self.r, self.g, self.b);
+			</OnLeave>
+		</Scripts>
+		<ButtonText name="$parentText" inherits="GameFontNormal" justifyH="RIGHT" text="">
+			<Size>
+				<AbsDimension x="220" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentHighlight" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="2" y="1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</ButtonText>
+		<NormalFont inherits="GameFontNormal" justifyH="RIGHT"/>
+		<HighlightFont inherits="GameFontHighlight" justifyH="RIGHT"/>
+		<DisabledFont inherits="GameFontDisable" justifyH="RIGHT"/>
+	</Button>
+
+	<Frame name="MobMapMobSearchFrame" hidden="true" parent="MobMapFrame">
+		<Size>
+			<AbsDimension x="600" y="400"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="MobMapFrame" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-80"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<Frame name="$parentSelectionDetails" hidden="true">
+				<Size>
+					<AbsDimension x="300" y="300"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-30" y="-16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentName" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalLarge" text="">
+							<Size>
+								<AbsDimension x="300" y="20"/>
+							</Size>
+							 <Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentSubtitle" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="">
+							<Size>
+								<AbsDimension x="300" y="16"/>
+							</Size>
+							 <Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="$parentName" relativePoint="BOTTOMRIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentLevel" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="">
+							<Size>
+								<AbsDimension x="300" y="12"/>
+							</Size>
+							 <Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="$parentSubtitle" relativePoint="BOTTOMRIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentZoneListTitle" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_ZONELIST_TITLE">
+							<Size>
+								<AbsDimension x="300" y="16"/>
+							</Size>
+							 <Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="$parentLevel" relativePoint="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="0" y="-22"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<ScrollFrame name="$parentZoneListScrollFrame" inherits="MobMapZoneListScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="30" y="240"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapMobSearchFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-38" y="-96"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(self, offset, 22, MobMap_UpdateZoneList);
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+			<Frame name="$parentMobHighlightFrame" hidden="true">
+				<Size>
+					<AbsDimension x="230" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="MobMapHighlight" file="Interface\Buttons\UI-Listbox-Highlight2"/>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<Button name="MobMapMob1" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="22" y="-86"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob2" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob3" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob2" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob4" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob3" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob5" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob4" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob6" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob5" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob7" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob6" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob8" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob7" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob9" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob8" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob10" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob9" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob11" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob10" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob12" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob11" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob13" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob12" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob14" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob13" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob15" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob14" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob16" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob15" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob17" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob16" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob18" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob17" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob19" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob18" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob20" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob19" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob21" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob20" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob22" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob21" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob23" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob22" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob24" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob23" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob25" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob24" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob26" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob25" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob27" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob26" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob28" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob27" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob29" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob28" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob30" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob29" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob31" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob30" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob32" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob31" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob33" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob32" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob34" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob33" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob35" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob34" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapMob36" inherits="MobMapMobButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMob35" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<ScrollFrame name="$parentMobListScrollFrame" inherits="MobMapZoneListScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="30" y="240"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapMobSearchFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="260" y="-96"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(self, offset, 22, MobMap_UpdateMobMapFrame);
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+
+			<EditBox name="$parentSearchBox" letters="10000" historyLines="0" autoFocus="false">
+				<Size>
+					<AbsDimension x="190" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="90" y="-14"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-5" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="10" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+						<FontString name="$parentText" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_MOB_SEARCH_BOX_TEXT">
+							<Size>
+								<AbsDimension x="100" y="12"/>
+							</Size>
+							 <Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-10" y="-5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnterPressed>
+						self:ClearFocus();
+					</OnEnterPressed>
+					<OnEscapePressed>
+						self:ClearFocus();
+					</OnEscapePressed>
+					<OnEditFocusLost>
+						self:HighlightText(0, 0);
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						self:HighlightText();
+					</OnEditFocusGained>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+
+			<EditBox name="$parentSubtitleSearchBox" letters="1000" historyLines="0" autoFocus="false">
+				<Size>
+					<AbsDimension x="190" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentSearchBox" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-24"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-5" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="10" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+						<FontString name="$parentText" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_MOB_SUBTITLE_SEARCH_BOX_TEXT">
+							<Size>
+								<AbsDimension x="100" y="12"/>
+							</Size>
+							 <Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-10" y="-5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnterPressed>
+						self:ClearFocus();
+					</OnEnterPressed>
+					<OnEscapePressed>
+						self:ClearFocus();
+					</OnEscapePressed>
+					<OnEditFocusLost>
+						self:HighlightText(0, 0);
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						self:HighlightText();
+					</OnEditFocusGained>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+
+			<EditBox name="$parentZoneSearchBox" letters="100" historyLines="0" autoFocus="false">
+				<Size>
+					<AbsDimension x="190" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentSubtitleSearchBox" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-24"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-5" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="10" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="$parentCurrentZoneButton" inherits="MobMapSmallRightTextButtonTemplate">
+						<Size>
+							<AbsDimension x="40" y="12"/>
+						</Size>
+						 <Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="-10" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								self:SetText(MOBMAP_QUEST_ZONE_FILTER_BOX_TEXT);
+							</OnLoad>
+							<OnClick>
+								MobMapMobSearchFrameZoneSearchBox:SetText(GetRealZoneText());
+							</OnClick>
+							<OnEnter>
+								GameTooltip_AddNewbieTip(self, "MobMap",1.0,1.0,1.0,MOBMAP_ZONE_QUICKBUTTON_INFO,1);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnEnterPressed>
+						self:ClearFocus();
+					</OnEnterPressed>
+					<OnEscapePressed>
+						self:ClearFocus();
+					</OnEscapePressed>
+					<OnTextChanged>
+						MobMap_PositionZoneFilter_OnTextChanged();
+					</OnTextChanged> 
+					<OnEditFocusLost>
+						self:HighlightText(0, 0);
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						self:HighlightText();
+					</OnEditFocusGained>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+
+			<Frame name="MobMapZoneHighlightFrame" hidden="true">
+				<Size>
+					<AbsDimension x="220" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="MobMapZoneHighlight" file="Interface\Buttons\UI-Listbox-Highlight2"/>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<Button name="MobMapZone1" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-46" y="-98"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone2" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone1" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone3" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone2" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone4" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone3" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone5" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone4" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone6" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone5" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone7" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone6" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone8" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone7" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone9" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone8" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone10" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone9" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone11" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone10" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone12" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone11" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone13" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone12" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone14" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone13" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone15" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone14" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone16" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone15" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone17" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone16" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone18" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone17" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone19" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone18" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone20" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone19" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone21" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone20" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone22" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone21" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone23" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone22" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone24" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone23" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone25" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone24" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone26" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone25" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone27" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone26" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone28" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone27" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone29" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone28" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone30" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone29" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone31" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone30" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone32" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone31" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone33" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone32" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone34" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone33" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="MobMapZone35" inherits="MobMapZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapZone34" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnEscapePressed>
+				HideUIPanel(MobMapFrame);
+			</OnEscapePressed>
+			<OnShow>
+				MobMapMobSearchFrame_OnShow();
+				MobMapMobSearchFrameSearchBox:SetFocus();
+			</OnShow>
+			<OnUpdate>
+				MobMapMobSearchFrame_OnUpdate();
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+	<Button name="MobMapEventButtonTemplate" hidden="true" virtual="true">
+		<Size>
+			<AbsDimension x="540" y="16"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentSubText" inherits="GameFontNormalSmall" justifyH="LEFT"/>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				self:SetFrameLevel(self:GetFrameLevel() + 1);
+			</OnLoad>
+			<OnClick>
+				MobMapEventButton_OnClick(self);
+			</OnClick>
+			<OnEnter>
+				getglobal(self:GetName().."SubText"):SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+			</OnEnter>
+			<OnLeave>
+				getglobal(self:GetName().."SubText"):SetTextColor(self.r, self.g, self.b);
+			</OnLeave>
+		</Scripts>
+		<ButtonText name="$parentText" inherits="GameFontNormal" justifyH="LEFT">
+			<Size>
+				<AbsDimension x="540" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentHighlight" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="2" y="1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</ButtonText>
+		<NormalFont inherits="GameFontNormal" justifyH="LEFT"/>
+		<HighlightFont inherits="GameFontHighlight" justifyH="LEFT"/>
+		<DisabledFont inherits="GameFontDisable" justifyH="LEFT"/>
+	</Button>
+
+	<Button name="MobMapEventZoneButtonTemplate" hidden="true" virtual="true">
+		<Size>
+			<AbsDimension x="540" y="16"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<FontString name="$parentSubText" inherits="GameFontNormalSmall" justifyH="LEFT"/>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				self:SetFrameLevel(self:GetFrameLevel() + 1);
+			</OnLoad>
+			<OnClick>
+				MobMapEventZoneButton_OnClick(self);
+			</OnClick>
+			<OnEnter>
+				getglobal(self:GetName().."SubText"):SetTextColor(HIGHLIGHT_FONT_COLOR.r, HIGHLIGHT_FONT_COLOR.g, HIGHLIGHT_FONT_COLOR.b);
+			</OnEnter>
+			<OnLeave>
+				getglobal(self:GetName().."SubText"):SetTextColor(self.r, self.g, self.b);
+			</OnLeave>
+		</Scripts>
+		<ButtonText name="$parentText" inherits="GameFontNormal" justifyH="LEFT">
+			<Size>
+				<AbsDimension x="540" y="16"/>
+			</Size>
+			<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentHighlight" relativePoint="RIGHT">
+					<Offset>
+						<AbsDimension x="2" y="1"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</ButtonText>
+		<NormalFont inherits="GameFontNormal" justifyH="LEFT"/>
+		<HighlightFont inherits="GameFontHighlight" justifyH="LEFT"/>
+		<DisabledFont inherits="GameFontDisable" justifyH="LEFT"/>
+	</Button>
+
+	<ScrollFrame name="MobMapQuestZoneListScrollFrameTemplate" inherits="FauxScrollFrameTemplate" virtual="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-ScrollBar">
+					<Size>
+						<AbsDimension x="30" y="60"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-3" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.46875" top="0.0234375" bottom="0.9609375"/>
+				</Texture>
+				<Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-ScrollBar">
+					<Size>
+						<AbsDimension x="30" y="60"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="-3" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.53125" right="1.0" top="0.03125" bottom="1.0"/>
+				</Texture>
+			</Layer>
+		</Layers>
+	</ScrollFrame>
+
+	<Frame name="MobMapQuestEventFrame" hidden="true" parent="MobMapFrame">
+		<Size>
+			<AbsDimension x="600" y="350"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="MobMapFrame" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-80"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Layers>
+			<Layer level="OVERLAY">
+				<Texture file="Interface\AddOns\MobMap\Divider.blp">
+					<Size>
+						<AbsDimension x="289" y="8"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="11" y="160"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture file="Interface\AddOns\MobMap\Divider.blp">
+					<Size>
+						<AbsDimension x="289" y="8"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="300" y="160"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentZoneListTitle" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_QUESTEVENT_ZONELIST_TITLE">
+					<Size>
+						<AbsDimension x="600" y="16"/>
+					</Size>
+					 <Anchors>
+						<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="20" y="140"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<EditBox name="$parentSearchBox" letters="10000" historyLines="0" autoFocus="false">
+				<Size>
+					<AbsDimension x="400" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="100" y="-14"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-5" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="10" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+						<FontString name="$parentText" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_QUESTEVENT_SEARCH_BOX_TEXT">
+							<Size>
+								<AbsDimension x="100" y="12"/>
+							</Size>
+							 <Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-10" y="-5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnterPressed>
+						self:ClearFocus();
+					</OnEnterPressed>
+					<OnEscapePressed>
+						self:ClearFocus();
+					</OnEscapePressed>
+					<OnEditFocusLost>
+						self:HighlightText(0, 0);
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						self:HighlightText();
+					</OnEditFocusGained>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+
+			<ScrollFrame name="$parentEventListScrollFrame" inherits="MobMapZoneListScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="30" y="180"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapQuestEventFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="534" y="-48"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(self, offset, 22, MobMap_UpdateQuestEventFrame);
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+
+			<Frame name="$parentEventHighlightFrame" hidden="true">
+				<Size>
+					<AbsDimension x="540" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="$parentHighlight" file="Interface\Buttons\UI-Listbox-Highlight2"/>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<Button name="$parentEvent1" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="22" y="-56"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent2" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent3" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent2" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent4" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent3" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent5" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent4" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent6" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent5" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent7" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent6" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent8" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent7" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent9" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent8" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent10" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent9" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent11" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent10" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent12" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent11" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent13" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent12" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent14" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent13" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent15" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent14" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent16" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent15" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent17" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent16" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent18" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent17" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent19" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent18" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent20" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent19" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent21" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent20" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent22" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent21" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent23" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent22" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent24" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent23" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent25" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent24" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent26" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent25" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent27" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent26" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent28" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent27" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent29" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent28" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent30" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent29" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent31" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent30" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEvent32" inherits="MobMapEventButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEvent31" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+			<ScrollFrame name="$parentEventZoneListScrollFrame" inherits="MobMapQuestZoneListScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="30" y="102"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="MobMapQuestEventFrame" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="534" y="60"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(self, offset, 22, MobMap_UpdateQuestEventZoneFrame);
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+
+			<Frame name="$parentEventZoneHighlightFrame" hidden="true">
+				<Size>
+					<AbsDimension x="540" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="$parentHighlight" file="Interface\Buttons\UI-Listbox-Highlight2"/>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<Button name="$parentEventZone1" inherits="MobMapEventZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="22" y="124"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEventZone2" inherits="MobMapEventZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEventZone1" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEventZone3" inherits="MobMapEventZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEventZone2" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentEventZone4" inherits="MobMapEventZoneButtonTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentEventZone3" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+
+		</Frames>
+		<Scripts>
+			<OnEscapePressed>
+				HideUIPanel(MobMapFrame);
+			</OnEscapePressed>
+			<OnShow>
+				MobMapQuestEventFrame_OnShow();
+				MobMapQuestEventFrameSearchBox:SetFocus();
+			</OnShow>
+			<OnUpdate>
+				MobMapQuestEventFrame_OnUpdate();
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+</Ui>

@@ -1,0 +1,6 @@
+## Interface: 30300
+## Title: MobMapDatabaseStub14
+## Notes: This is a load-on-demand addon stub for the MobMap quest comment database.
+## RequiredDeps: MobMap
+## LoadOnDemand: 1
+..\MobMap\MobMapDatabase_questcommentdata.lua

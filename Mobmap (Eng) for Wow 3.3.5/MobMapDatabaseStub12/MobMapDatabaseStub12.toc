@@ -1,0 +1,6 @@
+## Interface: 30300
+## Title: MobMapDatabaseStub12
+## Notes: This is a load-on-demand addon stub for the MobMap herbs database.
+## RequiredDeps: MobMap
+## LoadOnDemand: 1
+..\MobMap\MobMapDatabase_herbspickupdata.lua

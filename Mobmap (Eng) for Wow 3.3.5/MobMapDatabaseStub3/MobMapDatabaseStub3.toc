@@ -1,0 +1,7 @@
+## Interface: 30300
+## Title: MobMapDatabaseStub3
+## Notes: This is a load-on-demand addon stub for the MobMap merchant database.
+## RequiredDeps: MobMap
+## LoadOnDemand: 1
+..\MobMap\MobMapDatabase_merchants.lua
+..\MobMap\MobMap_merchants.xml

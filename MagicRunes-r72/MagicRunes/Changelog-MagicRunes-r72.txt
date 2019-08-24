@@ -1,0 +1,58 @@
+------------------------------------------------------------------------
+r72 | dhedbor | 2010-10-03 20:10:12 -0500 (Sun, 03 Oct 2010) | 1 line
+Changed paths:
+   M /trunk/Locales/enUS.lua
+
+Localization updates.
+------------------------------------------------------------------------
+r71 | dhedbor | 2010-10-03 19:49:23 -0500 (Sun, 03 Oct 2010) | 3 lines
+Changed paths:
+   M /trunk/IconDisplay/IconDisplay.lua
+   M /trunk/RuneBars/RuneBars.lua
+   M /trunk/RuneConfig.lua
+
+[*]RuneBars: Added option to hide icons.
+[*]RuneBars: Added option to arrange bar in a grid (1x6 to 6x1).
+[*]RuneBars: Added presets for various layouts.
+------------------------------------------------------------------------
+r70 | dhedbor | 2010-10-03 19:35:59 -0500 (Sun, 03 Oct 2010) | 1 line
+Changed paths:
+   A /trunk/Textures/PunishedBlood.tga
+   A /trunk/Textures/PunishedDeath.tga
+   A /trunk/Textures/PunishedFrost.tga
+   A /trunk/Textures/PunishedUnholy.tga
+
+Actually added the Punished rune icons by Lichborne - the option to use them was there but it seems I forgot to actually add the icons.
+------------------------------------------------------------------------
+r69 | dhedbor | 2010-10-03 03:02:32 -0500 (Sun, 03 Oct 2010) | 1 line
+Changed paths:
+   M /trunk/MagicRunes.lua
+   M /trunk/RuneBars/RuneBars.lua
+
+[*]RuneBars: Fix an issue where the rune bars would move from their intended position on load.
+------------------------------------------------------------------------
+r68 | dhedbor | 2010-09-30 02:11:37 -0500 (Thu, 30 Sep 2010) | 1 line
+Changed paths:
+   M /trunk/MagicRunes.lua
+   M /trunk/MagicRunes.toc
+
+[*]Fixed bug when changing rune icon style with the bars hidden.
+------------------------------------------------------------------------
+r67 | dhedbor | 2010-09-27 00:52:33 -0500 (Mon, 27 Sep 2010) | 2 lines
+Changed paths:
+   M /trunk/IconDisplay/MagicRunes_IconDisplay.toc
+   M /trunk/MagicRunes.toc
+   M /trunk/RuneBars/MagicRunes_RuneBars.toc
+   M /trunk/RuneBars/RuneBars.lua
+
+[*]RuneBars: Fixed bug with Cataclysm's varied rune cooldown duration.
+[*]Added X-Compatible-With for Cataclysm.
+------------------------------------------------------------------------
+r66 | dhedbor | 2009-12-11 13:58:36 -0600 (Fri, 11 Dec 2009) | 1 line
+Changed paths:
+   M /trunk/IconDisplay/MagicRunes_IconDisplay.toc
+   M /trunk/MagicRunes.toc
+   M /trunk/RuneBars/MagicRunes_RuneBars.toc
+
+[*]Updated .toc to 3.3 version.
+------------------------------------------------------------------------

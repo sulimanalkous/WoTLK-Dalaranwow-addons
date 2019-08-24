@@ -1,0 +1,866 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="MobMap_recipes.lua"/>
+
+	<Frame name="MobMapRecipeListEntryTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="240" y="18"/>
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentRecipeLevel" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="375">
+					<Size>
+						<AbsDimension x="36" y="12"/>
+					</Size>
+					 <Anchors>
+						<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="244" y="-3"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Button name="$parentRecipeName" inherits="MobMapTopTextButtonTemplate">
+				<Size>
+					<AbsDimension x="216" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MobMap_ShowRecipeDetails(self:GetParent().recipeid);
+					</OnClick>
+					<OnEnter>
+						if(self:GetParent().recipeid~=nil) then
+							MobMapTooltip:SetOwner(self, "ANCHOR_TOPLEFT");
+							if(self:GetParent().isenchant==true) then
+								MobMapTooltip:SetHyperlink(MobMap_ConstructEnchantLink(self:GetParent().productid,self:GetText()));
+								MobMapTooltip:SetFrameLevel(5000);
+								MobMapTooltip:Show();
+							else
+								MobMap_DisplayItemTooltip(MobMapTooltip, self:GetParent().productid);
+							end					
+						end
+					</OnEnter>
+					<OnLeave>
+						MobMapTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				getglobal(self:GetName().."RecipeNameText"):SetWidth(220);
+				getglobal(self:GetName().."RecipeNameText"):SetHeight(18);
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Button name="MobMapRecipeItemTemplate" inherits="QuestItemTemplate" virtual="true">
+		<Frames>
+			<Button name="$parentDropButton">
+				<Size>
+					<AbsDimension x="12" y="12"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture name="$parentIconTexture" file="Interface\Icons\INV_Axe_11.blp">
+							<Size>
+								<AbsDimension x="12" y="12"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>						
+					</Layer>
+				</Layers>		
+				<Scripts>
+					<OnClick>
+						if(self.itemid~=nil) then
+							MobMap_LoadDatabase(MOBMAP_DROP_DATABASE);
+							MobMap_LoadDatabase(MOBMAP_PICKUP_DATABASE);
+							local itemname=MobMap_GetItemNameByItemID(self.itemid);
+							if(itemname~=nil) then
+								if(MobMap_IsInDropRateDatabase(itemname)) then
+									MobMap_DoDropRateItemSearch(itemname);
+								elseif(MobMap_IsInAnyPickupDatabase(itemname)) then
+									MobMap_DoAnyPickupDatabaseSearch(itemname);
+								end
+							end
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self, "MobMap",1.0,1.0,1.0,MOBMAP_RECIPE_REAGENT_DROP_BUTTON_INFO,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="$parentMerchantButton">
+				<Size>
+					<AbsDimension x="12" y="12"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parentDropButton" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture name="$parentIconTexture" file="Interface\Icons\INV_Misc_Coin_02.blp">
+							<Size>
+								<AbsDimension x="12" y="12"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>						
+					</Layer>
+				</Layers>		
+				<Scripts>
+					<OnClick>
+						if(self.itemid~=nil) then
+							MobMap_LoadDatabase(MOBMAP_MERCHANT_DATABASE);
+							MobMap_DoMerchantItemSearch(MobMap_GetIHIDByItemID(self.itemid));
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self, "MobMap",1.0,1.0,1.0,MOBMAP_RECIPE_REAGENT_BUYABLE_BUTTON_INFO,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				self:SetScale(0.9);
+			</OnLoad>
+			<OnEnter>
+				if(self.link~=nil) then
+					MobMapTooltip:SetOwner(self, "ANCHOR_TOPLEFT");
+					MobMapTooltip:SetHyperlink(self.link);
+					MobMapTooltip:Show();
+				end
+				CursorUpdate(self);
+			</OnEnter>
+			<OnLeave>
+				MobMapTooltip:Hide();
+				ResetCursor();
+			</OnLeave>
+			<OnUpdate>
+				CursorOnUpdate(self);
+			</OnUpdate>
+			<OnClick>
+				if(IsControlKeyDown()) then
+					DressUpItemLink(self.link);
+				elseif(IsShiftKeyDown()) then
+					ChatEdit_InsertLink(self.link);
+				end
+			</OnClick>
+		</Scripts>
+	</Button>
+
+	<Frame name="MobMapRecipeListFrame" hidden="true" parent="MobMapFrame">
+		<Size>
+			<AbsDimension x="600" y="400"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="MobMapFrame" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-80"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<Frame name="MobMapRecipeListProfessionFilter" inherits="UIDropDownMenuTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="46" y="-12"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentText" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_PROFESSION_FILTER_BOX_TEXT">
+							<Size>
+								<AbsDimension x="100" y="12"/>
+							</Size>
+							 <Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="12" y="-8"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						MobMap_RecipeListProfessionFilter_OnLoad(self);
+					</OnLoad>
+					<OnShow>
+					</OnShow>
+				</Scripts>
+			</Frame>
+
+			<EditBox name="MobMapRecipeListNameFilter" letters="100" historyLines="0" autoFocus="false">
+				<Size>
+					<AbsDimension x="180" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="70" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-5" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="10" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+						<FontString name="$parentText" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_RECIPE_NAME_FILTER_BOX_TEXT">
+							<Size>
+								<AbsDimension x="100" y="12"/>
+							</Size>
+							 <Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-10" y="-5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnterPressed>
+						self:ClearFocus();
+					</OnEnterPressed>
+					<OnEscapePressed>
+						self:ClearFocus();
+					</OnEscapePressed>
+					<OnTextChanged>
+					</OnTextChanged> 
+					<OnEditFocusLost>
+						self:HighlightText(0, 0);
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						self:HighlightText();
+					</OnEditFocusGained>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+
+			<CheckButton name="MobMapRecipeListSortByName">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapRecipeListNameFilter" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_RECIPE_LIST_SORT_BY_NAME">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentText" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_RECIPE_LIST_SORT_BY">
+							<Size>
+								<AbsDimension x="100" y="12"/>
+							</Size>
+							 <Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-10" y="-5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_recipe_list_sorting=1;
+						else
+							mobmap_recipe_list_sorting=0;
+						end
+						MobMap_RecipeListSortingOptions_OnShow();
+						MobMap_RefreshRecipeList();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+
+			<CheckButton name="MobMapRecipeListSortByLevel">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapRecipeListNameFilter" relativePoint="BOTTOMLEFT">
+						<Offset>
+							<AbsDimension x="96" y="-2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_RECIPE_LIST_SORT_BY_LEVEL">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_recipe_list_sorting=0;
+						else
+							mobmap_recipe_list_sorting=1;
+						end
+						MobMap_RecipeListSortingOptions_OnShow();
+						MobMap_RefreshRecipeList();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			
+			<Frame name="MobMapRecipe1" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="18" y="-82"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe2" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe1" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe3" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe2" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe4" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe3" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe5" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe4" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe6" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe5" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe7" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe6" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe8" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe7" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe9" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe8" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe10" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe9" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe11" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe10" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe12" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe11" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe13" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe12" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe14" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe13" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe15" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe14" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe16" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe15" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe17" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe16" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe18" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe17" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe19" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe18" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe20" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe19" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe21" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe20" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe22" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe21" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe23" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe22" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe24" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe23" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe25" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe24" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe26" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe25" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe27" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe26" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe28" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe27" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe29" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe28" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe30" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe29" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe31" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe30" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe32" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe31" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe33" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe32" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe34" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe33" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe35" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe34" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapRecipe36" inherits="MobMapRecipeListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapRecipe35" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+
+			<ScrollFrame name="MobMapRecipeListScrollFrame" inherits="MobMapQuestListScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="242" y="280"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapRecipeListFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="18" y="-58"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(self, offset, 22, MobMap_UpdateRecipeList);
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+
+			<Frame name="MobMapRecipeDetailsFrame" hidden="true">
+				<Size>
+					<AbsDimension x="297" y="150"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="290" y="-16"/>
+						</Offset>
+					</Anchor>	
+				</Anchors>						
+				<Layers>
+					<Layer level="BACKGROUND">
+						<FontString name="$parentRecipeName" inherits="GameFontNormal" text="Skill Name" justifyH="LEFT">
+							<Size>
+								<AbsDimension x="230" y="0"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="50" y="-5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<Texture name="$parentHeaderLeft" file="Interface\ClassTrainerFrame\UI-ClassTrainer-DetailHeaderLeft">
+							<Size>
+								<AbsDimension x="244" y="64"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="3"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-DetailHeaderRight">
+							<Size>
+								<AbsDimension x="64" y="64"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentHeaderLeft" relativePoint="TOPRIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<FontString name="$parentReagentLabel" inherits="GameFontNormalSmall" text="SPELL_REAGENTS">
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="8" y="-60"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+						<FontString name="$parentRecipeNameLabel" inherits="GameFontNormalSmall" text="" justifyH="LEFT">
+							<Size>
+								<AbsDimension x="280" y="24"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="8" y="-270"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="$parentRecipeIcon">
+						<Size>
+							<AbsDimension x="37" y="37"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="8" y="-3"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString name="$parentCount" inherits="NumberFontNormal" justifyH="RIGHT" hidden="false">
+									<Anchors>
+										<Anchor point="BOTTOMRIGHT">
+											<Offset>
+												<AbsDimension x="-5" y="2"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnLoad>
+								self.hasItem = 1;
+							</OnLoad>
+							<OnClick>
+								if(IsControlKeyDown()) then
+									DressUpItemLink(self.link);
+								elseif(IsShiftKeyDown()) then
+									ChatEdit_InsertLink(self.link);
+								end
+							</OnClick>
+							<OnEnter>
+								MobMapTooltip:SetOwner(self, "ANCHOR_RIGHT");
+								if(self.link~=nil) then
+									MobMapTooltip:SetHyperlink(self.link);
+									MobMapTooltip:Show();
+								end
+							</OnEnter>
+							<OnLeave>
+								MobMapTooltip:Hide();
+								ResetCursor();
+							</OnLeave>
+							<OnUpdate>
+								CursorOnUpdate(self);
+							</OnUpdate>
+						</Scripts>
+					</Button>
+					<Button name="$parentReagent1" inherits="MobMapRecipeItemTemplate" id="1">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentReagentLabel" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-26"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentReagent2" inherits="MobMapRecipeItemTemplate" id="2">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentReagent1" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="12" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentReagent3" inherits="MobMapRecipeItemTemplate" id="3">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentReagent1" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentReagent4" inherits="MobMapRecipeItemTemplate" id="4">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentReagent3" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="12" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentReagent5" inherits="MobMapRecipeItemTemplate" id="5">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentReagent3" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentReagent6" inherits="MobMapRecipeItemTemplate" id="6">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentReagent5" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="12" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentReagent7" inherits="MobMapRecipeItemTemplate" id="7">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentReagent5" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentReagent8" inherits="MobMapRecipeItemTemplate" id="8">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentReagent7" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="12" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentRecipeSourceButton" inherits="MobMapSmallTextButtonTemplate">
+						<Size>
+							<AbsDimension x="280" y="12"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT">
+								<Offset>
+									<AbsDimension x="8" y="-300"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(self:GetName().."Text"):SetWidth(280);
+							</OnLoad>
+							<OnClick>
+								MobMap_RecipeSourceButton_OnClick();
+							</OnClick>
+							<OnEnter>
+								GameTooltip_AddNewbieTip(self, "MobMap",1.0,1.0,1.0,MOBMAP_RECIPE_SOURCE_SEARCH_INFO,1);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnUpdate>
+						MobMap_RecipeDetailFrame_OnUpdate();
+					</OnUpdate>
+				</Scripts>
+			</Frame>
+
+		</Frames>
+		<Scripts>
+			<OnShow>
+				MobMap_RecipeListFrame_OnShow();
+				MobMap_RecipeListSortingOptions_OnShow();
+			</OnShow>
+			<OnUpdate>
+				MobMap_RecipeListFrame_OnUpdate();
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+</Ui>

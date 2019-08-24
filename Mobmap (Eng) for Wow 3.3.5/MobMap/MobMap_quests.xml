@@ -1,0 +1,2523 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="MobMap_quests.lua"/>
+
+	<Frame name="MobMapQuestListEntryTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="600" y="31"/>
+		</Size>
+		<Frames>
+			<CheckButton name="$parentQuestDone">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="-2" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MobMap_ManuallySetQuestCompletion(self);
+						MobMap_UpdateQuestList();
+					</OnClick>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self,MOBMAP_QUEST_COMPLETION_TRACKER_TITLE,1.0,1.0,1.0,MOBMAP_QUEST_COMPLETION_TRACKER_INFO,true);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<Button name="$parentQuestName" inherits="MobMapSmallTextButtonTemplate">
+				<Size>
+					<AbsDimension x="220" y="24"/>
+				</Size>
+				<Anchors>
+					<Anchor point="RIGHT" relativeTo="$parent" relativePoint="LEFT">
+						<Offset>
+							<AbsDimension x="240" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MobMap_ShowQuestDetails(self:GetParent().questid);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentQuestSource" inherits="MobMapSmallTextButtonTemplate">
+				<Size>
+					<AbsDimension x="200" y="12"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentQuestName" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="6"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MobMap_ShowPanel("MobMapMobSearchFrame");
+						MobMap_ShowMobByID(self:GetParent().npcid);
+					</OnClick>
+				</Scripts>
+			</Button>
+			<Button name="$parentQuestZone" inherits="MobMapSmallTextButtonTemplate">
+				<Size>
+					<AbsDimension x="200" y="12"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentQuestSource" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Button>
+			<Button name="$parentQuestType" inherits="MobMapSmallCenteredTextButtonTemplate">
+				<Size>
+					<AbsDimension x="50" y="12"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentQuestSource" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-6"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Button>
+			<Button name="$parentQuestLevel" inherits="MobMapSmallCenteredTextButtonTemplate">
+				<Size>
+					<AbsDimension x="30" y="12"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentQuestType" relativePoint="RIGHT"/>
+				</Anchors>
+			</Button>
+			<Frame name="$parentFactionIconHorde">
+				<Size>
+					<AbsDimension x="8" y="17"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentQuestLevel" relativePoint="RIGHT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture file="Interface\TargetingFrame\UI-PVP-Horde.blp">
+							<Size>
+								<AbsDimension x="32" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						self:SetFrameLevel(self:GetParent():GetFrameLevel()+1);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+			<Frame name="$parentFactionIconAlliance">
+				<Size>
+					<AbsDimension x="8" y="17"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentFactionIconHorde" relativePoint="RIGHT"/>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<Texture file="Interface\TargetingFrame\UI-PVP-Alliance.blp">
+							<Size>
+								<AbsDimension x="32" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT"/>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+						self:SetFrameLevel(self:GetParent():GetFrameLevel()+2);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				getglobal(self:GetName().."QuestNameText"):SetWidth(240);
+				getglobal(self:GetName().."QuestNameText"):SetHeight(24);
+
+				getglobal(self:GetName().."QuestSourceText"):SetWidth(200);
+				getglobal(self:GetName().."QuestSourceText"):SetHeight(10);
+
+				getglobal(self:GetName().."QuestZoneText"):SetWidth(200);
+				getglobal(self:GetName().."QuestZoneText"):SetHeight(10);
+				getglobal(self:GetName().."QuestZoneText"):SetTextColor(1.0,1.0,1.0,1.0);
+				getglobal(self:GetName().."QuestZone"):Disable();
+
+				getglobal(self:GetName().."QuestTypeText"):SetWidth(50);
+				getglobal(self:GetName().."QuestTypeText"):SetHeight(10);
+				getglobal(self:GetName().."QuestTypeText"):SetTextColor(1.0,1.0,1.0,1.0);
+				getglobal(self:GetName().."QuestType"):Disable();
+
+				getglobal(self:GetName().."QuestLevelText"):SetWidth(30);
+				getglobal(self:GetName().."QuestLevelText"):SetHeight(10);
+				getglobal(self:GetName().."QuestLevelText"):SetTextColor(1.0,1.0,1.0,1.0);
+				getglobal(self:GetName().."QuestLevel"):Disable();
+			</OnLoad>
+		</Scripts>
+	</Frame>
+
+	<Frame name="MobMapQuestListFrame" hidden="true" parent="MobMapFrame">
+		<Size>
+			<AbsDimension x="600" y="400"/>
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativeTo="MobMapFrame" relativePoint="TOPLEFT">
+				<Offset>
+					<AbsDimension x="0" y="-80"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Frames>
+			<Frame name="MobMapQuestListHeaderFrame" hidden="false">
+				<Size>
+					<AbsDimension x="578" y="28"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapQuestListFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="11" y="-78"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture>
+							<Color r="0.0" g="0.0" b="0.0" a="1.0"/>
+						</Texture>
+					</Layer>
+					<Layer level="OVERLAY">
+						<Texture file="Interface\AddOns\MobMap\Divider.blp">
+							<Size>
+								<AbsDimension x="289" y="8"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture file="Interface\AddOns\MobMap\Divider.blp">
+							<Size>
+								<AbsDimension x="289" y="8"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="289" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture file="Interface\AddOns\MobMap\Divider.blp">
+							<Size>
+								<AbsDimension x="289" y="8"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="-28"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture file="Interface\AddOns\MobMap\Divider.blp">
+							<Size>
+								<AbsDimension x="289" y="8"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="289" y="-28"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Frames>
+					
+					<Button name="MobMapQuestListSyncButton" inherits="MobMapSmallButtonTemplate" text="S">
+						<Size>
+							<AbsDimension x="18" y="22"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="6" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								MobMap_SyncCompletedQuestsWithServer();
+							</OnClick>
+							<OnEnter>
+								GameTooltip_AddNewbieTip(self,"MobMap",1.0,1.0,1.0,MOBMAP_QUEST_SYNC_BUTTON_TOOLTIP,1);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Button>
+					<Button name="$parentQuestNameHeader" inherits="MobMapTextButtonTemplate" text="MOBMAP_QUEST_LIST_HEADER_1">
+						<Size>
+							<AbsDimension x="240" y="24"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativePoint="LEFT">
+								<Offset>
+									<AbsDimension x="30" y="-2"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								self:Disable();
+								getglobal(self:GetName().."Text"):SetTextColor(1.0,1.0,1.0,1.0);
+							</OnLoad>
+						</Scripts>
+					</Button>
+					<Button name="$parentQuestGiverHeader" inherits="MobMapTextButtonTemplate" text="MOBMAP_QUEST_LIST_HEADER_2">
+						<Size>
+							<AbsDimension x="100" y="24"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentQuestNameHeader" relativePoint="RIGHT"/>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								self:Disable();
+								getglobal(self:GetName().."Text"):SetTextColor(1.0,1.0,1.0,1.0);
+							</OnLoad>
+						</Scripts>
+					</Button>
+					<Button name="$parentQuestGiverShowAllButton" inherits="MobMapSmallTextButtonTemplate" text="MOBMAP_QUEST_SHOW_ALL_QUEST_GIVERS">
+						<Size>
+							<AbsDimension x="100" y="24"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentQuestGiverHeader" relativePoint="RIGHT"/>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								MobMap_ShowAllQuestGivers();
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentQuestTypeHeader" inherits="MobMapCenteredTextButtonTemplate" text="MOBMAP_QUEST_LIST_HEADER_3">
+						<Size>
+							<AbsDimension x="50" y="24"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentQuestGiverShowAllButton" relativePoint="RIGHT"/>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								self:Disable();
+								getglobal(self:GetName().."Text"):SetTextColor(1.0,1.0,1.0,1.0);
+								getglobal(self:GetName().."Text"):SetWidth(50);
+							</OnLoad>
+						</Scripts>
+					</Button>
+					<Button name="$parentQuestLevelHeader" inherits="MobMapCenteredTextButtonTemplate" text="MOBMAP_QUEST_LIST_HEADER_4">
+						<Size>
+							<AbsDimension x="40" y="24"/>
+						</Size>
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentQuestTypeHeader" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="-5" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								self:Disable();
+								getglobal(self:GetName().."Text"):SetTextColor(1.0,1.0,1.0,1.0);
+								getglobal(self:GetName().."Text"):SetWidth(40);
+							</OnLoad>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+
+			<EditBox name="MobMapQuestListNameFilter" letters="100" historyLines="0" autoFocus="false">
+				<Size>
+					<AbsDimension x="160" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="96" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-5" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="10" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+						<FontString name="$parentText" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_QUEST_NAME_FILTER_BOX_TEXT">
+							<Size>
+								<AbsDimension x="100" y="12"/>
+							</Size>
+							 <Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-10" y="-5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnterPressed>
+						MobMap_RefreshQuestList();
+						self:ClearFocus();
+					</OnEnterPressed>
+					<OnEscapePressed>
+						self:ClearFocus();
+					</OnEscapePressed>
+					<OnTextChanged>
+					</OnTextChanged> 
+					<OnEditFocusLost>
+						self:HighlightText(0, 0);
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						self:HighlightText();
+					</OnEditFocusGained>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+
+			<EditBox name="MobMapQuestListNPCFilter" letters="100" historyLines="0" autoFocus="false">
+				<Size>
+					<AbsDimension x="160" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapQuestListNameFilter" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-21"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-5" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="10" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+						<FontString name="$parentText" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_QUEST_NPC_FILTER_BOX_TEXT">
+							<Size>
+								<AbsDimension x="100" y="12"/>
+							</Size>
+							 <Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-10" y="-5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnterPressed>
+						MobMap_RefreshQuestList();
+						self:ClearFocus();
+					</OnEnterPressed>
+					<OnEscapePressed>
+						self:ClearFocus();
+					</OnEscapePressed>
+					<OnTextChanged>
+					</OnTextChanged> 
+					<OnEditFocusLost>
+						self:HighlightText(0, 0);
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						self:HighlightText();
+					</OnEditFocusGained>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+
+			<EditBox name="MobMapQuestListZoneFilter" letters="100" historyLines="0" autoFocus="false">
+				<Size>
+					<AbsDimension x="160" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapQuestListNPCFilter" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-21"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-5" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="10" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="$parentCurrentZoneButton" inherits="MobMapSmallRightTextButtonTemplate">
+						<Size>
+							<AbsDimension x="40" y="12"/>
+						</Size>
+						 <Anchors>
+							<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="-10" y="-5"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								self:SetText(MOBMAP_QUEST_ZONE_FILTER_BOX_TEXT);
+							</OnLoad>
+							<OnClick>
+								MobMapQuestListZoneFilter:SetText(GetRealZoneText());
+								MobMap_RefreshQuestList();
+							</OnClick>
+							<OnEnter>
+								GameTooltip_AddNewbieTip(self,"MobMap",1.0,1.0,1.0,MOBMAP_ZONE_QUICKBUTTON_INFO,1);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnEnterPressed>
+						MobMap_RefreshQuestList();
+						self:ClearFocus();
+					</OnEnterPressed>
+					<OnEscapePressed>
+						self:ClearFocus();
+					</OnEscapePressed>
+					<OnTextChanged>
+						MobMap_QuestListZoneFilter_OnTextChanged();
+					</OnTextChanged> 
+					<OnEditFocusLost>
+						self:HighlightText(0, 0);
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						self:HighlightText();
+					</OnEditFocusGained>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+
+			<Frame name="MobMapQuestListTypeFilter" inherits="UIDropDownMenuTemplate" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="280" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentText" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_QUEST_TYPE_FILTER_BOX_TEXT">
+							<Size>
+								<AbsDimension x="100" y="12"/>
+							</Size>
+							 <Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="12" y="-8"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnLoad>
+					</OnLoad>
+					<OnShow>
+						MobMap_QuestListTypeFilter_OnLoad(self);
+					</OnShow>
+				</Scripts>
+			</Frame>
+
+			<EditBox name="MobMapQuestListMinLevelFilter" letters="2" historyLines="0" autoFocus="false" numeric="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="458" y="-32"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-5" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="10" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+						<FontString name="$parentText" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_QUEST_MINLEVEL_FILTER_BOX_TEXT">
+							<Size>
+								<AbsDimension x="100" y="12"/>
+							</Size>
+							 <Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-10" y="-5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnterPressed>
+						MobMap_RefreshQuestList();
+						self:ClearFocus();
+					</OnEnterPressed>
+					<OnEscapePressed>
+						self:ClearFocus();
+					</OnEscapePressed>
+					<OnTextChanged>
+					</OnTextChanged> 
+					<OnEditFocusLost>
+						self:HighlightText(0, 0);
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						self:HighlightText();
+					</OnEditFocusGained>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+
+			<EditBox name="MobMapQuestListMaxLevelFilter" letters="2" historyLines="0" autoFocus="false" numeric="true">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapQuestListMinLevelFilter" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="12" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-5" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="10" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+						<FontString name="$parentText" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="-">
+							<Size>
+								<AbsDimension x="100" y="12"/>
+							</Size>
+							 <Anchors>
+								<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-6" y="-5"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnterPressed>
+						MobMap_RefreshQuestList();
+						self:ClearFocus();
+					</OnEnterPressed>
+					<OnEscapePressed>
+						self:ClearFocus();
+					</OnEscapePressed>
+					<OnTextChanged>
+					</OnTextChanged> 
+					<OnEditFocusLost>
+						self:HighlightText(0, 0);
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						self:HighlightText();
+					</OnEditFocusGained>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+
+			<CheckButton name="MobMapQuestListAllianceFilter">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="518" y="-33"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture file="Interface\TargetingFrame\UI-PVP-Alliance.blp">
+							<Size>
+								<AbsDimension x="32" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="16" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+
+			<CheckButton name="MobMapQuestListHordeFilter">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapQuestListAllianceFilter" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="32" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture file="Interface\TargetingFrame\UI-PVP-Horde.blp">
+							<Size>
+								<AbsDimension x="32" y="32"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="16" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+
+			<Frame name="MobMapQuestListMoneyFilter" inherits="MoneyInputFrameTemplate">
+				<Anchors>
+					<Anchor point="TOPLEFT">
+						<Offset>
+							<AbsDimension x="274" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						getglobal(self:GetName().."Gold"):SetWidth(26);
+					</OnLoad>
+				</Scripts>
+			</Frame>
+
+			<CheckButton name="MobMapQuestListDoneFilter">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapQuestListMoneyFilter" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-19"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+                    <Layer level="ARTWORK">
+                        <FontString inherits="GameFontHighlightSmall" text="MOBMAP_QUEST_LIST_DONE_FILTER">
+                            <Anchors>
+                                <Anchor point="LEFT" relativePoint="RIGHT">
+                                    <Offset>
+                                        <AbsDimension x="0" y="1"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+				<Scripts>
+					<OnClick>
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+
+			<Button name="MobMapQuestListRewardFilter" inherits="MobMapSmallCenteredTextButtonTemplate">
+				<Size>
+					<AbsDimension x="180" y="12"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="406" y="-12"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						self:SetText(MOBMAP_QUEST_REWARD_FILTER_TEXT);
+						getglobal(self:GetName().."Text"):SetWidth(180);
+						self:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+					</OnLoad>
+					<OnClick>
+						if(arg1=="LeftButton") then
+							MobMap_OpenRewardSelection(self);
+						end
+						if(arg1=="RightButton") then
+							MobMap_ClearRewardSelection(self);
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self,"MobMap",1.0,1.0,1.0,MOBMAP_QUEST_REWARD_FILTER_INFO,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+			<Button name="MobMapQuestListFilterButton" inherits="MobMapSmallButtonTemplate" text="MOBMAP_QUEST_LIST_FILTER_BUTTON">
+				<Size>
+					<AbsDimension x="130" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="450" y="-54"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MobMap_RefreshQuestList();
+					</OnClick>
+				</Scripts>
+			</Button>
+			
+			<ScrollFrame name="MobMapQuestListScrollFrame" inherits="MobMapQuestListScrollFrameTemplate">
+				<Size>
+					<AbsDimension x="600" y="230"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapQuestListFrame" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-33" y="-108"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnVerticalScroll>
+						FauxScrollFrame_OnVerticalScroll(self, offset, 22, MobMap_UpdateQuestList);
+					</OnVerticalScroll>
+				</Scripts>
+			</ScrollFrame>
+			<Frame name="MobMapQuest1" inherits="MobMapQuestListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="18" y="-114"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapQuest2" inherits="MobMapQuestListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapQuest1" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapQuest3" inherits="MobMapQuestListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapQuest2" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapQuest4" inherits="MobMapQuestListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapQuest3" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapQuest5" inherits="MobMapQuestListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapQuest4" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapQuest6" inherits="MobMapQuestListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapQuest5" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapQuest7" inherits="MobMapQuestListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapQuest6" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapQuest8" inherits="MobMapQuestListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapQuest7" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapQuest9" inherits="MobMapQuestListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapQuest8" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapQuest10" inherits="MobMapQuestListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapQuest9" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapQuest11" inherits="MobMapQuestListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapQuest10" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapQuest12" inherits="MobMapQuestListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapQuest11" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapQuest13" inherits="MobMapQuestListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapQuest12" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapQuest14" inherits="MobMapQuestListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapQuest13" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapQuest15" inherits="MobMapQuestListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapQuest14" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapQuest16" inherits="MobMapQuestListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapQuest15" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapQuest17" inherits="MobMapQuestListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapQuest16" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapQuest18" inherits="MobMapQuestListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapQuest17" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapQuest19" inherits="MobMapQuestListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapQuest18" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+			<Frame name="MobMapQuest20" inherits="MobMapQuestListEntryTemplate">
+				<Anchors>
+					<Anchor point="TOP" relativeTo="MobMapQuest19" relativePoint="BOTTOM"/>
+				</Anchors>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnShow>
+				MobMap_RefreshQuestList();
+				MobMap_UpdateQuestList();
+			</OnShow>
+		</Scripts>
+	</Frame>
+
+	<Frame name="MobMapQuestObjectiveWordFrameTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="100" y="20"/>
+		</Size>
+		<Layers>
+			<Layer level="OVERLAY">
+				<FontString name="$parentText" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="">
+					<Size>
+						<AbsDimension x="100" y="20"/>
+					</Size>
+					<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Frame>
+
+	<Button name="MobMapQuestObjectiveLinkFrameTemplate" virtual="true">
+		<ButtonText name="$parentText" inherits="GameFontNormalSmall" justifyH="LEFT" justifyV="TOP">
+            <Anchors>
+                <Anchor point="TOPLEFT"/>
+            </Anchors>
+        </ButtonText>
+		<NormalFont style="GameFontNormalSmall" justifyH="LEFT"/>
+		<HighlightFont style="GameFontHighlightSmall" justifyH="LEFT"/>
+		<DisabledFont style="GameFontNormalSmall" justifyH="LEFT"/>
+		<Scripts>
+			<OnClick>
+				MobMap_ProcessEnrichmentLink(self.linktype, self.data);
+			</OnClick>
+		</Scripts>
+	</Button>
+
+	<Button name="MobMapQuestItemTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="147" y="41"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentIconTexture">
+					<Size>
+						<AbsDimension x="39" y="39"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<Texture name="$parentNameFrame" file="Interface\QuestFrame\UI-QuestItemNameFrame">
+					<Size>
+						<AbsDimension x="128" y="64"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentIconTexture" relativePoint="RIGHT">
+							<Offset>
+								<AbsDimension x="-10" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</Texture>
+				<FontString name="$parentName" inherits="GameFontHighlight" justifyH="LEFT">
+					<Size>
+						<AbsDimension x="90" y="36"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentNameFrame">
+							<Offset>
+								<AbsDimension x="15" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				self:SetScale(0.86);
+			</OnLoad>
+			<OnEnter>
+				if(self:GetAlpha()>0 and self.itemstring~=nil) then
+					MobMapTooltip:SetOwner(self, "ANCHOR_RIGHT", -100, 0);
+					MobMap_DisplayItemTooltip(MobMapTooltip, self.itemid);
+				end
+			</OnEnter>
+			<OnLeave>
+				MobMapTooltip:Hide();
+			</OnLeave>
+			<OnUpdate>
+			</OnUpdate>
+			<OnClick>
+				MobMap_QuestItem_OnClick(self);
+			</OnClick>
+		</Scripts>
+	</Button>
+
+	<Button name="MobMapNextQuestButton" virtual="true">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+		<NormalTexture file="Interface\AddOns\MobMap\NextButton"/>
+		<PushedTexture file="Interface\AddOns\MobMap\NextButtonDown"/>
+		<HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD"/>
+	</Button>
+
+	<Button name="MobMapPrevQuestButton" virtual="true">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+		<NormalTexture file="Interface\AddOns\MobMap\PrevButton"/>
+		<PushedTexture file="Interface\AddOns\MobMap\PrevButtonDown"/>
+		<HighlightTexture file="Interface\Buttons\UI-Panel-MinimizeButton-Highlight" alphaMode="ADD"/>
+	</Button>
+
+	<Frame name="MobMapQuestDetailFrame" toplevel="true" frameStrata="FULLSCREEN_DIALOG" hidden="true" enableMouse="true" movable="true">
+		<TitleRegion setAllPoints="true"/>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Size>
+			<AbsDimension x="300" y="620"/>
+		</Size>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Frames>
+			<Frame name="$parentBackground">
+				<Size>
+					<AbsDimension x="280" y="556"/>
+				</Size>
+				<Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="10" y="-12"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture>
+							<Color r="0.0" g="0.0" b="0.0" a="0.7"/>
+						</Texture>
+					</Layer>
+				</Layers>				
+			</Frame>
+			<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativeTo="MobMapQuestDetailFrame" relativePoint="TOPRIGHT">
+                        <Offset>
+                            <AbsDimension x="-4" y="-4"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+				<Scripts>
+					<OnClick>
+						mobmap_quest_details_idlist=nil;
+						self:GetParent():Hide();
+						MobMapQuestCommentFrame:Hide();
+					</OnClick>
+				</Scripts>
+            </Button>
+			<Button name="$parentNextButton" inherits="MobMapNextQuestButton">
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativeTo="MobMapQuestDetailFrame" relativePoint="TOPRIGHT">
+                        <Offset>
+                            <AbsDimension x="-24" y="-4"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+				<Scripts>
+					<OnClick>
+						MobMap_NextQuestDetail();
+					</OnClick>
+				</Scripts>
+            </Button>
+			<Button name="$parentPrevButton" inherits="MobMapPrevQuestButton">
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativeTo="MobMapQuestDetailFrame" relativePoint="TOPRIGHT">
+                        <Offset>
+                            <AbsDimension x="-44" y="-4"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+				<Scripts>
+					<OnClick>
+						MobMap_PrevQuestDetail();
+					</OnClick>
+				</Scripts>
+            </Button>
+			<Frame name="$parentTitle">
+				<Size>
+					<AbsDimension x="300" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentText" justifyH="CENTER" justifyV="TOP" hidden="false" inherits="GameFontNormal" text="">
+							<Size>
+								<AbsDimension x="300" y="30"/>
+							</Size>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<Frame name="$parentDetails">
+				<Size>
+					<AbsDimension x="270" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentLevelHeader" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_QUEST_DETAILS_LEVEL_HEADER">
+							<Size>
+								<AbsDimension x="260" y="14"/>
+							</Size>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString name="$parentLevel" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="">
+							<Size>
+								<AbsDimension x="260" y="14"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT" relativeTo="$parentLevelHeader" relativePoint="RIGHT"/>
+							</Anchors>	
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString name="$parentTypeHeader" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_QUEST_DETAILS_TYPE_HEADER">
+							<Size>
+								<AbsDimension x="260" y="14"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentLevelHeader" relativePoint="BOTTOMLEFT"/>
+							</Anchors>							
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString name="$parentType" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="">
+							<Size>
+								<AbsDimension x="260" y="14"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT" relativeTo="$parentTypeHeader" relativePoint="RIGHT"/>
+							</Anchors>	
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString name="$parentFactionHeader" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_QUEST_DETAILS_FACTION_HEADER">
+							<Size>
+								<AbsDimension x="260" y="14"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentTypeHeader" relativePoint="BOTTOMLEFT"/>
+							</Anchors>							
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString name="$parentFaction" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="">
+							<Size>
+								<AbsDimension x="260" y="14"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT" relativeTo="$parentFactionHeader" relativePoint="RIGHT"/>
+							</Anchors>	
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString name="$parentPrequestHeader" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_QUEST_DETAILS_PREQUEST_HEADER">
+							<Size>
+								<AbsDimension x="260" y="14"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentFactionHeader" relativePoint="BOTTOMLEFT"/>
+							</Anchors>							
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString name="$parentPostquestHeader" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_QUEST_DETAILS_POSTQUEST_HEADER">
+							<Size>
+								<AbsDimension x="260" y="14"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentPrequestHeader" relativePoint="BOTTOMLEFT"/>
+							</Anchors>							
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString name="$parentSourceHeader" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_QUEST_DETAILS_SOURCE_HEADER">
+							<Size>
+								<AbsDimension x="260" y="14"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentPostquestHeader" relativePoint="BOTTOMLEFT">
+									<Offset>
+										<AbsDimension x="0" y="-10"/>
+									</Offset>
+								</Anchor>
+							</Anchors>							
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString name="$parentZoneHeader" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_QUEST_DETAILS_ZONE_HEADER">
+							<Size>
+								<AbsDimension x="260" y="14"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentSourceHeader" relativePoint="BOTTOMLEFT"/>
+							</Anchors>							
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString name="$parentZone" justifyH="RIGHT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="">
+							<Size>
+								<AbsDimension x="260" y="14"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT" relativeTo="$parentZoneHeader" relativePoint="RIGHT"/>
+							</Anchors>	
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString name="$parentEndHeader" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_QUEST_DETAILS_END_HEADER">
+							<Size>
+								<AbsDimension x="260" y="14"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentZoneHeader" relativePoint="BOTTOMLEFT"/>
+							</Anchors>							
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="$parentPrequest" inherits="MobMapSmallTextButtonTemplate">
+						<Size>
+							<AbsDimension x="200" y="14"/>
+						</Size>
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="$parentPrequestHeader" relativePoint="RIGHT"/>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(self:GetName().."Text"):SetJustifyH("RIGHT");
+								getglobal(self:GetName().."Text"):SetJustifyV("TOP");
+								getglobal(self:GetName().."Text"):SetWidth(200);
+								getglobal(self:GetName().."Text"):SetHeight(16);
+							</OnLoad>
+							<OnClick>
+								MobMap_ShowQuestDetails(self.questid);
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentPostquest" inherits="MobMapSmallTextButtonTemplate">
+						<Size>
+							<AbsDimension x="200" y="14"/>
+						</Size>
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="$parentPostquestHeader" relativePoint="RIGHT"/>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(self:GetName().."Text"):SetJustifyH("RIGHT");
+								getglobal(self:GetName().."Text"):SetJustifyV("TOP");
+								getglobal(self:GetName().."Text"):SetWidth(200);
+								getglobal(self:GetName().."Text"):SetHeight(16);
+							</OnLoad>
+							<OnClick>
+								MobMap_ShowQuestDetails(self.questid);
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentSource" inherits="MobMapSmallTextButtonTemplate">
+						<Size>
+							<AbsDimension x="200" y="14"/>
+						</Size>
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="$parentSourceHeader" relativePoint="RIGHT"/>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(self:GetName().."Text"):SetJustifyH("RIGHT");
+								getglobal(self:GetName().."Text"):SetJustifyV("TOP");
+								getglobal(self:GetName().."Text"):SetWidth(200);
+								getglobal(self:GetName().."Text"):SetHeight(16);
+							</OnLoad>
+							<OnClick>
+								if(not MobMapFrame:IsVisible()) then
+									mobmap_questsearch=true;
+								end
+								MobMap_ShowPanel("MobMapMobSearchFrame");
+								MobMap_ShowMobByID(self.npcid);
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentEnd" inherits="MobMapSmallTextButtonTemplate">
+						<Size>
+							<AbsDimension x="200" y="14"/>
+						</Size>
+						<Anchors>
+							<Anchor point="RIGHT" relativeTo="$parentEndHeader" relativePoint="RIGHT"/>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								getglobal(self:GetName().."Text"):SetJustifyH("RIGHT");
+								getglobal(self:GetName().."Text"):SetJustifyV("TOP");
+								getglobal(self:GetName().."Text"):SetWidth(200);
+								getglobal(self:GetName().."Text"):SetHeight(16);
+							</OnLoad>
+							<OnClick>
+								if(not MobMapFrame:IsVisible()) then
+									mobmap_questsearch=true;
+								end
+								MobMap_ShowPanel("MobMapMobSearchFrame");
+								MobMap_ShowMobByID(self.npcid);
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>		
+			
+			<Frame name="$parentObjective">
+				<Size>
+					<AbsDimension x="270" y="140"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-184"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+
+			<Frame name="$parentRewards">
+				<Size>
+					<AbsDimension x="270" y="140"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-330"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentChoosableHeader" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_QUEST_REWARDS_CHOOSABLE">
+							<Size>
+								<AbsDimension x="260" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT"/>
+							</Anchors>		
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString name="$parentAlwaysHeader" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_QUEST_REWARDS_ALWAYS">
+							<Size>
+								<AbsDimension x="260" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="-140"/>
+									</Offset>
+								</Anchor>
+							</Anchors>		
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="$parentChoosable1" inherits="MobMapQuestItemTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-20"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentChoosable2" inherits="MobMapQuestItemTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentChoosable1" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="4" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentChoosable3" inherits="MobMapQuestItemTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentChoosable1" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-4"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentChoosable4" inherits="MobMapQuestItemTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentChoosable3" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="4" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentChoosable5" inherits="MobMapQuestItemTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentChoosable3" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-4"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentChoosable6" inherits="MobMapQuestItemTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentChoosable5" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="4" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+
+					<Frame name="$parentMoney" inherits="MoneyFrameTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="170" y="-168"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnLoad>
+								self.staticMoney=0;
+								MoneyFrame_SetType(self, "STATIC");
+								self:SetScale(0.8);
+							</OnLoad>
+							<OnEnter>
+								GameTooltip_AddNewbieTip(self,"MobMap",1.0,1.0,1.0,MOBMAP_QUEST_REWARD_MONEY_INFO,1);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Frame>
+
+					<Button name="$parentAlways1" inherits="MobMapQuestItemTemplate">
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-184"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentAlways2" inherits="MobMapQuestItemTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentAlways1" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="4" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentAlways3" inherits="MobMapQuestItemTemplate">
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parentAlways1" relativePoint="BOTTOM">
+								<Offset>
+									<AbsDimension x="0" y="-4"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+					<Button name="$parentAlways4" inherits="MobMapQuestItemTemplate">
+						<Anchors>
+							<Anchor point="LEFT" relativeTo="$parentAlways3" relativePoint="RIGHT">
+								<Offset>
+									<AbsDimension x="4" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+					</Button>
+				</Frames>
+			</Frame>
+
+			<Frame name="$parentComments">
+				<Size>
+					<AbsDimension x="270" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-570"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentCount" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_QUEST_COMMENT_COUNT">
+							<Size>
+								<AbsDimension x="260" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT"/>
+							</Anchors>		
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="$parentDisplayButton" inherits="MobMapSmallButtonTemplate" text="MOBMAP_QUEST_COMMENT_DISPLAY_BUTTON">
+						<Size>
+							<AbsDimension x="60" y="22"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="140" y="6"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								MobMap_ShowQuestComments(MobMapQuestDetailFrameComments.data);
+							</OnClick>
+							<OnEnter>
+								GameTooltip_AddNewbieTip(self,"MobMap",1.0,1.0,1.0,MOBMAP_QUEST_COMMENT_DISPLAY_BUTTON_INFO,1);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Button>
+					<Button name="$parentCreateButton" inherits="MobMapSmallButtonTemplate" text="MOBMAP_QUEST_COMMENT_CREATE_BUTTON">
+						<Size>
+							<AbsDimension x="70" y="22"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="200" y="6"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								MobMap_ShowQuestCommentEditor(MobMapQuestDetailFrame.questtitle, MobMapQuestDetailFrame.questobjective);
+							</OnClick>
+							<OnEnter>
+								GameTooltip_AddNewbieTip(self,"MobMap",1.0,1.0,1.0,MOBMAP_QUEST_COMMENT_CREATE_BUTTON_INFO,1);
+							</OnEnter>
+							<OnLeave>
+								GameTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				tinsert(UISpecialFrames,self:GetName());
+			</OnLoad>
+			<OnShow>
+				self:SetScale(UIParent:GetScale());
+			</OnShow>
+			<OnEvent>
+			</OnEvent>
+			<OnUpdate>
+				MobMap_QuestDetailFrame_OnUpdate();
+			</OnUpdate>
+    	</Scripts>
+	</Frame>
+
+	<Frame name="MobMapQuestCommentFrame" toplevel="true" frameStrata="FULLSCREEN_DIALOG" hidden="true" enableMouse="true">
+		<Anchors>
+			<Anchor point="BOTTOMLEFT" relativeTo="MobMapQuestDetailFrame" relativePoint="BOTTOMRIGHT">
+				<Offset>
+					<AbsDimension x="0" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Size>
+			<AbsDimension x="300" y="600"/>
+		</Size>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Frames>
+			<Frame name="$parentBackground">
+				<Size>
+					<AbsDimension x="280" y="576"/>
+				</Size>
+				<Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="10" y="-12"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture>
+							<Color r="0.0" g="0.0" b="0.0" a="0.7"/>
+						</Texture>
+					</Layer>
+				</Layers>				
+			</Frame>
+			<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+                        <Offset>
+                            <AbsDimension x="-4" y="-4"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+				<Scripts>
+					<OnClick>
+						self:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+            </Button>
+			<Frame name="$parentTitle">
+				<Size>
+					<AbsDimension x="260" y="40"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentText" justifyH="CENTER" justifyV="TOP" hidden="false" inherits="GameFontNormal" text="">
+							<Size>
+								<AbsDimension x="260" y="40"/>
+							</Size>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<Frame name="$parentPage">
+				<Size>
+					<AbsDimension x="280" y="40"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="$parent" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentText" inherits="GameFontNormalSmall" justifyH="CENTER" text="Seite 0 von 0">
+							<Anchors>
+								<Anchor point="BOTTOM" relativeTo="$parent" relativePoint="BOTTOM">
+									<Offset>
+										<AbsDimension x="0" y="10"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>	
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="$parentPrevButton">
+						<Size>
+							<AbsDimension x="32" y="32"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="6" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">								
+								<Texture file="Interface\Buttons\UI-PageButton-Background">
+									<Size>
+										<AbsDimension x="32" y="32"/>
+									</Size>
+									<Anchors>
+										<Anchor point="CENTER">
+											<Offset>
+												<AbsDimension x="0" y="1"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnClick>
+								MobMap_ShowQuestComments(MobMapQuestDetailFrameComments.data,MobMapQuestCommentFramePage.offset[MobMapQuestCommentFramePage.pagenum-1],MobMapQuestCommentFramePage.pagenum-1);
+							</OnClick>
+						</Scripts>
+						<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Up"/>
+						<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Down"/>
+						<DisabledTexture file="Interface\Buttons\UI-SpellbookIcon-PrevPage-Disabled"/>
+						<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+					</Button>
+					<Button name="$parentNextButton">
+						<Size>
+							<AbsDimension x="32" y="32"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="-6" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture file="Interface\Buttons\UI-PageButton-Background">
+									<Size>
+										<AbsDimension x="32" y="32"/>
+									</Size>
+									<Anchors>
+										<Anchor point="CENTER">
+											<Offset>
+												<AbsDimension x="0" y="1"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnClick>
+								MobMap_ShowQuestComments(MobMapQuestDetailFrameComments.data,MobMapQuestCommentFramePage.offset[MobMapQuestCommentFramePage.pagenum+1],MobMapQuestCommentFramePage.pagenum+1);
+							</OnClick>
+						</Scripts>
+						<NormalTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Up"/>
+						<PushedTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Down"/>
+						<DisabledTexture file="Interface\Buttons\UI-SpellbookIcon-NextPage-Disabled"/>
+						<HighlightTexture file="Interface\Buttons\UI-Common-MouseHilight" alphaMode="ADD"/>
+					</Button>
+				</Frames>				
+			</Frame>			
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				tinsert(UISpecialFrames,self:GetName());
+			</OnLoad>
+			<OnShow>
+				self:SetScale(UIParent:GetScale());
+			</OnShow>
+			<OnEvent>
+			</OnEvent>
+			<OnUpdate>
+			</OnUpdate>
+    	</Scripts>
+	</Frame>
+
+	<Frame name="MobMapQuestCommentFrameTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="260" y="200"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture>
+					<Color r="1.0" g="1.0" b="1.0" a="0.0"/>
+				</Texture>
+			</Layer>
+			<Layer level="OVERLAY">
+				<FontString name="$parentTitle" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="Slarti auf Blackhand schrieb am 6.5.2008:">
+					<Size>
+						<AbsDimension x="260" y="20"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="0.7" g="0.7" b="0.7" a="1.0"/>
+				</FontString>
+			</Layer>
+		</Layers>
+		<Frames>
+			<Frame name="$parentSpace">
+				<Size>
+					<AbsDimension x="260" y="600"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+			</Frame>
+			<Frame name="$parentLine">
+				<Size>
+					<AbsDimension x="260" y="1"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM" relativeTo="$parent" relativePoint="BOTTOM">
+						<Offset><AbsDimension x="0" y="-5"/></Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture>
+							<Color r="0.5" g="0.5" b="0.5" a="0.5"/>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
+	</Frame>
+
+	<Frame name="MobMapQuestCommentEditorFrame" toplevel="true" frameStrata="FULLSCREEN_DIALOG" hidden="true" enableMouse="true" movable="true">
+		<TitleRegion setAllPoints="true"/>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Size>
+			<AbsDimension x="300" y="600"/>
+		</Size>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Frames>
+			<Frame name="$parentBackground">
+				<Size>
+					<AbsDimension x="280" y="576"/>
+				</Size>
+				<Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="10" y="-12"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture>
+							<Color r="0.0" g="0.0" b="0.0" a="0.7"/>
+						</Texture>
+					</Layer>
+				</Layers>				
+			</Frame>
+			<Button name="$parentCloseButton" inherits="UIPanelCloseButton">
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+                        <Offset>
+                            <AbsDimension x="-4" y="-4"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+				<Scripts>
+					<OnClick>
+						self:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+            </Button>
+			<Frame name="$parentTitle">
+				<Size>
+					<AbsDimension x="260" y="30"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentText" justifyH="CENTER" justifyV="TOP" hidden="false" inherits="GameFontNormal" text="MOBMAP_QUEST_COMMENT_EDITOR_TITLE">
+							<Size>
+								<AbsDimension x="260" y="30"/>
+							</Size>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString name="$parentSubText" justifyH="CENTER" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_QUEST_COMMENT_EDITOR_TITLE">
+							<Size>
+								<AbsDimension x="260" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="$parentText" relativePoint="TOP">
+									<Offset><AbsDimension x="0" y="-18"/></Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<Frame name="$parentEditbox">
+				<Size>
+					<AbsDimension x="260" y="400"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-48"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentText1" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_QUEST_COMMENT_EDITOR_TEXT_1">
+							<Size>
+								<AbsDimension x="260" y="60"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+									<Offset><AbsDimension x="0" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString name="$parentText2" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_QUEST_COMMENT_EDITOR_TEXT_2">
+							<Size>
+								<AbsDimension x="260" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="$parentText1" relativePoint="BOTTOM">
+									<Offset><AbsDimension x="0" y="-4"/></Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Frame name="$parentBorder">
+						<Size>
+							<AbsDimension x="260" y="300"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+								<Offset><AbsDimension x="0" y="-80"/></Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture>
+									<Color r="0.2" g="0.2" b="0.2" a="0.3"/>
+								</Texture>
+							</Layer>
+						</Layers>
+						<Frames>
+							<Button name="$parentPositionButton">
+								<Size>
+									<AbsDimension x="16" y="16"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+										<Offset><AbsDimension x="0" y="18"/></Offset>
+									</Anchor>
+								</Anchors>
+								<Layers>
+								</Layers>
+								<Scripts>
+									<OnClick>
+										MobMap_AddCurrentPositionToComment();
+									</OnClick>
+									<OnEnter>
+										GameTooltip_AddNewbieTip(self,"MobMap",1.0,1.0,1.0,MOBMAP_QUEST_COMMENT_EDITOR_POSITION_BUTTON_INFO,1);
+									</OnEnter>
+									<OnLeave>
+										GameTooltip:Hide();
+									</OnLeave>
+								</Scripts>
+								<NormalTexture file="Interface\AddOns\MobMap\positionbutton">
+									<Size>
+										<AbsDimension x="32" y="32"/>
+									</Size>
+									<TexCoords left="0" right="0.625" top="0" bottom="0.625"></TexCoords>
+								</NormalTexture>
+								<HighlightTexture file="Interface\AddOns\MobMap\positionbuttonhover">
+									<Size>
+										<AbsDimension x="32" y="32"/>
+									</Size>
+									<TexCoords left="0" right="0.625" top="0" bottom="0.625"></TexCoords>
+								</HighlightTexture>
+							</Button>
+							<Frame name="$parentLine1">
+								<Size>
+									<AbsDimension x="260" y="1"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+										<Offset><AbsDimension x="0" y="0"/></Offset>
+									</Anchor>
+								</Anchors>
+								<Layers>
+									<Layer level="BACKGROUND">
+										<Texture>
+											<Color r="0.7" g="0.7" b="0.7" a="0.8"/>
+										</Texture>
+									</Layer>
+								</Layers>
+							</Frame>
+							<EditBox name="$parentEditBox" letters="2000" multiLine="true" enableMouse="true" autoFocus="false" spacewrap="true">
+								<Size>
+									<AbsDimension x="250" y="294"/>
+								</Size>
+								<Anchors>
+									<Anchor point="TOPLEFT">
+										<Offset>
+											<AbsDimension x="5" y="-3"/>
+										</Offset>
+									</Anchor>
+								</Anchors>
+								<Scripts>
+									<OnTextChanged>
+									</OnTextChanged>
+									<OnCursorChanged>
+									</OnCursorChanged>
+									<OnUpdate>
+									</OnUpdate>
+									<OnEscapePressed>
+										self:ClearFocus();
+									</OnEscapePressed>
+								</Scripts>
+								<FontString inherits="GameFontHighlight"/>
+							</EditBox>
+							<Frame name="$parentLine2">
+								<Size>
+									<AbsDimension x="260" y="1"/>
+								</Size>
+								<Anchors>
+									<Anchor point="BOTTOM" relativeTo="$parent" relativePoint="BOTTOM">
+										<Offset><AbsDimension x="0" y="0"/></Offset>
+									</Anchor>
+								</Anchors>
+								<Layers>
+									<Layer level="BACKGROUND">
+										<Texture>
+											<Color r="0.5" g="0.5" b="0.5" a="0.5"/>
+										</Texture>
+									</Layer>
+								</Layers>
+							</Frame>
+						</Frames>
+						<Scripts>
+							<OnMouseUp>
+								MobMapQuestCommentEditorFrameEditboxBorderEditBox:SetFocus();
+							</OnMouseUp> 
+						</Scripts>
+					</Frame>
+				</Frames>
+			</Frame>
+
+			<Frame name="$parentIdentification">
+				<Size>
+					<AbsDimension x="260" y="52"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-448"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentText1" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_QUEST_COMMENT_EDITOR_TEXT_3">
+							<Size>
+								<AbsDimension x="260" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+									<Offset><AbsDimension x="0" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<CheckButton name="$parentYes">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-16"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString inherits="GameFontHighlightSmall" text="MOBMAP_QUEST_COMMENT_EDITOR_IDENTIFICATION_YES">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="0" y="1"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnClick>
+								if(self:GetChecked()) then
+									PlaySound("igMainMenuOptionCheckBoxOn");
+									MobMapQuestCommentEditorFrameIdentificationNo:SetChecked(false);
+									mobmap_quest_comment_identification=true;
+								else
+									MobMapQuestCommentEditorFrameIdentificationNo:SetChecked(true);
+									mobmap_quest_comment_identification=false;
+								end
+							</OnClick>
+						</Scripts>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+					</CheckButton>
+					<CheckButton name="$parentNo">
+						<Size>
+							<AbsDimension x="20" y="20"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentYes" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="0" y="-18"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="ARTWORK">
+								<FontString inherits="GameFontHighlightSmall" text="MOBMAP_QUEST_COMMENT_EDITOR_IDENTIFICATION_NO">
+									<Anchors>
+										<Anchor point="LEFT" relativePoint="RIGHT">
+											<Offset>
+												<AbsDimension x="0" y="1"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+								</FontString>
+							</Layer>
+						</Layers>
+						<Scripts>
+							<OnClick>
+								if(self:GetChecked()) then
+									PlaySound("igMainMenuOptionCheckBoxOn");
+									MobMapQuestCommentEditorFrameIdentificationYes:SetChecked(false);
+									mobmap_quest_comment_identification=false;
+								else
+									MobMapQuestCommentEditorFrameIdentificationYes:SetChecked(true);
+									mobmap_quest_comment_identification=true;
+								end
+							</OnClick>
+						</Scripts>
+						<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+						<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+						<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+						<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+						<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+					</CheckButton>
+				</Frames>
+			</Frame>
+			<Frame name="$parentFinishing">
+				<Size>
+					<AbsDimension x="260" y="80"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="20" y="-504"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentText1" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_QUEST_COMMENT_EDITOR_TEXT_4">
+							<Size>
+								<AbsDimension x="260" y="60"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+									<Offset><AbsDimension x="0" y="0"/></Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="$parentSaveButton" inherits="MobMapSmallButtonTemplate" text="MOBMAP_QUEST_COMMENT_EDITOR_SAVE_BUTTON">
+						<Size>
+							<AbsDimension x="100" y="22"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMLEFT" relativeTo="$parent" relativePoint="BOTTOMLEFT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								MobMap_SaveQuestComment(MobMapQuestCommentEditorFrame.questtitle, MobMapQuestCommentEditorFrame.questobjective, MobMapQuestCommentEditorFrameEditboxBorderEditBox:GetText(), MobMapQuestCommentEditorFrameIdentificationYes:GetChecked());
+							</OnClick>
+						</Scripts>
+					</Button>
+					<Button name="$parentAbortButton" inherits="MobMapSmallButtonTemplate" text="MOBMAP_QUEST_COMMENT_EDITOR_ABORT_BUTTON">
+						<Size>
+							<AbsDimension x="100" y="22"/>
+						</Size>
+						<Anchors>
+							<Anchor point="BOTTOMRIGHT" relativeTo="$parent" relativePoint="BOTTOMRIGHT">
+								<Offset>
+									<AbsDimension x="0" y="0"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								MobMapQuestCommentEditorFrame:Hide();
+							</OnClick>
+						</Scripts>
+					</Button>
+				</Frames>
+			</Frame>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				tinsert(UISpecialFrames,self:GetName());
+			</OnLoad>
+			<OnShow>
+				self:SetScale(UIParent:GetScale());
+			</OnShow>
+			<OnEvent>
+			</OnEvent>
+			<OnUpdate>
+			</OnUpdate>
+    	</Scripts>
+	</Frame>
+
+</Ui>

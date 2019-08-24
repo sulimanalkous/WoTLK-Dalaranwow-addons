@@ -1,0 +1,6 @@
+## Interface: 30300
+## Title: MobMapDatabaseStub11
+## Notes: This is a load-on-demand addon stub for the MobMap mining database.
+## RequiredDeps: MobMap
+## LoadOnDemand: 1
+..\MobMap\MobMapDatabase_miningpickupdata.lua

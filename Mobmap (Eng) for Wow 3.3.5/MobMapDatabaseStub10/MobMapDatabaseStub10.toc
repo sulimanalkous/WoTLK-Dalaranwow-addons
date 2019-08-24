@@ -1,0 +1,6 @@
+## Interface: 30300
+## Title: MobMapDatabaseStub10
+## Notes: This is a load-on-demand addon stub for the MobMap fishing database.
+## RequiredDeps: MobMap
+## LoadOnDemand: 1
+..\MobMap\MobMapDatabase_fishingpickupdata.lua

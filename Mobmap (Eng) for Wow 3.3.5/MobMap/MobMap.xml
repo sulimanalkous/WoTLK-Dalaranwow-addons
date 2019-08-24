@@ -1,0 +1,2986 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.blizzard.com/wow/ui/
+..\FrameXML\UI.xsd">
+	<Script file="MobMap_localization.lua"/>
+	<Script file="MobMap.lua"/>
+	<Script file="Base64.lua"/>
+	<Script file="MobMapDatabase_metadata.lua"/>
+
+	<Frame name="MobMapDotParentFrame">
+		<Size>
+			<AbsDimension x="1004" y="672" />
+		</Size>
+		<Anchors>
+			<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="WorldMapPositioningGuide">
+			</Anchor>
+		</Anchors>
+		<!-- <Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentTexture">
+					<Size>
+						<AbsDimension x="1004" y="672"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						</Anchor>
+					</Anchors>
+					<Color r="1.0" g="1.0" b="1.0" a="0.5"/>
+				</Texture>
+			</Layer>
+		</Layers>-->
+		<Scripts>
+			<OnUpdate>
+				self:SetAlpha(1.0);
+				if(WorldMapFrame.scale==WORLDMAP_RATIO_MINI) then
+					local newScale=WorldMapFrame:GetEffectiveScale()*0.572;
+					if(self:GetScale()~=newScale) then
+						self:SetScale(newScale);
+						self:ClearAllPoints();
+						self:SetPoint("TOPLEFT", WorldMapPositioningGuide, "TOPLEFT", 28, -60);
+						MobMap_PlaceMobMapButtonFrame();
+					end
+				elseif(WorldMapFrame.scale==WORLDMAP_RATIO_SMALL) then
+					local newScale=WorldMapFrame:GetEffectiveScale()*0.69;
+					if(self:GetScale()~=newScale) then
+						self:SetScale(newScale);
+						self:ClearAllPoints();
+						self:SetPoint("TOPLEFT", WorldMapPositioningGuide, "TOPLEFT", 10, -98);
+						MobMap_PlaceMobMapButtonFrame();
+					end
+				else
+					local newScale=WorldMapFrame:GetEffectiveScale();
+					if(self:GetScale()~=newScale) then
+						self:SetScale(newScale);
+						self:ClearAllPoints();
+						self:SetPoint("TOPLEFT", WorldMapPositioningGuide, "TOPLEFT", 4, -67);
+						MobMap_PlaceMobMapButtonFrame();
+					end
+				end
+				if((not WorldMapFrame:IsVisible()) and self:IsVisible()) then
+					self:Hide();
+				end
+				MobMap_ProcessDotEffects(self,arg1);
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+	<Button name="MobMapDotFrameTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="10.04" y="6.72"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentTexture">
+					<Size>
+						<AbsDimension x="6" y="6"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="3" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1.0" g="1.0" b="1.0"/>
+				</Texture>
+			</Layer>
+			<Layer level="ARTWORK">
+				<Texture name="$parentTexture2">
+					<Size>
+						<AbsDimension x="3" y="3"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="4.5" y="0.5"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1.0" g="1.0" b="1.0"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEnter>
+				if(mobmap_show_world_map_tooltips==true) then
+					MobMap_DisplayDotTooltip(self);
+				end
+			</OnEnter>
+			<OnLeave>
+				MobMap_HideDotTooltip();
+			</OnLeave>
+			<OnClick>
+				MobMapDotFrame_OnClick(self);
+			</OnClick>
+		</Scripts>
+	</Button>
+
+	<Button name="MobMapMinimapDotFrameTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="4" y="4"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentTexture">
+					<Size>
+						<AbsDimension x="4" y="4"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1.0" g="1.0" b="1.0"/>
+				</Texture>
+			</Layer>
+		</Layers>
+	</Button>
+
+	<Button name="MobMapBattlefieldMinimapDotFrameTemplate" virtual="true">
+		<Size>
+			<AbsDimension x="2.25" y="1.5"/>
+		</Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentTexture">
+					<Size>
+						<AbsDimension x="2.25" y="1.5"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+							<Offset>
+								<AbsDimension x="0" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<Color r="1.0" g="1.0" b="1.0"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnEnter>
+				if(mobmap_show_world_map_tooltips==true) then
+					MobMap_DisplayDotTooltip();
+				end
+			</OnEnter>
+			<OnLeave>
+				MobMap_HideDotTooltip();
+			</OnLeave>
+			<OnClick>
+				MobMapDotFrame_OnClick();
+			</OnClick>
+			<OnUpdate>
+				self:SetAlpha(BattlefieldMinimapBackground:GetAlpha());
+			</OnUpdate>
+		</Scripts>
+	</Button>
+
+	<Frame name="MobMapButtonFrame" parent="UIParent">
+		<Size>
+			<AbsDimension x="400" y="50"/>
+		</Size>
+		<Frames>
+			<Frame name="MobMapButtonFrameCurrentMobFrame">
+				<Size>
+					<AbsDimension x="300" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-6"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="MobMapButtonFrameCurrentMob" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormal" text="">
+							<Size>
+								<AbsDimension x="300" y="16"/>
+							</Size>
+							 <Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnEnter>
+						WorldMapTooltip:SetOwner(self, "ANCHOR_TOPRIGHT");
+						if(self.itemid~=nil) then
+							MobMap_DisplayItemTooltip(WorldMapTooltip, self.itemid, self.ihid);
+						end
+					</OnEnter>
+					<OnLeave>
+						WorldMapTooltip:Hide();						
+					</OnLeave>
+				</Scripts>
+			</Frame>
+			<Button name="MobMapButton" inherits="UIPanelButtonTemplate" text="MOBMAP_BUTTON">
+				<Size>
+					<AbsDimension x="100" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapButtonFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MobMap_ShowMobMapFrame();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<CheckButton name="MobMapCheckButton">
+                <Size>
+                    <AbsDimension x="20" y="20"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="MobMapButtonFrame" relativePoint="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="0" y="-22"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <FontString inherits="GameFontHighlightSmall" text="">
+                            <Anchors>
+                                <Anchor point="LEFT" relativePoint="RIGHT">
+                                    <Offset>
+                                        <AbsDimension x="0" y="1"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Scripts>
+                    <OnClick>
+                        if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_enabled=true;
+							if(MobMap_Display) then
+								MobMap_Display();
+							end
+                        else
+							mobmap_enabled=false;
+							if(MobMap_HideAllDots) then
+								MobMap_HideAllDots();
+							end
+                        end
+                    </OnClick>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self,"MobMap",1.0,1.0,1.0,MOBMAP_CHECKBOX,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+                </Scripts>
+                <NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+                <PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+                <HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+                <CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+                <DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+            </CheckButton>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				MobMapButtonFrame_OnLoad();
+			</OnLoad>
+			<OnUpdate>
+				if((not WorldMapFrame:IsVisible()) and self:IsVisible()) then
+					self:Hide();
+				end
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+	<Frame name="MobMapQuestButtonFrameTemplate" frameStrata="BACKGROUND" virtual="true">
+		<Size>
+			<AbsDimension x="16" y="16"/>
+		</Size>
+		<Frames>
+			<Button name="$parentButton" text="">
+				<Size>
+					<AbsDimension x="16" y="16"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<Texture name="$parentTexture" file="Interface\AddOns\MobMap\blizztrackerbutton">
+							<Size>
+								<AbsDimension x="16" y="16"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT" />
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetParent().questid~=nil) then
+							if(MobMap_ParseQuestID(self:GetParent().questid)==true) then
+								return;
+							end
+						end
+						if(self:GetParent().questobj~=nil) then MobMap_ParseQuestObjective(self:GetParent().questobj); end
+						if(self:GetParent().questtitle~=nil) then MobMap_ParseQuestTitle(self:GetParent().questtitle, self:GetParent().questobjectivetext); end
+						if(self:GetParent().unknowntext~=nil) then MobMap_ParseQuestTitleOrObjective(self:GetParent().unknowntext); end
+						if(self:GetParent().reagentname~=nil) then MobMap_ParseQuestObjective(self:GetParent().reagentname, MOBMAP_PARSETYPE_ITEMNAME); end
+					</OnClick>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self,"MobMap",1.0,1.0,1.0,MOBMAP_QUEST_BUTTON_TOOLTIP,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<HighlightTexture name="$parentHighlight" file="Interface\AddOns\MobMap\blizztrackerbuttonglow" alphaMode="ADD" >
+				</HighlightTexture>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<ScrollFrame name="MobMapZoneListScrollFrameTemplate" inherits="FauxScrollFrameTemplate" virtual="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-ScrollBar">
+					<Size>
+						<AbsDimension x="30" y="120"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-3" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.46875" top="0.0234375" bottom="0.9609375"/>
+				</Texture>
+				<Texture name="$parentInnerTexture" file="Interface\ClassTrainerFrame\UI-ClassTrainer-ScrollBar">
+					<Size>
+						<AbsDimension x="30" y="0"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="-3" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.53125" right="1.0" top="0.03125" bottom="0.7"/>
+				</Texture>
+				<Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-ScrollBar">
+					<Size>
+						<AbsDimension x="30" y="123"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="-3" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.53125" right="1.0" top="0.03125" bottom="1.0"/>
+				</Texture>
+			</Layer>
+		</Layers>
+	</ScrollFrame>
+
+	<ScrollFrame name="MobMapQuestListScrollFrameTemplate" inherits="FauxScrollFrameTemplate" virtual="true">
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-ScrollBar">
+					<Size>
+						<AbsDimension x="24" y="120"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="1" y="2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.46875" top="0.0234375" bottom="0.9609375"/>
+				</Texture>
+				<Texture name="$parentInnerTexture" file="Interface\ClassTrainerFrame\UI-ClassTrainer-ScrollBar">
+					<Size>
+						<AbsDimension x="24" y="160"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativePoint="TOPRIGHT">
+							<Offset>
+								<AbsDimension x="1" y="0"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.53125" right="1.0" top="0.03125" bottom="0.7"/>
+				</Texture>
+				<Texture file="Interface\ClassTrainerFrame\UI-ClassTrainer-ScrollBar">
+					<Size>
+						<AbsDimension x="24" y="123"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT" relativePoint="BOTTOMRIGHT">
+							<Offset>
+								<AbsDimension x="1" y="-2"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0.53125" right="1.0" top="0.03125" bottom="1.0"/>
+				</Texture>
+			</Layer>
+		</Layers>
+	</ScrollFrame>
+
+	<Frame name="MobMapDialogBoxFrame_OnlyOK" virtual="true" toplevel="true" frameStrata="DIALOG" hidden="true">
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Frames>
+			<Button name="$parentOKButton">
+				<Size>
+					<AbsDimension x="128" y="32"/>
+				</Size>
+				<Anchors>
+					<Anchor point="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						self:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+				<NormalTexture inherits="DialogButtonNormalTexture"/>
+				<PushedTexture inherits="DialogButtonPushedTexture"/>
+				<HighlightTexture inherits="DialogButtonHighlightTexture"/>
+				<ButtonText inherits="DialogButtonNormalText" text="OKAY"/>
+			</Button>
+		</Frames>
+	</Frame>
+
+	<Frame name="MobMapErrorMessageFrame" inherits="MobMapDialogBoxFrame_OnlyOK" frameStrata="DIALOG">
+		<Size>
+			<AbsDimension x="400" y="200"/>
+		</Size>
+		<Frames>
+			<Frame>
+				<Size>
+					<AbsDimension x="280" y="200"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP">
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString name="MobMapErrorMessageFrameTitle" inherits="GameFontNormalLarge" justifyH="CENTER" justifyV="TOP" text="MOBMAP_ERROR_FRAME_TITLE">
+							<Size>
+								<AbsDimension x="360" y="0"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="0" y="-16"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1" g="1" b="1" a="1"/>
+						</FontString>
+						<FontString name="MobMapErrorMessageFrameText" inherits="GameFontNormal" justifyH="CENTER" justifyV="TOP" text="">
+						<Size>
+							<AbsDimension x="360" y="180"/>
+						</Size>
+							<Anchors>
+								<Anchor point="TOP">
+									<Offset>
+										<AbsDimension x="0" y="-50"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+		</Frames>
+    </Frame>
+
+	<Button name="MobMapTabButtonTemplate" virtual="true">
+		<Size>
+            <AbsDimension x="115" y="32"/>
+        </Size>
+		<Layers>
+			<Layer level="BACKGROUND">
+				<Texture name="$parentLeftDisabled" file="Interface\HelpFrame\HelpFrameTab-Active">
+					<Size>
+						<AbsDimension x="8" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT">
+							<Offset>
+								<AbsDimension x="0" y="-3"/>
+							</Offset>
+						</Anchor>
+					</Anchors>
+					<TexCoords left="0" right="0.25" top="0" bottom="1.0"/>
+				</Texture>
+				<Texture name="$parentMiddleDisabled" file="Interface\HelpFrame\HelpFrameTab-Active">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentLeftDisabled" relativePoint="RIGHT"/>
+					</Anchors>
+					<TexCoords left="0.25" right="0.75" top="0" bottom="1.0"/>
+				</Texture>
+				<Texture name="$parentRightDisabled" file="Interface\HelpFrame\HelpFrameTab-Active">
+					<Size>
+						<AbsDimension x="8" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentMiddleDisabled" relativePoint="RIGHT"/>
+					</Anchors>
+					<TexCoords left="0.75" right="1.0" top="0" bottom="1.0"/>
+				</Texture>
+				<Texture name="$parentLeft" file="Interface\HelpFrame\HelpFrameTab-Inactive">
+					<Size>
+						<AbsDimension x="8" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="BOTTOMLEFT"/>
+					</Anchors>
+					<TexCoords left="0" right="0.25" top="0" bottom="1.0"/>
+				</Texture>
+				<Texture name="$parentMiddle" file="Interface\HelpFrame\HelpFrameTab-Inactive">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+					</Anchors>
+					<TexCoords left="0.25" right="0.75" top="0" bottom="1.0"/>
+				</Texture>
+				<Texture name="$parentRight" file="Interface\HelpFrame\HelpFrameTab-Inactive">
+					<Size>
+						<AbsDimension x="8" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="LEFT" relativeTo="$parentMiddle" relativePoint="RIGHT"/>
+					</Anchors>
+					<TexCoords left="0.75" right="1.0" top="0" bottom="1.0"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				PanelTemplates_TabResize(self, 0);
+				getglobal(self:GetName().."HighlightTexture"):SetWidth(self:GetTextWidth() + 16);
+			</OnLoad>
+		</Scripts>
+		<ButtonText name="$parentText">
+			<Size>
+				<AbsDimension x="0" y="13"/>
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOM">
+					<Offset>
+						<AbsDimension x="0" y="5"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</ButtonText>
+		<NormalFont style="GameFontNormalSmall"/>
+		<HighlightFont style="GameFontHighlightSmall"/>
+		<DisabledFont style="GameFontDisableSmall"/>
+		<HighlightTexture name="$parentHighlightTexture" file="Interface\PaperDollInfoFrame\UI-Character-Tab-Highlight" alphaMode="ADD">
+			<Size>
+				<AbsDimension x="5" y="32"/>
+			</Size>
+			<Anchors>
+				<Anchor point="BOTTOM">
+					<Offset>
+						<AbsDimension x="2" y="-8"/>
+					</Offset>
+				</Anchor>
+			</Anchors>
+		</HighlightTexture>
+    </Button>
+
+	<!-- this template mimics the pre-3.0 button behavior in terms of the SetTextColor and SetHighlightTextColor functions -->
+	<!-- it allows to easily manipulate button color while preserving the color change when hovering -->
+	<Button name="MobMapHoverableButtonTemplate" virtual="true">
+		<Scripts>
+			<OnLoad>
+				self.highlightR=1.0;
+				self.highlightG=1.0;
+				self.highlightB=1.0;
+				self.highlightA=1.0;
+				self.textR=1.0;
+				self.textG=0.82;
+				self.textB=0.0;
+				self.textA=1.0;
+				self.SetTextColor=function(self,r,g,b,a)
+					self.textR=r;
+					self.textG=g;
+					self.textB=b;
+					if(a) then self.textA=a;
+					else self.textA=1.0; end
+					self:GetFontString():SetTextColor(self.textR, self.textG, self.textB, self.textA);
+				end
+				self.SetHighlightTextColor=function(self,r,g,b,a)
+					self.highlightR=r;
+					self.highlightG=g;
+					self.highlightB=b;
+					if(a) then self.highlightA=a;
+					else self.highlightA=1.0; end
+				end
+				self.SuperOnEnter=function(self)
+					if(not self:IsEnabled()) then return; end
+					self:GetFontString():SetTextColor(self.highlightR, self.highlightG, self.highlightB, self.highlightA);
+				end
+				self.SuperOnLeave=function(self)
+					if(not self:IsEnabled()) then return; end
+					self:GetFontString():SetTextColor(self.textR, self.textG, self.textB, self.textA);
+				end
+			</OnLoad>
+			<OnEnter>
+				if(self.SuperOnEnter) then self:SuperOnEnter(); end
+			</OnEnter>
+			<OnLeave>
+				if(self.SuperOnLeave) then self:SuperOnLeave(); end
+			</OnLeave>
+		</Scripts>
+	</Button>
+
+	<Button name="MobMapSmallButtonTemplate" virtual="true">
+		<ButtonText name="$parentText"/>
+		<NormalFont style="GameFontNormalSmall"/>
+		<HighlightFont style="GameFontHighlightSmall"/>
+		<DisabledFont style="GameFontDisableSmall"/>
+		<NormalTexture inherits="UIPanelButtonUpTexture"/>
+		<PushedTexture inherits="UIPanelButtonDownTexture"/>
+		<DisabledTexture inherits="UIPanelButtonDisabledTexture"/>
+		<HighlightTexture inherits="UIPanelButtonHighlightTexture"/>
+	</Button>
+
+	<Button name="MobMapSmallTextButtonTemplate" inherits="MobMapHoverableButtonTemplate" virtual="true">
+		<ButtonText name="$parentText" inherits="GameFontNormalSmall" justifyH="LEFT" justifyV="CENTER">
+            <Anchors>
+                <Anchor point="LEFT"/>
+				<Anchor point="TOP"/>
+				<Anchor point="BOTTOM"/>
+				<Anchor point="RIGHT"/>
+            </Anchors>
+        </ButtonText>
+		<NormalFont style="GameFontNormalSmall" justifyH="LEFT"/>
+		<HighlightFont style="GameFontHighlightSmall" justifyH="LEFT"/>
+		<DisabledFont style="GameFontNormalSmall" justifyH="LEFT">
+			<Color r="1.0" g="1.0" b="1.0"/>
+		</DisabledFont>		
+	</Button>
+
+	<Button name="MobMapSmallRightTextButtonTemplate" inherits="MobMapHoverableButtonTemplate" virtual="true">
+		<ButtonText name="$parentText" inherits="GameFontNormalSmall" justifyH="RIGHT" justifyV="CENTER">
+            <Anchors>
+                <Anchor point="LEFT"/>
+				<Anchor point="TOP"/>
+				<Anchor point="BOTTOM"/>
+				<Anchor point="RIGHT"/>
+            </Anchors>
+        </ButtonText>
+		<NormalFont style="GameFontNormalSmall" justifyH="RIGHT"/>
+		<HighlightFont style="GameFontHighlightSmall" justifyH="RIGHT"/>
+		<DisabledFont style="GameFontNormalSmall" justifyH="RIGHT">
+			<Color r="1.0" g="1.0" b="1.0"/>
+		</DisabledFont>
+	</Button>
+
+	<Button name="MobMapSmallCenteredTextButtonTemplate" inherits="MobMapHoverableButtonTemplate" virtual="true">
+		<ButtonText name="$parentText" inherits="GameFontNormalSmall" justifyH="CENTER" justifyV="CENTER">
+            <Anchors>
+                <Anchor point="LEFT"/>
+				<Anchor point="TOP"/>
+				<Anchor point="BOTTOM"/>
+				<Anchor point="RIGHT"/>
+            </Anchors>
+        </ButtonText>
+		<NormalFont style="GameFontNormalSmall" justifyH="CENTER"/>
+		<HighlightFont style="GameFontHighlightSmall" justifyH="CENTER"/>
+		<DisabledFont style="GameFontNormalSmall" justifyH="CENTER">
+			<Color r="1.0" g="1.0" b="1.0"/>
+		</DisabledFont>
+	</Button>
+
+	<Button name="MobMapTextButtonTemplate" inherits="MobMapHoverableButtonTemplate" virtual="true">
+		<ButtonText name="$parentText" inherits="GameFontNormal" justifyH="LEFT" justifyV="CENTER">
+            <Anchors>
+                <Anchor point="LEFT"/>
+				<Anchor point="TOP"/>
+				<Anchor point="BOTTOM"/>
+				<Anchor point="RIGHT"/>
+            </Anchors>
+        </ButtonText>
+		<NormalFont style="GameFontNormal" justifyH="LEFT"/>
+		<HighlightFont style="GameFontHighlight" justifyH="LEFT"/>
+		<DisabledFont style="GameFontNormal" justifyH="LEFT">
+			<Color r="1.0" g="1.0" b="1.0"/>
+		</DisabledFont>
+	</Button>
+
+	<Button name="MobMapTopTextButtonTemplate" inherits="MobMapHoverableButtonTemplate" virtual="true">
+		<ButtonText name="$parentText" inherits="GameFontNormal" justifyH="LEFT" justifyV="TOP">
+            <Anchors>
+                <Anchor point="LEFT"/>
+				<Anchor point="TOP"/>
+				<Anchor point="BOTTOM"/>
+				<Anchor point="RIGHT"/>
+            </Anchors>
+        </ButtonText>
+		<NormalFont style="GameFontNormal" justifyH="TOP"/>
+		<HighlightFont style="GameFontHighlight" justifyH="TOP"/>
+		<DisabledFont style="GameFontNormal" justifyH="TOP">
+			<Color r="1.0" g="1.0" b="1.0"/>
+		</DisabledFont>
+	</Button>
+
+	<Button name="MobMapCenteredTextButtonTemplate" inherits="MobMapHoverableButtonTemplate" virtual="true">
+		<ButtonText name="$parentText" inherits="GameFontNormal" justifyH="CENTER" justifyV="CENTER">
+            <Anchors>
+                <Anchor point="LEFT"/>
+				<Anchor point="TOP"/>
+				<Anchor point="BOTTOM"/>
+				<Anchor point="RIGHT"/>
+            </Anchors>
+        </ButtonText>
+		<NormalFont style="GameFontNormal" justifyH="CENTER"/>
+		<HighlightFont style="GameFontHighlight" justifyH="CENTER"/>
+		<DisabledFont style="GameFontNormal" justifyH="CENTER">
+			<Color r="1.0" g="1.0" b="1.0"/>
+		</DisabledFont>
+	</Button>
+
+	<Slider name="MobMapSliderTemplate" inherits="OptionsSliderTemplate" virtual="true">
+		<Size x="180" y="18"/>
+		<Layers>
+			<Layer level="ARTWORK">
+				<FontString name="$parentValText" inherits="GameFontNormalSmall">
+					<Anchors>
+						<Anchor point="BOTTOM">
+							<Offset x="0" y="-6"/>
+						</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Slider>
+
+	<Frame name="MobMapFrame" toplevel="true" frameStrata="FULLSCREEN_DIALOG" hidden="true" enableMouse="true" movable="true">
+		<TitleRegion setAllPoints="true"/>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Size>
+			<AbsDimension x="600" y="430"/>
+		</Size>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Frames>
+			<Button name="MobMapFrameCloseButton" inherits="UIPanelCloseButton">
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativeTo="MobMapFrame" relativePoint="TOPRIGHT">
+                        <Offset>
+                            <AbsDimension x="-4" y="-4"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+				<Scripts>
+					<OnClick>
+						self:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+            </Button>
+			<Button name="MobMapExportFrameButton" inherits="UIPanelButtonTemplate" text="MOBMAP_EXPORT_FRAME_BUTTON">
+				<Size>
+					<AbsDimension x="140" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-10"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MobMap_ShowExportFrame();
+					</OnClick>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self,"MobMap",1.0,1.0,1.0,MOBMAP_EXPORT_TOOLTIP,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Frame name="$parentTitle">
+				<Size>
+					<AbsDimension x="300" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentText" justifyH="CENTER" justifyV="TOP" hidden="false" inherits="GameFontNormalLarge" text="MOBMAP_FRAMETITLE">
+							<Size>
+								<AbsDimension x="300" y="20"/>
+							</Size>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<Button name="MobMapSearchModeButton" inherits="MobMapTabButtonTemplate" text="MOBMAP_MOB_SEARCH_MODE_BUTTON" id="1">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent">
+						<Offset>
+							<AbsDimension x="20" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						PanelTemplates_TabResize(self, 0);
+						PanelTemplates_DeselectTab(self);
+						getglobal(self:GetName().."HighlightTexture"):SetWidth(self:GetTextWidth()+16);
+						getglobal(self:GetName().."Left"):SetAlpha(0.5);
+						getglobal(self:GetName().."Middle"):SetAlpha(0.5);
+						getglobal(self:GetName().."Right"):SetAlpha(0.5);
+						getglobal(self:GetName().."LeftDisabled"):SetAlpha(0.5);
+						getglobal(self:GetName().."MiddleDisabled"):SetAlpha(0.5);
+						getglobal(self:GetName().."RightDisabled"):SetAlpha(0.5);
+					</OnLoad>
+					<OnClick>
+						MobMap_ShowPanel("MobMapMobSearchFrame");
+					</OnClick>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self,"MobMap",1.0,1.0,1.0,MOBMAP_MOB_SEARCH_TAB_INFO,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+			<Button name="MobMapQuestModeButton" inherits="MobMapTabButtonTemplate" text="MOBMAP_QUEST_MODE_BUTTON" id="2">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent">
+						<Offset>
+							<AbsDimension x="104" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						PanelTemplates_TabResize(self, 0);
+						PanelTemplates_DeselectTab(self);
+						getglobal(self:GetName().."HighlightTexture"):SetWidth(self:GetTextWidth()+16);
+						getglobal(self:GetName().."Left"):SetAlpha(0.5);
+						getglobal(self:GetName().."Middle"):SetAlpha(0.5);
+						getglobal(self:GetName().."Right"):SetAlpha(0.5);
+						getglobal(self:GetName().."LeftDisabled"):SetAlpha(0.5);
+						getglobal(self:GetName().."MiddleDisabled"):SetAlpha(0.5);
+						getglobal(self:GetName().."RightDisabled"):SetAlpha(0.5);
+					</OnLoad>
+					<OnClick>
+						MobMap_ShowPanel("MobMapQuestListFrame");
+					</OnClick>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self,"MobMap",1.0,1.0,1.0,MOBMAP_QUEST_SEARCH_TAB_INFO,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+			<Button name="MobMapMerchantModeButton" inherits="MobMapTabButtonTemplate" text="MOBMAP_MERCHANT_MODE_BUTTON" id="3">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent">
+						<Offset>
+							<AbsDimension x="164" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						PanelTemplates_TabResize(self, 0);
+						getglobal(self:GetName().."HighlightTexture"):SetWidth(self:GetTextWidth()+16);
+						PanelTemplates_DeselectTab(self);
+						getglobal(self:GetName().."Left"):SetAlpha(0.5);
+						getglobal(self:GetName().."Middle"):SetAlpha(0.5);
+						getglobal(self:GetName().."Right"):SetAlpha(0.5);
+						getglobal(self:GetName().."LeftDisabled"):SetAlpha(0.5);
+						getglobal(self:GetName().."MiddleDisabled"):SetAlpha(0.5);
+						getglobal(self:GetName().."RightDisabled"):SetAlpha(0.5);
+					</OnLoad>
+					<OnClick>
+						MobMap_ShowPanel("MobMapMerchantListFrame");
+					</OnClick>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self,"MobMap",1.0,1.0,1.0,MOBMAP_MERCHANT_SEARCH_TAB_INFO,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+			<Button name="MobMapRecipeModeButton" inherits="MobMapTabButtonTemplate" text="MOBMAP_RECIPE_MODE_BUTTON" id="4">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent">
+						<Offset>
+							<AbsDimension x="240" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						PanelTemplates_TabResize(self, 0);
+						getglobal(self:GetName().."HighlightTexture"):SetWidth(self:GetTextWidth()+16);
+						PanelTemplates_DeselectTab(self);
+						getglobal(self:GetName().."Left"):SetAlpha(0.5);
+						getglobal(self:GetName().."Middle"):SetAlpha(0.5);
+						getglobal(self:GetName().."Right"):SetAlpha(0.5);
+						getglobal(self:GetName().."LeftDisabled"):SetAlpha(0.5);
+						getglobal(self:GetName().."MiddleDisabled"):SetAlpha(0.5);
+						getglobal(self:GetName().."RightDisabled"):SetAlpha(0.5);
+					</OnLoad>
+					<OnClick>
+						MobMap_ShowPanel("MobMapRecipeListFrame");
+					</OnClick>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self,"MobMap",1.0,1.0,1.0,MOBMAP_RECIPE_SEARCH_TAB_INFO,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+			<Button name="MobMapDropModeButton" inherits="MobMapTabButtonTemplate" text="MOBMAP_DROP_MODE_BUTTON" id="7">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent">
+						<Offset>
+							<AbsDimension x="304" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						PanelTemplates_TabResize(self, 0);
+						getglobal(self:GetName().."HighlightTexture"):SetWidth(self:GetTextWidth()+16);
+						PanelTemplates_DeselectTab(self);
+						getglobal(self:GetName().."Left"):SetAlpha(0.5);
+						getglobal(self:GetName().."Middle"):SetAlpha(0.5);
+						getglobal(self:GetName().."Right"):SetAlpha(0.5);
+						getglobal(self:GetName().."LeftDisabled"):SetAlpha(0.5);
+						getglobal(self:GetName().."MiddleDisabled"):SetAlpha(0.5);
+						getglobal(self:GetName().."RightDisabled"):SetAlpha(0.5);
+					</OnLoad>
+					<OnClick>
+						MobMap_ShowPanel("MobMapDropListFrame");
+					</OnClick>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self,"MobMap",1.0,1.0,1.0,MOBMAP_DROP_SEARCH_TAB_INFO,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+			<Button name="MobMapPickupModeButton" inherits="MobMapTabButtonTemplate" text="MOBMAP_PICKUP_MODE_BUTTON" id="8">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent">
+						<Offset>
+							<AbsDimension x="396" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						PanelTemplates_TabResize(self, 0);
+						getglobal(self:GetName().."HighlightTexture"):SetWidth(self:GetTextWidth()+16);
+						PanelTemplates_DeselectTab(self);
+						getglobal(self:GetName().."Left"):SetAlpha(0.5);
+						getglobal(self:GetName().."Middle"):SetAlpha(0.5);
+						getglobal(self:GetName().."Right"):SetAlpha(0.5);
+						getglobal(self:GetName().."LeftDisabled"):SetAlpha(0.5);
+						getglobal(self:GetName().."MiddleDisabled"):SetAlpha(0.5);
+						getglobal(self:GetName().."RightDisabled"):SetAlpha(0.5);
+					</OnLoad>
+					<OnClick>
+						MobMap_ShowPanel("MobMapPickupListFrame");
+					</OnClick>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self,"MobMap",1.0,1.0,1.0,MOBMAP_PICKUP_SEARCH_TAB_INFO,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+			<Button name="MobMapQuestEventModeButton" inherits="MobMapTabButtonTemplate" text="MOBMAP_QUESTEVENT_MODE_BUTTON" id="6">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent">
+						<Offset>
+							<AbsDimension x="460" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						PanelTemplates_TabResize(self, 0);
+						getglobal(self:GetName().."HighlightTexture"):SetWidth(self:GetTextWidth()+16);
+						PanelTemplates_DeselectTab(self);
+						getglobal(self:GetName().."Left"):SetAlpha(0.5);
+						getglobal(self:GetName().."Middle"):SetAlpha(0.5);
+						getglobal(self:GetName().."Right"):SetAlpha(0.5);
+						getglobal(self:GetName().."LeftDisabled"):SetAlpha(0.5);
+						getglobal(self:GetName().."MiddleDisabled"):SetAlpha(0.5);
+						getglobal(self:GetName().."RightDisabled"):SetAlpha(0.5);
+					</OnLoad>
+					<OnClick>
+						MobMap_ShowPanel("MobMapQuestEventFrame");
+					</OnClick>
+					<OnEnter>
+						GameTooltip_AddNewbieTip(self,"MobMap",1.0,1.0,1.0,MOBMAP_QUESTEVENT_SEARCH_TAB_INFO,1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+			<Button name="MobMapAboutModeButton" inherits="MobMapTabButtonTemplate" text="MOBMAP_ABOUT_MODE_BUTTON" id="5">
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent">
+						<Offset>
+							<AbsDimension x="560" y="-50"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnLoad>
+						PanelTemplates_TabResize(self, 0);
+						getglobal(self:GetName().."HighlightTexture"):SetWidth(self:GetTextWidth()+16);
+						PanelTemplates_DeselectTab(self);
+						getglobal(self:GetName().."Left"):SetAlpha(0.5);
+						getglobal(self:GetName().."Middle"):SetAlpha(0.5);
+						getglobal(self:GetName().."Right"):SetAlpha(0.5);
+						getglobal(self:GetName().."LeftDisabled"):SetAlpha(0.5);
+						getglobal(self:GetName().."MiddleDisabled"):SetAlpha(0.5);
+						getglobal(self:GetName().."RightDisabled"):SetAlpha(0.5);
+					</OnLoad>
+					<OnClick>
+						MobMap_ShowPanel("MobMapAboutFrame");
+					</OnClick>
+					<OnEnter>
+					</OnEnter>
+					<OnLeave>
+					</OnLeave>
+				</Scripts>
+			</Button>
+
+
+			<Frame name="MobMapBackgroundFrame" hidden="false">
+				<Size>
+					<AbsDimension x="578" y="334"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="11" y="-84"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture>
+							<Color r="0.0" g="0.0" b="0.0" a="0.5"/>
+						</Texture>
+						<Texture file="Interface\AddOns\MobMap\Divider.blp">
+							<Size>
+								<AbsDimension x="289" y="8"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="3"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+						<Texture file="Interface\AddOns\MobMap\Divider.blp">
+							<Size>
+								<AbsDimension x="289" y="8"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="289" y="3"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</Texture>
+					</Layer>
+				</Layers>
+			</Frame>
+
+			<Frame name="MobMapAboutFrame" hidden="true">
+				<Size>
+					<AbsDimension x="600" y="400"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="MobMapFrame" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-80"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormal" text="MOBMAP_ABOUT_1">
+							<Size>
+								<AbsDimension x="600" y="12"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="24" y="-16"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_ABOUT_2">
+							<Size>
+								<AbsDimension x="600" y="12"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="24" y="-30"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_ABOUT_3">
+							<Size>
+								<AbsDimension x="600" y="12"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="24" y="-56"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_ABOUT_4">
+							<Size>
+								<AbsDimension x="600" y="12"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="24" y="-70"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_ABOUT_5">
+							<Size>
+								<AbsDimension x="600" y="30"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="24" y="-96"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString name="$parentDBInfoHeader" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_DATABASE_INFO_HEADER">
+							<Size>
+								<AbsDimension x="600" y="12"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="24" y="-140"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString name="$parentDBInfoBuildTime" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_DATABASE_INFO_1">
+							<Size>
+								<AbsDimension x="600" y="12"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentDBInfoHeader" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="12" y="-20"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString name="$parentDBInfoLanguage" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_DATABASE_INFO_2">
+							<Size>
+								<AbsDimension x="600" y="12"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentDBInfoBuildTime" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="-16"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString name="$parentDBInfoMobCount" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_DATABASE_INFO_3">
+							<Size>
+								<AbsDimension x="600" y="12"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentDBInfoLanguage" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="-16"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString name="$parentDBInfoQuestCount" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_DATABASE_INFO_4">
+							<Size>
+								<AbsDimension x="600" y="12"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentDBInfoMobCount" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="-16"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString name="$parentDBInfoMerchantCount" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_DATABASE_INFO_5">
+							<Size>
+								<AbsDimension x="600" y="12"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentDBInfoQuestCount" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="-16"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString name="$parentDBInfoRecipeCount" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_DATABASE_INFO_6">
+							<Size>
+								<AbsDimension x="600" y="12"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentDBInfoMerchantCount" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="-16"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+						<FontString name="$parentDBInfoCommentCount" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormalSmall" text="MOBMAP_DATABASE_INFO_7">
+							<Size>
+								<AbsDimension x="600" y="12"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT" relativeTo="$parentDBInfoRecipeCount" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="-16"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Button name="$parentMemInfo" inherits="MobMapSmallTextButtonTemplate">
+						<Size>
+							<AbsDimension x="600" y="24"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parentDBInfoCommentCount" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="-12" y="-24"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								MobMap_UpdateMemoryUsage(self);
+							</OnClick>
+							<OnEnter>
+								MobMap_ShowMemoryUsageDetailTooltip(self);
+							</OnEnter>
+							<OnLeave>
+								MobMapTooltip:Hide();
+							</OnLeave>
+						</Scripts>
+					</Button>
+				</Frames>
+				<Scripts>
+					<OnShow>
+						MobMap_AboutFrame_OnShow(self);
+					</OnShow>
+					<OnUpdate>
+					</OnUpdate>
+				</Scripts>
+			</Frame>
+
+			<CheckButton name="MobMapMinimapCheckButton">
+                <Size>
+                    <AbsDimension x="20" y="20"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="MobMapFrame" relativePoint="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="16" y="-30"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <FontString inherits="GameFontHighlightSmall" text="MOBMAP_MINIMAP_CHECKBOX">
+                            <Anchors>
+                                <Anchor point="LEFT" relativePoint="RIGHT">
+                                    <Offset>
+                                        <AbsDimension x="0" y="1"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Scripts>
+                    <OnClick>
+                        if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_minimap=true;
+                        else
+							mobmap_minimap=false;
+							MobMap_HideAllMinimapDots();
+                        end
+                    </OnClick>
+                </Scripts>
+                <NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+                <PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+                <HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+                <CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+                <DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+            </CheckButton>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				tinsert(UISpecialFrames,self:GetName());
+				MobMapFrame_OnLoad(self);
+			</OnLoad>
+			<OnShow>
+				MobMap_ResizeWindow();
+				self:SetScale(UIParent:GetScale());
+				MobMapMinimapCheckButton:SetChecked(mobmap_minimap);
+			</OnShow>
+			<OnEvent>
+				MobMapFrame_OnEvent(self);
+			</OnEvent>
+			<OnEscapePressed>
+				HideUIPanel(MobMapFrame);
+			</OnEscapePressed>
+    	</Scripts>
+	</Frame>
+
+	<Frame name="MobMapExportFrame" toplevel="true" frameStrata="FULLSCREEN_DIALOG" hidden="true" enableMouse="true" movable="true">
+		<TitleRegion setAllPoints="true"/>
+		<Anchors>
+			<Anchor point="CENTER"/>
+		</Anchors>
+		<Size>
+			<AbsDimension x="600" y="400"/>
+		</Size>
+		<Backdrop bgFile="Interface\DialogFrame\UI-DialogBox-Background" edgeFile="Interface\DialogFrame\UI-DialogBox-Border" tile="true">
+			<EdgeSize>
+				<AbsValue val="32"/>
+			</EdgeSize>
+			<TileSize>
+				<AbsValue val="32"/>
+			</TileSize>
+			<BackgroundInsets>
+				<AbsInset left="11" right="12" top="12" bottom="11"/>
+			</BackgroundInsets>
+		</Backdrop>
+		<Frames>
+			<Button name="MobMapExportFrameCloseButton" inherits="UIPanelCloseButton">
+                <Anchors>
+                    <Anchor point="TOPRIGHT" relativeTo="MobMapExportFrame" relativePoint="TOPRIGHT">
+                        <Offset>
+                            <AbsDimension x="-4" y="-4"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+				<Scripts>
+					<OnClick>
+						self:GetParent():Hide();
+					</OnClick>
+				</Scripts>
+            </Button>
+			<Frame name="$parentTitle">
+				<Size>
+					<AbsDimension x="300" y="18"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parent" relativePoint="TOP">
+						<Offset>
+							<AbsDimension x="0" y="-16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentText" justifyH="CENTER" justifyV="TOP" hidden="false" inherits="GameFontNormalLarge" text="MOBMAP_EXPORT_FRAME_TITLE">
+							<Size>
+								<AbsDimension x="300" y="20"/>
+							</Size>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<Frame name="$parentSubTitle">
+				<Size>
+					<AbsDimension x="560" y="250"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentTitle" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="-8"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="OVERLAY">
+						<FontString name="$parentText" justifyH="LEFT" justifyV="TOP" hidden="false" inherits="GameFontNormal" text="MOBMAP_EXPORT_FRAME_EXPLANATION">
+							<Size>
+								<AbsDimension x="560" y="250"/>
+							</Size>
+							<Color r="1.0" g="1.0" b="1.0" a="1.0"/>
+						</FontString>
+					</Layer>
+				</Layers>
+			</Frame>
+			<EditBox name="MobMapExportFrameData" letters="1000000" historyLines="0" autoFocus="false">
+				<Size>
+					<AbsDimension x="400" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOP" relativeTo="$parentSubTitle" relativePoint="BOTTOM">
+						<Offset>
+							<AbsDimension x="0" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="BACKGROUND">
+						<Texture name="$parentLeft" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="TOPLEFT">
+									<Offset>
+										<AbsDimension x="-5" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0" right="0.0625" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentRight" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="8" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+							<TexCoords left="0.9375" right="1.0" top="0" bottom="0.625"/>
+						</Texture>
+						<Texture name="$parentMiddle" file="Interface\Common\Common-Input-Border">
+							<Size>
+								<AbsDimension x="20" y="20"/>
+							</Size>
+							<Anchors>
+								<Anchor point="LEFT" relativeTo="$parentLeft" relativePoint="RIGHT"/>
+								<Anchor point="RIGHT" relativeTo="$parentRight" relativePoint="LEFT"/>
+							</Anchors>
+							<TexCoords left="0.0625" right="0.9375" top="0" bottom="0.625"/>
+						</Texture>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnMouseUp>
+						self:HighlightText();
+					</OnMouseUp>
+					<OnEscapePressed>
+						self:ClearFocus();
+					</OnEscapePressed>
+					<OnTextChanged>
+						self:SetText(self.data);
+						self:HighlightText();
+					</OnTextChanged>
+					<OnEditFocusLost>
+						self:HighlightText(0, 0);
+					</OnEditFocusLost>
+					<OnEditFocusGained>
+						self:HighlightText();
+					</OnEditFocusGained>
+				</Scripts>
+				<FontString inherits="ChatFontNormal"/>
+			</EditBox>
+			<Button name="MobMapExportFrameDeleteButton" inherits="UIPanelButtonTemplate" text="MOBMAP_EXPORT_FRAME_DELETE_BUTTON">
+				<Size>
+					<AbsDimension x="140" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="MobMapExportFrameData" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="-30"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MobMap_DeletePositionData();
+						MobMap_ExportData();
+					</OnClick>
+				</Scripts>
+			</Button>
+			<CheckButton name="MobMapExportFrameNoScanCheckButton">
+                <Size>
+                    <AbsDimension x="20" y="20"/>
+                </Size>
+                <Anchors>
+                    <Anchor point="TOPLEFT" relativeTo="MobMapExportFrameData" relativePoint="TOPLEFT">
+                        <Offset>
+                            <AbsDimension x="0" y="-32"/>
+                        </Offset>
+                    </Anchor>
+                </Anchors>
+                <Layers>
+                    <Layer level="ARTWORK">
+                        <FontString inherits="GameFontHighlightSmall" text="MOBMAP_EXPORT_FRAME_NOSCAN_CHECK_BUTTON">
+                            <Anchors>
+                                <Anchor point="LEFT" relativePoint="RIGHT">
+                                    <Offset>
+                                        <AbsDimension x="0" y="1"/>
+                                    </Offset>
+                                </Anchor>
+                            </Anchors>
+                        </FontString>
+                    </Layer>
+                </Layers>
+                <Scripts>
+                    <OnClick>
+                        if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_scanning=false;
+                        else
+							mobmap_scanning=true;
+							MobMapFrame:RegisterEvent("PLAYER_TARGET_CHANGED");
+                        end
+                    </OnClick>
+                </Scripts>
+                <NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+                <PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+                <HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+                <CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+                <DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+            </CheckButton>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				tinsert(UISpecialFrames,self:GetName());
+			</OnLoad>
+			<OnShow>
+				self:SetScale(UIParent:GetScale());
+				local realmname=GetRealmName();
+				MobMapExportFrameNoScanCheckButton:SetChecked(not mobmap_scanning);
+				MobMapExportFrameData:SetFocus();
+			</OnShow>
+			<OnEvent>
+			</OnEvent>
+    	</Scripts>
+	</Frame>
+
+	<Frame name="MobMapOptionsFrame" hidden="true">
+		<Size>
+			<AbsDimension x="600" y="400"/>
+		</Size>
+		<Frames>
+			<Frame name="$parentDotColorSettings" hidden="false">
+				<Size>
+					<AbsDimension x="200" y="100"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="16" y="-16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_DOT_COLOR_SETTING">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="16" y="-8"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Frames>
+					<Frame name="$parentExample" hidden="false">
+						<Size>
+							<AbsDimension x="36" y="36"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="20" y="-40"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Layers>
+							<Layer level="BACKGROUND">
+								<Texture name="$parentTexture">
+									<Size>
+										<AbsDimension x="36" y="36"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="0" y="0"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<Color r="1.0" g="1.0" b="1.0"/>
+								</Texture>
+							</Layer>
+							<Layer level="ARTWORK">
+								<Texture name="$parentTexture2">
+									<Size>
+										<AbsDimension x="18" y="18"/>
+									</Size>
+									<Anchors>
+										<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+											<Offset>
+												<AbsDimension x="9" y="-9"/>
+											</Offset>
+										</Anchor>
+									</Anchors>
+									<Color r="1.0" g="1.0" b="1.0"/>
+								</Texture>
+							</Layer>
+						</Layers>
+					</Frame>
+					<Button name="$parentChangeOuterButton" inherits="UIPanelButtonTemplate" text="MOBMAP_DOT_OUTER_COLOR_BUTTON">
+						<Size>
+							<AbsDimension x="120" y="22"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="80" y="-32"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								MobMap_DisplayColorSelector(mobmap_outer_dot_color);
+							</OnClick>
+							<OnEnter>
+							</OnEnter>
+							<OnLeave>
+							</OnLeave>
+						</Scripts>
+					</Button>
+					<Button name="$parentChangeInnerButton" inherits="UIPanelButtonTemplate" text="MOBMAP_DOT_INNER_COLOR_BUTTON">
+						<Size>
+							<AbsDimension x="120" y="22"/>
+						</Size>
+						<Anchors>
+							<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+								<Offset>
+									<AbsDimension x="80" y="-58"/>
+								</Offset>
+							</Anchor>
+						</Anchors>
+						<Scripts>
+							<OnClick>
+								MobMap_DisplayColorSelector(mobmap_inner_dot_color);
+							</OnClick>
+							<OnEnter>
+							</OnEnter>
+							<OnLeave>
+							</OnLeave>
+						</Scripts>
+					</Button>
+				</Frames>						
+			</Frame>			
+			<Slider name="$parentWindowHeightSlider" inherits="MobMapSliderTemplate" minValue="430" maxValue="830" valuestep="1">			
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset x="30" y="-140"/>
+					</Anchor>
+				</Anchors>				
+				<Scripts>
+					<OnLoad>
+						getglobal(self:GetName().."Text"):SetText(MOBMAP_WINDOW_HEIGHT_SLIDER);
+						getglobal(self:GetName().."Low"):SetText("430");
+						getglobal(self:GetName().."High"):SetText("830");
+					</OnLoad>
+					<OnValueChanged>
+						getglobal(self:GetName().."ValText"):SetText(self:GetValue());
+						mobmap_window_height=self:GetValue();
+						MobMap_ResizeWindow();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			<Slider name="$parentButtonSlider" inherits="MobMapSliderTemplate" minValue="0" maxValue="3" valuestep="1">			
+				<Size x="120" y="18"/>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentWindowHeightSlider" relativePoint="RIGHT">
+						<Offset x="16" y="0"/>
+					</Anchor>
+				</Anchors>				
+				<Scripts>
+					<OnLoad>
+						getglobal(self:GetName().."Text"):SetText(MOBMAP_BUTTON_TYPE_SLIDER);
+						getglobal(self:GetName().."Low"):SetText("0");
+						getglobal(self:GetName().."High"):SetText("3");
+					</OnLoad>
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT");
+						GameTooltip:SetText(MOBMAP_BUTTON_TYPE_SLIDER_INFO, nil, nil, nil, nil, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+					<OnValueChanged>
+						getglobal(self:GetName().."ValText"):SetText(self:GetValue());
+						mobmap_button_position=self:GetValue();
+						MobMap_PlaceMobMapButtonFrame();
+					</OnValueChanged>
+				</Scripts>
+			</Slider>
+			<CheckButton name="$parentShowMinimapButtonCheckButton">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentWindowHeightSlider" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-40"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_SHOW_MINIMAP_BUTTON_CHECKBOX">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_minimap_button_visible=true;
+						else
+							mobmap_minimap_button_visible=false;
+						end
+						MobMap_MinimapButton_UpdateVisibility();
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT");
+						GameTooltip:SetText(MOBMAP_SHOW_MINIMAP_BUTTON_CHECKBOX_INFO, nil, nil, nil, nil, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<CheckButton name="$parentFlashDotsCheckButton">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentShowMinimapButtonCheckButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_FLASH_DOTS_CHECKBOX">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_flash_positions=true;
+						else
+							mobmap_flash_positions=false;
+						end
+						MobMap_MinimapButton_UpdateVisibility();
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT");
+						GameTooltip:SetText(MOBMAP_FLASH_DOTS_CHECKBOX_INFO, nil, nil, nil, nil, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<CheckButton name="$parentDatabaseLoadingInfoCheckButton">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentFlashDotsCheckButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_DATABASE_LOADING_INFO_CHECKBOX">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_display_database_loading_info=true;
+						else
+							mobmap_display_database_loading_info=false;
+						end
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<CheckButton name="$parentWorldMapTooltipCheckButton">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentDatabaseLoadingInfoCheckButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_WORLD_MAP_TOOLTIP_CHECKBOX">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_show_world_map_tooltips=true;
+						else
+							mobmap_show_world_map_tooltips=false;
+						end
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<CheckButton name="$parentRequestItemDetailsCheckButton">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentWorldMapTooltipCheckButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_REQUEST_ITEM_DETAILS_CHECKBOX">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_request_item_details=true;
+						else
+							mobmap_request_item_details=false;
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT");
+						GameTooltip:SetText(MOBMAP_REQUEST_ITEM_DETAILS_CHECKBOX_INFO, nil, nil, nil, nil, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<Frame name="$parentQuestionMarkButtonSettingsTitle" hidden="false">
+				<Size>
+					<AbsDimension x="100" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentRequestItemDetailsCheckButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-26"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_QUESTIONMARK_SETTINGS_TITLE">
+							<Anchors>
+								<Anchor point="TOPLEFT" relativePoint="TOPLEFT">
+									<Offset>
+										<AbsDimension x="0" y="0"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>				
+			</Frame>
+			<CheckButton name="$parentShowQuestLogButtonsCheckButton">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentQuestionMarkButtonSettingsTitle" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="0" y="2"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_SHOW_QUESTLOG_BUTTONS_CHECKBOX">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_hide_questlog_buttons=false;
+						else
+							mobmap_hide_questlog_buttons=true;
+						end
+					</OnClick>
+					<OnEnter>
+					</OnEnter>
+					<OnLeave>
+					</OnLeave>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<CheckButton name="$parentShowQuestTrackerButtonsCheckButton">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentShowQuestLogButtonsCheckButton" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="100" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_SHOW_QUESTTRACKER_BUTTONS_CHECKBOX">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_hide_questtracker_buttons=false;
+						else
+							mobmap_hide_questtracker_buttons=true;
+						end
+					</OnClick>
+					<OnEnter>
+					</OnEnter>
+					<OnLeave>
+					</OnLeave>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<CheckButton name="$parentShowReagentButtonsCheckButton">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentShowQuestLogButtonsCheckButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_SHOW_REAGENT_BUTTONS_CHECKBOX">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_hide_reagent_buttons=false;
+						else
+							mobmap_hide_reagent_buttons=true;
+						end
+					</OnClick>
+					<OnEnter>
+					</OnEnter>
+					<OnLeave>
+					</OnLeave>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<CheckButton name="$parentShowQuestGossipButtonsCheckButton">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="LEFT" relativeTo="$parentShowReagentButtonsCheckButton" relativePoint="RIGHT">
+						<Offset>
+							<AbsDimension x="100" y="0"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_SHOW_QUEST_GOSSIP_BUTTONS_CHECKBOX">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_hide_questgossip_buttons=false;
+						else
+							mobmap_hide_questgossip_buttons=true;
+						end
+					</OnClick>
+					<OnEnter>
+					</OnEnter>
+					<OnLeave>
+					</OnLeave>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<CheckButton name="$parentIgnoreQuestCommentsCheckButton">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentRequestItemDetailsCheckButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-64"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_IGNORE_QUEST_COMMENTS_CHECKBOX">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_use_quest_comments=false;
+						else
+							mobmap_use_quest_comments=true;
+						end
+					</OnClick>
+					<OnEnter>
+					</OnEnter>
+					<OnLeave>
+					</OnLeave>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<CheckButton name="$parentAutoshowQuestCommentsCheckButton">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentIgnoreQuestCommentsCheckButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_AUTOSHOW_QUEST_COMMENTS_CHECKBOX">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_autoshow_comments=true;
+						else
+							mobmap_autoshow_comments=false;
+						end
+					</OnClick>
+					<OnEnter>
+					</OnEnter>
+					<OnLeave>
+					</OnLeave>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<CheckButton name="$parentAutoTrackCompletedQuestsCheckButton">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentAutoshowQuestCommentsCheckButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_AUTOTRACK_COMPLETED_QUESTS">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_track_quest_completion=true;
+						else
+							mobmap_track_quest_completion=false;
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT");
+						GameTooltip:SetText(MOBMAP_AUTOTRACK_COMPLETED_QUESTS_INFO, nil, nil, nil, nil, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<CheckButton name="$parentOptimizeResponseTimesCheckButton">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentAutoTrackCompletedQuestsCheckButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_OPTIMIZE_RESPONSE_TIMES_CHECKBOX">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_optimize_response_times=true;
+						else
+							mobmap_optimize_response_times=false;
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT");
+						GameTooltip:SetText(MOBMAP_OPTIMIZE_RESPONSE_TIMES_CHECKBOX_INFO, nil, nil, nil, nil, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				MobMapOptionsFrame_OnLoad(self);
+			</OnLoad>
+			<OnShow>
+				MobMapOptionsFrame_OnShow(self);
+			</OnShow>
+			<OnUpdate>
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+	<Frame name="MobMapTrackerOptionsFrame" hidden="true">
+		<Size>
+			<AbsDimension x="600" y="400"/>
+		</Size>
+		<Frames>
+			<CheckButton name="$parentUseTrackerCheckButton">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="10" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_USE_TRACKER_CHECKBOX">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_use_questtracker=true;
+						else
+							mobmap_use_questtracker=false;
+						end
+						MobMap_QuestTracker_Setup();
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT");
+						GameTooltip:SetText(MOBMAP_USE_TRACKER_CHECKBOX_INFO, nil, nil, nil, nil, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<CheckButton name="$parentAutocreateWaypointsCheckButton">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentUseTrackerCheckButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_AUTOCREATE_WAYPOINTS_CHECKBOX">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_autocreate_waypoints=true;
+						else
+							mobmap_autocreate_waypoints=false;
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT");
+						GameTooltip:SetText(MOBMAP_AUTOCREATE_WAYPOINTS_CHECKBOX_INFO, nil, nil, nil, nil, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<CheckButton name="$parentOmitMapCheckButton">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentAutocreateWaypointsCheckButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_QUESTTRACKER_OMIT_MAP_CHECKBOX">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_quicksearch_omit_map=true;
+						else
+							mobmap_quicksearch_omit_map=false;
+						end
+					</OnClick>
+					<OnEnter>
+						GameTooltip:SetOwner(self, "ANCHOR_TOPRIGHT");
+						GameTooltip:SetText(MOBMAP_QUESTTRACKER_OMIT_MAP_CHECKBOX_INFO, nil, nil, nil, nil, 1);
+					</OnEnter>
+					<OnLeave>
+						GameTooltip:Hide();
+					</OnLeave>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<CheckButton name="$parentShowAdditionalTargetsCheckButton">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentOmitMapCheckButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_QUESTTRACKER_SHOW_ADDITIONAL_TARGETS_CHECKBOX">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_questtracker_status.showadditionaltargets=true;
+						else
+							mobmap_questtracker_status.showadditionaltargets=false;
+						end
+						MobMap_QuestTracker_Setup();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<CheckButton name="$parentHideFinishedObjectivesCheckButton">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentShowAdditionalTargetsCheckButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_QUESTTRACKER_HIDE_FINISHED_OBJECTIVES_CHECKBOX">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_questtracker_status.hidefinishedobjectives=true;
+						else
+							mobmap_questtracker_status.hidefinishedobjectives=false;
+						end
+						MobMap_QuestTracker_Setup();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<CheckButton name="$parentHideFinishedQuestsCheckButton">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentHideFinishedObjectivesCheckButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_QUESTTRACKER_HIDE_FINISHED_QUESTS_CHECKBOX">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_questtracker_status.hidefinishedquests=true;
+						else
+							mobmap_questtracker_status.hidefinishedquests=false;
+						end
+						MobMap_QuestTracker_Setup();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<CheckButton name="$parentShowDistanceCheckButton">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentHideFinishedQuestsCheckButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_QUESTTRACKER_SHOW_DISTANCE_CHECKBOX">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_questtracker_status.showdistance=true;
+						else
+							mobmap_questtracker_status.showdistance=false;
+						end
+						MobMap_QuestTracker_Setup();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<CheckButton name="$parentSortQuestsByDistanceButton">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentShowDistanceCheckButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_QUESTTRACKER_SORT_QUESTS_BY_DISTANCE">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_questtracker_status.sortbydistance=true;
+						else
+							mobmap_questtracker_status.sortbydistance=false;
+						end
+						MobMap_QuestTracker_Setup();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<CheckButton name="$parentUseExactPositioningButton">
+				<Size>
+					<AbsDimension x="20" y="20"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parentSortQuestsByDistanceButton" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="0" y="-20"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Layers>
+					<Layer level="ARTWORK">
+						<FontString inherits="GameFontHighlightSmall" text="MOBMAP_QUESTTRACKER_USE_EXACT_POSITIONING">
+							<Anchors>
+								<Anchor point="LEFT" relativePoint="RIGHT">
+									<Offset>
+										<AbsDimension x="0" y="1"/>
+									</Offset>
+								</Anchor>
+							</Anchors>
+						</FontString>
+					</Layer>
+				</Layers>
+				<Scripts>
+					<OnClick>
+						if(self:GetChecked()) then
+							PlaySound("igMainMenuOptionCheckBoxOn");
+							mobmap_questtracker_status.exactpositioning=true;
+						else
+							mobmap_questtracker_status.exactpositioning=false;
+						end
+						MobMap_QuestTracker_Setup();
+					</OnClick>
+				</Scripts>
+				<NormalTexture file="Interface\Buttons\UI-CheckBox-Up"/>
+				<PushedTexture file="Interface\Buttons\UI-CheckBox-Down"/>
+				<HighlightTexture file="Interface\Buttons\UI-CheckBox-Highlight" alphaMode="ADD"/>
+				<CheckedTexture file="Interface\Buttons\UI-CheckBox-Check"/>
+				<DisabledCheckedTexture file="Interface\Buttons\UI-CheckBox-Check-Disabled"/>
+			</CheckButton>
+			<Button name="$parentResetTrackerPosButton" inherits="UIPanelButtonTemplate" text="MOBMAP_RESET_TRACKER_POS_BUTTON">
+				<Size>
+					<AbsDimension x="160" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPRIGHT" relativeTo="$parent" relativePoint="TOPRIGHT">
+						<Offset>
+							<AbsDimension x="-20" y="-16"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MobMap_QuestTracker_ResetTrackerPos();
+					</OnClick>
+					<OnEnter>
+					</OnEnter>
+					<OnLeave>
+					</OnLeave>
+				</Scripts>
+			</Button>
+			<Button name="$parentSetTrackerBackgroundButton" inherits="UIPanelButtonTemplate" text="MOBMAP_SET_TRACKER_BACKGROUND_BUTTON">
+				<Size>
+					<AbsDimension x="240" y="22"/>
+				</Size>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT">
+						<Offset>
+							<AbsDimension x="7" y="-204"/>
+						</Offset>
+					</Anchor>
+				</Anchors>
+				<Scripts>
+					<OnClick>
+						MobMap_DisplayColorSelector(mobmap_questtracker_status.backcolor);
+					</OnClick>
+					<OnEnter>
+					</OnEnter>
+					<OnLeave>
+					</OnLeave>
+				</Scripts>
+			</Button>
+		</Frames>
+		<Scripts>
+			<OnLoad>
+				MobMapTrackerOptionsFrame_OnLoad(self);
+			</OnLoad>
+			<OnShow>
+				MobMapTrackerOptionsFrame_OnShow(self);
+			</OnShow>
+			<OnUpdate>
+			</OnUpdate>
+		</Scripts>
+	</Frame>
+
+	<Button name="MobMapMinimapButtonFrame" hidden="true" parent="UIParent">
+		<Size>
+			<AbsDimension x="32" y="32"/>
+		</Size>
+		<Layers>
+			<Layer level="ARTWORK">
+				<Texture name="$parentTexture" file="Interface\AddOns\MobMap\minimapicon">
+					<Size>
+						<AbsDimension x="32" y="32"/>
+					</Size>
+					<Anchors>
+						<Anchor point="TOPLEFT" relativeTo="$parent" relativePoint="TOPLEFT" />
+					</Anchors>
+					<Color r="1.0" g="1.0" b="1.0"/>
+				</Texture>
+			</Layer>
+		</Layers>
+		<Scripts>
+			<OnLoad>
+				MobMap_MinimapButton_OnLoad(self);
+				this:RegisterForClicks("LeftButtonUp", "RightButtonUp");
+			</OnLoad>
+			<OnDragStart>
+				self:StartMoving();
+				self:SetScript("OnUpdate", MobMap_MinimapButton_OnMove);
+			</OnDragStart>
+			<OnDragStop>
+				self:StopMovingOrSizing();
+				self:SetScript("OnUpdate", nil);
+			</OnDragStop>
+			<OnClick>
+				if(arg1=="RightButton") then
+					MobMap_Guide_Toggle();
+				else
+					MobMap_ToggleMobMapFrame();
+				end
+			</OnClick>
+			<OnEnter>
+				GameTooltip:SetOwner(self, "ANCHOR_RIGHT");
+				GameTooltip:ClearLines();
+				GameTooltip:AddLine("MobMap");
+				GameTooltip:AddLine(MOBMAP_MINIMAP_BUTTON_HELP, 1.0, 1.0, 1.0, 1.0, 1.0);
+				GameTooltip:Show();
+			</OnEnter>
+			<OnLeave>
+				GameTooltip:Hide();
+			</OnLeave>
+		</Scripts>
+		<HighlightTexture file="Interface\Minimap\UI-Minimap-ZoomButton-Highlight" alphaMode="ADD" />
+	</Button>
+
+	<Frame name="MobMapTimerFrame" hidden="false">
+    	<Scripts>
+			<OnUpdate>
+				MobMapTimerFrame_OnUpdate();
+			</OnUpdate>
+    	</Scripts>
+    </Frame>
+
+	<GameTooltip name="MobMapScanTooltip" frameStrata="TOOLTIP" inherits="GameTooltipTemplate" hidden="true">
+	</GameTooltip>
+
+	<GameTooltip name="MobMapTooltip" frameStrata="TOOLTIP" inherits="GameTooltipTemplate" hidden="true">
+		<Scripts>
+			<OnShow>
+				self:SetScale(UIParent:GetScale());
+			</OnShow>
+		</Scripts>
+	</GameTooltip>
+</Ui>
