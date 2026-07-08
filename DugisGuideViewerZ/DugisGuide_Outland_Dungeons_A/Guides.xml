@@ -1,0 +1,20 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+
+	<Script file="60_62_Hellfire_Ramparts.lua"/>
+	<Script file="61_63_The_Blood_Furnace.lua"/>
+	<Script file="62_64_Slave_Pens.lua"/>
+	<Script file="63_65_The_Underbog.lua"/>
+	<Script file="64_66_Mana-Tombs.lua"/>
+	<Script file="65_67_Auchenai_Crypts.lua"/>
+	<Script file="66_68_Old_Hillsbrad_Foothills.lua"/>
+	<Script file="67_69_Sethekk_Halls.lua"/>
+	<Script file="68_70_The_Steamvault.lua"/>
+	<Script file="69_70_Shattered_Halls.lua"/>
+	<Script file="70_Magister_Terrace.lua"/>
+	<Script file="70_Shadow_Labyrinth.lua"/>
+	<Script file="70_The_Arcatraz.lua"/>
+	<Script file="70_The_Black_Morass.lua"/>
+	<Script file="70_The_Botanica.lua"/>
+	<Script file="70_The_Mechanar.lua"/>
+
+</Ui>

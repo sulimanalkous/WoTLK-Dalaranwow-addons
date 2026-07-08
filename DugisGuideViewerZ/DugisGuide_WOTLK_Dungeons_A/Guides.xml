@@ -1,0 +1,13 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	<Script file="68_70_Utgarde_Keep.lua"/>
+	<Script file="70_72_The_Nexus.lua"/>
+	<Script file="72_74_Azjol-Nerub_AhnKahet_The_Old_Kingdom.lua"/>
+	<Script file="74_76_Drak'Tharon_Keep.lua"/>
+	<Script file="75_77_The_Violet_Hold.lua"/>
+	<Script file="76_78_Gundrak.lua"/>
+	<Script file="77_79_Halls_of_Stone.lua"/>
+	<Script file="78_80_Halls_of_Lightning.lua"/>
+	<Script file="78_80_The_Culling_Of_Stratholme.lua"/>
+	<Script file="78_80_The_Oculus.lua"/>
+	<Script file="78_80_Utgarde_Pinnacle.lua"/>
+</Ui>

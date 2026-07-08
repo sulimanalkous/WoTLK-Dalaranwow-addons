@@ -1,0 +1,214 @@
+------------------------------------------------------------------------
+r54 | nevcairiel | 2009-04-14 15:46:33 +0000 (Tue, 14 Apr 2009) | 1 line
+Changed paths:
+   A /tags/3.0-release15 (from /trunk:53)
+
+Weekly Tag - Week 15
+------------------------------------------------------------------------
+r53 | nevcairiel | 2009-04-14 15:45:03 +0000 (Tue, 14 Apr 2009) | 1 line
+Changed paths:
+   M /trunk/LibBabble-Class-3.0.toc
+
+Automated LibBabble re-generation from the localization system
+------------------------------------------------------------------------
+r52 | nevcairiel | 2009-03-06 10:11:50 +0000 (Fri, 06 Mar 2009) | 1 line
+Changed paths:
+   M /trunk/LibBabble-Class-3.0.toc
+
+Restore LoD to Libraries, as 3.0.8 fixed all bugs that blocked LoD OptionalDeps to load properly.
+------------------------------------------------------------------------
+r50 | nevcairiel | 2009-01-20 20:46:34 +0000 (Tue, 20 Jan 2009) | 1 line
+Changed paths:
+   M /trunk/LibBabble-Class-3.0.lua
+
+frFR Update
+------------------------------------------------------------------------
+r49 | pastamancer | 2009-01-08 19:32:30 +0000 (Thu, 08 Jan 2009) | 1 line
+Changed paths:
+   M /trunk/LibBabble-Class-3.0.lua
+
+Copied esES to esMX.
+------------------------------------------------------------------------
+r48 | maqjav | 2008-11-15 10:49:44 +0000 (Sat, 15 Nov 2008) | 1 line
+Changed paths:
+   M /trunk/LibBabble-Class-3.0.lua
+
+LibBabble-Class-3.0: esES update
+------------------------------------------------------------------------
+r47 | trasher | 2008-11-15 08:20:14 +0000 (Sat, 15 Nov 2008) | 1 line
+Changed paths:
+   M /trunk/LibBabble-Class-3.0.lua
+
+frFR & esES update
+------------------------------------------------------------------------
+r46 | StingerSoft | 2008-10-17 02:34:24 +0000 (Fri, 17 Oct 2008) | 1 line
+Changed paths:
+   M /trunk/LibBabble-Class-3.0.lua
+
+updated ruRU (added Death Knight class)
+------------------------------------------------------------------------
+r45 | trasher | 2008-10-15 10:21:02 +0000 (Wed, 15 Oct 2008) | 1 line
+Changed paths:
+   M /trunk/LibBabble-Class-3.0.lua
+
+fr update
+------------------------------------------------------------------------
+r44 | sylvanaar | 2008-10-15 03:03:08 +0000 (Wed, 15 Oct 2008) | 1 line
+Changed paths:
+   M /trunk/LibBabble-Class-3.0.lua
+
+enUS reverse translation of DEATHKNIGHT was broken
+------------------------------------------------------------------------
+r42 | stanzilla | 2008-10-14 16:49:10 +0000 (Tue, 14 Oct 2008) | 1 line
+Changed paths:
+   M /trunk/LibBabble-Class-3.0.toc
+
+Update TOC for WotLK
+------------------------------------------------------------------------
+r41 | nevcairiel | 2008-10-12 11:39:12 +0000 (Sun, 12 Oct 2008) | 1 line
+Changed paths:
+   M /trunk/LibBabble-Class-3.0.toc
+
+Patch 3.0 prep: Remove LoD from Libraries that have no load manager (LoD+OptDep Bug)
+------------------------------------------------------------------------
+r40 | nevcairiel | 2008-10-09 21:51:54 +0000 (Thu, 09 Oct 2008) | 1 line
+Changed paths:
+   M /trunk/LibBabble-3.0.lua
+   M /trunk/LibBabble-Class-3.0.lua
+
+WoWAce Post-Processing: Virtually inflate Library Revision numbers for proper upgrade path
+------------------------------------------------------------------------
+r39 | arrowmaster | 2008-10-04 01:30:24 +0000 (Sat, 04 Oct 2008) | 1 line
+Changed paths:
+   M /trunk
+   M /trunk/LibBabble-3.0.lua
+   M /trunk/LibBabble-Class-3.0.lua
+
+Fix autoupdating minor version
+------------------------------------------------------------------------
+r38 | root | 2008-09-29 21:36:31 +0000 (Mon, 29 Sep 2008) | 1 line
+Changed paths:
+   A /trunk/.pkgmeta
+
+Facilitate WowAce-on-CurseForge transition
+------------------------------------------------------------------------
+r36 | root | 2008-09-29 20:58:16 +0000 (Mon, 29 Sep 2008) | 1 line
+Changed paths:
+   D /tmp/trunk/LibBabble-Class-3.0
+   A /trunk (from /tmp/trunk/LibBabble-Class-3.0:35)
+
+Importing old repo data under /trunk
+------------------------------------------------------------------------
+r35 | sylvanaar | 2008-09-11 07:08:19 +0000 (Thu, 11 Sep 2008) | 2 lines
+Changed paths:
+   M /tmp/trunk/LibBabble-Class-3.0/LibBabble-Class-3.0.lua
+
+LibBabble-Class-3.0
+- "Death Knight" is correct for default
+------------------------------------------------------------------------
+r34 | andyca | 2008-08-18 12:06:38 +0000 (Mon, 18 Aug 2008) | 2 lines
+Changed paths:
+   M /tmp/trunk/LibBabble-Class-3.0/LibBabble-Class-3.0.lua
+
+LibBabble-Class-3.0
+- update zhTW
+------------------------------------------------------------------------
+r33 | nevcairiel | 2008-08-18 10:57:02 +0000 (Mon, 18 Aug 2008) | 2 lines
+Changed paths:
+   M /tmp/trunk/LibBabble-Class-3.0/LibBabble-Class-3.0.lua
+
+LibBabble-Class-3.0
+- add DK to deDE
+------------------------------------------------------------------------
+r32 | archarodim | 2008-08-17 22:47:56 +0000 (Sun, 17 Aug 2008) | 2 lines
+Changed paths:
+   M /tmp/trunk/LibBabble-Class-3.0/LibBabble-Class-3.0.toc
+
+LibBabble-Class-3.0
+- Fix French description that was not in utf-8
+------------------------------------------------------------------------
+r31 | StingerSoft | 2008-08-16 19:33:07 +0000 (Sat, 16 Aug 2008) | 2 lines
+Changed paths:
+   M /tmp/trunk/LibBabble-Class-3.0/LibBabble-Class-3.0.lua
+
+LibBabble-Class-3.0
+- update ruRU (Deathknight)
+------------------------------------------------------------------------
+r30 | cwdg | 2008-08-13 13:59:35 +0000 (Wed, 13 Aug 2008) | 2 lines
+Changed paths:
+   M /tmp/trunk/LibBabble-Class-3.0/LibBabble-Class-3.0.lua
+
+LibBabble-Class-3.0
+- zhCN Update
+------------------------------------------------------------------------
+r29 | andyca | 2008-08-12 07:16:08 +0000 (Tue, 12 Aug 2008) | 2 lines
+Changed paths:
+   M /tmp/trunk/LibBabble-Class-3.0/LibBabble-Class-3.0.lua
+
+LibBabble-Class-3.0
+- update zhTW
+------------------------------------------------------------------------
+r28 | 7destiny | 2008-08-11 16:59:15 +0000 (Mon, 11 Aug 2008) | 2 lines
+Changed paths:
+   M /tmp/trunk/LibBabble-Class-3.0/LibBabble-Class-3.0.lua
+
+LibBabble-Class-3.0
+- koKR Update
+------------------------------------------------------------------------
+r27 | archarodim | 2008-08-11 11:01:22 +0000 (Mon, 11 Aug 2008) | 2 lines
+Changed paths:
+   M /tmp/trunk/LibBabble-Class-3.0/LibBabble-Class-3.0.lua
+
+LibBabble-Class-3.0
+- Added Deathknight for EN and FR
+------------------------------------------------------------------------
+r24 | cwdg | 2008-07-30 14:35:03 +0000 (Wed, 30 Jul 2008) | 2 lines
+Changed paths:
+   M /tmp/trunk/LibBabble-Class-3.0/LibBabble-Class-3.0.lua
+
+LibBabble-Class-3.0
+- zhCN update
+------------------------------------------------------------------------
+r23 | sylvanaar | 2008-07-30 06:11:21 +0000 (Wed, 30 Jul 2008) | 2 lines
+Changed paths:
+   M /tmp/trunk/LibBabble-Class-3.0/LibBabble-Class-3.0.lua
+
+LibBabble-Class-3.0
+- Merged in 2.2 feminine translations. Users still need to provide their own implementations of reverse lookup+struppr, and their own lookup of class color
+------------------------------------------------------------------------
+r22 | Cybersea | 2008-07-15 09:18:41 +0000 (Tue, 15 Jul 2008) | 2 lines
+Changed paths:
+   M /tmp/trunk/LibBabble-Class-3.0/LibBabble-Class-3.0.lua
+
+LibBabble-Class-3.0
+- added ruRU translation
+------------------------------------------------------------------------
+r20 | nemes | 2008-04-13 03:37:19 +0000 (Sun, 13 Apr 2008) | 3 lines
+Changed paths:
+   M /tmp/trunk/LibBabble-Class-3.0/LibBabble-Class-3.0.toc
+
+LibBabble-Class-3.0:
+- TOC->2.4
+
+------------------------------------------------------------------------
+r18 | archarodim | 2008-03-08 22:39:38 +0000 (Sat, 08 Mar 2008) | 3 lines
+Changed paths:
+   M /tmp/trunk/LibBabble-Class-3.0
+   M /tmp/trunk/LibBabble-Class-3.0/LibBabble-Class-3.0.lua
+
+LibBabble-Class-3.0
+- MINOR_VERSION is now usable (uses LibBabble-Spell-3.0 code)
+- added logtemplate svn property
+------------------------------------------------------------------------
+r17 | rabbit | 2008-02-20 12:39:30 +0000 (Wed, 20 Feb 2008) | 1 line
+Changed paths:
+   A /tmp/trunk/LibBabble-Class-3.0
+   A /tmp/trunk/LibBabble-Class-3.0/LibBabble-3.0.lua
+   A /tmp/trunk/LibBabble-Class-3.0/LibBabble-Class-3.0.lua
+   A /tmp/trunk/LibBabble-Class-3.0/LibBabble-Class-3.0.toc
+   A /tmp/trunk/LibBabble-Class-3.0/LibStub
+   A /tmp/trunk/LibBabble-Class-3.0/LibStub/LibStub.lua
+   A /tmp/trunk/LibBabble-Class-3.0/lib.xml
+
+LibBabble-Class-3.0: Unlike 2.x, this doesn't contain any of the color functions - make those yourself.
+------------------------------------------------------------------------

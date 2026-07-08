@@ -1,0 +1,66 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+
+	<Script file="Zone.lua"/>
+	<Script file="Borean_Tundra_Daily.lua"/>
+	<Script file="Dragonblight_Daily.lua"/>
+	<Script file="Howling_Fjord_Daily_A.lua"/>
+	<Script file="Howling_Fjord_Daily_H.lua"/>
+	<Script file="Grizzly_Hills_Daily_A.lua"/>
+	<Script file="Grizzly_Hills_Daily_H.lua"/>
+	<Script file="Icecrown_Daily_A.lua"/>
+	<Script file="Icecrown_Daily_H.lua"/>
+	<Script file="Sholazar_Basin_Frenzyheart.lua"/>
+	<Script file="Sholazar_Basin_Oracles.lua"/>
+	<Script file="Storm_Peaks_Daily_H.lua"/>
+	<Script file="Storm_Peaks_Daily_A.lua"/>
+	<Script file="ZulDrak_Daily.lua"/>	
+
+	
+	<Script file="AT.lua"/>			
+	<Script file="Argent_Tournament_H.lua"/>
+	<Script file="Argent_Tournament_A.lua"/>	
+	<Script file="Argent_Tournament_Aspirant_A.lua"/>
+	<Script file="Argent_Tournament_Aspirant_H.lua"/>	
+	<Script file="Argent_Tournament_Valiant_A.lua"/>
+	<Script file="Argent_Tournament_Valiant_H.lua"/>
+	<Script file="Argent_Tournament_Champion_A.lua"/>
+	<Script file="Argent_Tournament_Champion_Silver_A.lua"/>
+	<Script file="Argent_Tournament_Champion_Sunreaver_H.lua"/>
+
+	<Script file="Speed.lua"/>
+	<Script file="Speed Gold Runs.lua"/>
+	<Script file="Speed_Gold_Run_A.lua"/>
+	<Script file="Speed_Gold_Run_H.lua"/>
+	<Script file="Speed_Gold_Run_Aspirant_A.lua"/>
+	<Script file="Speed_Gold_Run_Aspirant_H.lua"/>
+	<Script file="Speed_Gold_Run_Valiant_A.lua"/>
+	<Script file="Speed_Gold_Run_Valiant_H.lua"/>
+	<Script file="Speed_Gold_Run_Champion_A.lua"/>
+	<Script file="Speed_Gold_Run_Champion_H.lua"/>
+
+	<Script file="Rep.lua"/>
+	<Script file="Alliance_Vanguard.lua"/>
+	<Script file="Argent_Crusade_A.lua"/>	
+	<Script file="Argent_Crusade_H.lua"/>
+	<Script file="Horde_Expedition.lua"/>
+	<Script file="Knights_of_the_Ebon_Blade.lua"/>
+	<Script file="Sons_of_Hodir.lua"/>
+	<Script file="The_Kaluak.lua"/>
+	<Script file="The_Wyrmrest_Accord.lua"/>
+	<Script file="Netherwing_Dailies.lua"/>
+	<Script file="Netherwing_Neutral_Rep.lua"/>
+	<Script file="Venomhide_Ravasaur_H.lua"/>
+						
+	<Script file="Prof.lua"/>
+	<Script file="Cooking_Daily_H.lua"/>
+	<Script file="Cooking_Daily_A.lua"/>
+	<Script file="Fishing_Daily.lua"/>
+	<Script file="Jewelcrafting_Daily.lua"/>
+	
+	<Script file="Pre.lua"/>
+	<Script file="Sholazar_Basin_Daily.lua"/>
+	<Script file="78_80_Storm_Peaks_A.lua"/>
+	<Script file="78_80_Storm_Peaks_H.lua"/>
+	<Script file="80_Icecrown_A.lua"/>
+	<Script file="80_Icecrown_H.lua"/>	
+</Ui>

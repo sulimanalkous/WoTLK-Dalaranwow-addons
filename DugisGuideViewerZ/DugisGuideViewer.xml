@@ -1,0 +1,1084 @@
+<Ui xmlns ="http://www.blizzard.com/wow/ui/"
+xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+xsi:schemaLocation = "http://www.blizzard.com/wow/ui/
+http://wowprogramming.com/FrameXML/UI.xsd">
+
+<!--
+<Button name ="Dugis_IconTemplate" virtual ="true">
+		<Size x="32" y="32"/>
+		<NormalTexture name ="$parentIcon" setAllPoints ="true"/>
+</Button>
+-->
+
+
+<!--Template for a Background frame-->
+<Frame name = "DugisBorderFrame" parent ="UIParent" virtual="true" movable = "true" enableMouse = "true">
+	<Size x="50" y="50"/>
+	<Anchors>
+		<Anchor point="CENTER" />
+	</Anchors>
+
+   		<Backdrop
+           bgFile="Interface\DialogFrame\UI-DialogBox-Background"
+           edgeFile="Interface\DialogFrame\UI-DialogBox-Border"
+           tile="true">
+           <BackgroundInsets>
+               <AbsInset left="11" right="12" top="12" bottom="11"/>
+           </BackgroundInsets>
+           <TileSize>
+               <AbsValue val="32"/>
+           </TileSize>
+           <EdgeSize>
+               <AbsValue val="32"/>
+           </EdgeSize>
+		</Backdrop>	
+		<!-- <Frames>
+         <Button name='$parentClose' inherits='UIPanelCloseButton'>
+            <Anchors> <Anchor point='TOPRIGHT'> <Offset> <AbsDimension x='-5' y='-4'/> </Offset> </Anchor> </Anchors>
+            <Scripts> <OnClick> self:GetParent():Hide() </OnClick> </Scripts>
+         </Button>
+		 </Frames>-->
+	  <Scripts>
+         <OnMouseDown> self:StartMoving() </OnMouseDown>
+         <OnMouseUp>  self:StopMovingOrSizing() </OnMouseUp>
+      </Scripts>
+</Frame>
+
+<!--Template for a row with checkbox, picture and quest text -->
+<Button name = "RecapPanelDetailTemplate" virtual="true" >
+	<Size> 
+		<AbsDimension x="545" y="35" />
+	</Size>
+<!--	<HighlightTexture alphaMode ="ADD"
+			file ="Interface\Buttons\ButtonHilight-Square"/>-->
+	<Scripts>
+		<OnEnter>
+			DugisGuideViewer:Tooltip_OnEnter(self, event)
+		</OnEnter>
+		<OnLeave>
+			DugisGuideViewer:Tooltip_OnLeave(self, event)		
+		</OnLeave>
+	</Scripts>
+	
+		<Frames>
+			<CheckButton name = "$parentChk" inherits ="UICheckButtonTemplate" visible ="false">
+				<Size x="25" y="25"/>
+				<Anchors>
+				<Anchor point = "TOPLEFT"/>
+				</Anchors>
+				
+				<Scripts>
+				<OnClick function="DugisGuideViewer_CheckButton_OnEvent">
+				</OnClick>
+				</Scripts>
+				</CheckButton>	
+			
+		<Button name ="$parentButton">
+			<Size x="32" y="32"/>
+			<NormalTexture  setAllPoints ="true"/>
+			<!--<HighlightTexture alphaMode ="ADD"
+			file ="Interface\Buttons\ButtonHilight-Square"/>-->	
+			<Anchors>
+			<Anchor point="LEFT" relativeTo="$parentChk" relativePoint="RIGHT" />
+			</Anchors>
+		</Button>
+
+		</Frames>
+	<Layers>
+		<Layer >
+			<FontString name="$parentName" inherits="GameFontNormal" wraponspaces="false" justifyH="LEFT" text=""> <!--GameFontHighlight-->
+				<Size>
+				<AbsDimension x="475" y="14"/>
+				</Size>
+				<Anchors>
+				<Anchor point="LEFT"  >
+				<Offset>
+				<AbsDimension x="60" y="10"/>
+				</Offset>
+				</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentOpt" inherits="GameFontNormal" wraponspaces="false" justifyH="LEFT"  > <!--GameFontHighlight-->
+				<Size>
+				<AbsDimension x="475" y="14"/>
+				</Size>
+				<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentName" relativePoint="RIGHT" >
+				<Offset>
+				<AbsDimension x="0" y="0"/>
+				</Offset>
+				</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentDesc" inherits="GameFontHighlightSmall" wraponspaces="false" justifyH="LEFT" text="">
+				<Size>
+				<AbsDimension x="475" y="14"/>
+				</Size>
+				<Anchors>
+				<!--<Anchor point="TOP" relativeTo="$parentName" relativePoint="BOTTOM"/>-->
+				<Anchor point="LEFT" relativeTo="$parentName" relativePoint="LEFT">
+				<Offset>
+				<AbsDimension x="0" y="-14"/>
+				</Offset>
+				</Anchor>
+				</Anchors>
+			</FontString>			
+			
+			
+			
+		</Layer>
+	</Layers>
+	
+
+</Button> ><!--End of virutual button row-->
+
+<!--Template for the small window with icon and text -->
+<Button name = "IconReferenceTemplate" virtual="true" >
+	<Size> 
+		<AbsDimension x="300" y="35" />
+	</Size>
+	<!--
+	<Backdrop
+           bgFile="Interface\DialogFrame\UI-DialogBox-Background"
+           edgeFile="Interface\DialogFrame\UI-DialogBox-Border"
+           tile="true">
+	</Backdrop>
+-->
+	
+<!--	<HighlightTexture alphaMode ="ADD"
+			file ="Interface\Buttons\ButtonHilight-Square"/>-->
+	<Frames>
+	<Button name ="$parentButton">
+		<Size x="25" y="25"/>
+		<NormalTexture  setAllPoints ="true"/>
+	<!--	<HighlightTexture alphaMode ="ADD"
+		file ="Interface\Buttons\ButtonHilight-Square"/>-->
+		<Anchors>
+		<Anchor point="LEFT" relativeTo="$parent" relativePoint="LEFT" />
+		</Anchors>
+	</Button>
+		</Frames>	
+	
+	<Layers>
+		<Layer >
+			<FontString name="$parentName" inherits="GameFontNormal" wraponspaces="false" text=""> <!--GameFontHighlight-->
+				<Size>
+				<AbsDimension x="75" y="14"/>
+				</Size>
+				<Anchors>
+				<Anchor point="LEFT" relativePoint="RIGHT" relativeTo="$parentButton">
+				<!--<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$parent">-->
+				<Offset>
+				<AbsDimension x="100" y="0"/>
+				</Offset>
+				</Anchor>
+				</Anchors>
+			</FontString>			
+			
+		</Layer>
+	</Layers>
+
+
+
+
+
+
+</Button> ><!--End of virutual button row-->
+
+<!--Template for the small window with icon and text -->
+<Button name = "SmallWindowTemplate" virtual="true" >
+	<Size> 
+		<AbsDimension x="300" y="35" />
+	</Size>
+	<!--
+	<Backdrop
+           bgFile="Interface\DialogFrame\UI-DialogBox-Background"
+           edgeFile="Interface\DialogFrame\UI-DialogBox-Border"
+           tile="true">
+	</Backdrop>
+	-->
+	
+<!--	<HighlightTexture alphaMode ="ADD"
+			file ="Interface\Buttons\ButtonHilight-Square"/>-->
+
+<!--
+			<Scripts>
+		<OnEnter>
+			DugisGuideViewer:SmallWindowTooltip_OnEnter(self, event)
+		</OnEnter>
+		<OnLeave>
+			DugisGuideViewer:SmallWindowTooltip_OnLeave(self, event)		
+		</OnLeave>
+	</Scripts>
+	-->
+		
+	<Layers>
+		<Layer >
+			<FontString name="$parentName" inherits="GameFontNormal" wraponspaces="false" justifyH="RIGHT" text=""> <!--GameFontHighlight-->
+				<Size>
+				<AbsDimension x="75" y="14"/>
+				</Size>
+				<Anchors>
+				<Anchor point="RIGHT" relativePoint="RIGHT" relativeTo="$parent">
+				<!--<Anchor point="LEFT" relativePoint="LEFT" relativeTo="$parent">-->
+				<Offset>
+				<AbsDimension x="25" y="10"/>
+				</Offset>
+				</Anchor>
+				</Anchors>
+			</FontString>			
+			
+		</Layer>
+	</Layers>
+	<Frames>
+
+		<Button name ="$parentButton">
+			<Size x="25" y="25"/>
+			<NormalTexture  setAllPoints ="true"/>
+			<!--<HighlightTexture alphaMode ="ADD"
+			file ="Interface\Buttons\ButtonHilight-Square"/>-->	
+			<Anchors>
+			<Anchor point="RIGHT" relativeTo="$parentName" relativePoint="LEFT" />
+			</Anchors>
+		</Button>
+
+		</Frames>
+
+</Button> ><!--End of virutual button row-->
+
+<!--Template for a row with a button and text for tabs-->
+<Button name = "ButtonTabRowTemplate" virtual="true">
+	<Size> 
+		<AbsDimension x="560" y="14" />
+	</Size>
+	
+	<HighlightTexture alphaMode ="ADD" file ="Interface\FriendsFrame\UI-FriendsFrame-HighlightBar"/>
+
+<!--<HighlightTexture alphaMode ="ADD" file ="Interface\BUTTONS\UI-Listbox-Highlight"/>-->
+
+	<Layers>
+		<Layer>
+			<FontString name="$parentTitle" inherits="GameFontHighlight" wraponspaces="false" justifyH="LEFT" text="Dailies Row"> 
+				<Size>
+				<AbsDimension x="350" y="14"/>
+				</Size>
+				<Anchors>
+				<Anchor point="LEFT"  >
+				<Offset>
+				<AbsDimension x="10" y="0"/>
+				</Offset>
+				</Anchor>
+				</Anchors>
+			</FontString>
+			<FontString name="$parentPercent" inherits="GameFontHighlight" wraponspaces="false" justifyH="RIGHT" text=""> 
+				<Size>
+				<AbsDimension x="175" y="14"/>
+				</Size>
+				<Anchors>
+				<Anchor point="LEFT" relativeTo="$parentTitle" relativePoint ="RIGHT">
+				<Offset>
+				<AbsDimension x="10" y="0"/>
+				</Offset>
+				</Anchor>
+				</Anchors>
+			</FontString>
+		</Layer>
+	</Layers>
+	<Scripts>
+		<OnClick function="DugisGuideViewer_TabRow_OnEvent">
+		</OnClick>
+		
+		<OnEnter>
+			TabRowClickHandlerOnEnter(self,event);
+			
+
+		</OnEnter>
+		
+		<OnLeave>
+			TabRowClickHandlerOnLeave(self,event);
+		</OnLeave>
+		
+	</Scripts>
+</Button> <!--End of template for button with text-->
+
+
+	
+<Frame name ="DugisMainframe" parent ="UIParent" movable ="true">
+	
+		<Size x="600" y="400"/>
+		<Anchors>
+			<Anchor point="CENTER" />
+		</Anchors>
+	
+		<Backdrop
+           bgFile="Interface\DialogFrame\UI-DialogBox-Background"
+           edgeFile="Interface\DialogFrame\UI-DialogBox-Border"
+           tile="true">
+           <BackgroundInsets>
+               <AbsInset left="11" right="12" top="12" bottom="11"/>
+           </BackgroundInsets>
+           <TileSize>
+               <AbsValue val="32"/>
+           </TileSize>
+           <EdgeSize>
+              <AbsValue val="32"/>
+           </EdgeSize>
+		</Backdrop>
+
+	
+		<Scripts> <!--Mainframe scripts-->
+		   
+			<OnLoad> tinsert(UISpecialFrames,this:GetName()); </OnLoad>
+            <OnMouseDown> this:StartMoving();  </OnMouseDown>
+            <OnMouseUp>  this:StopMovingOrSizing(); </OnMouseUp>
+            <OnDragStop> this:StopMovingOrSizing(); </OnDragStop>
+        </Scripts> 	
+	<Frames>
+
+	<ScrollFrame name = "Dugis" parent="UIParent" movable ="true">
+		
+		<Size x="600" y="310"/>
+		<Anchors>
+		<Anchor point="TOPLEFT" relativePoint="TOPLEFT" relativeTo="DugisMainframe">
+						<Offset>
+						<AbsDimension x="0" y="-50"/>
+						</Offset>
+		</Anchor>
+		</Anchors>
+
+		<Scripts>
+           <OnLoad>
+               this.elapsed = 0;
+			   tinsert(UISpecialFrames,this:GetName());
+			   PanelTemplates_SetNumTabs(Dugis, 7);
+               PanelTemplates_SetTab(Dugis, 1)
+           </OnLoad>
+		   <OnMouseWheel>
+				Dugis_OnMouseWheel(self, delta);
+		   </OnMouseWheel>
+		</Scripts>
+		
+		<Layers>
+			<Layer level="ARTWORK">
+
+				<FontString  name = "DugisTab1Title" inherits="GameFontHighlightLarge" text="View_title">
+						<Anchors>
+						<Anchor point="TOP" relativePoint="TOP" relativeTo="DugisMainframe">
+						<Offset>
+						<AbsDimension x="0" y="-17"/>
+						</Offset>
+						</Anchor>
+						</Anchors>
+				</FontString>
+				<FontString  name = "DugisTab1Desc" inherits="GameFontNormal" text="" >
+						<Anchors>
+						<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="DugisTab1Title">
+						<Offset>
+						<AbsDimension x="0" y="0"/>
+						</Offset>
+						</Anchor>
+						</Anchors>
+				</FontString>
+				<FontString  name = "DugisTab2Title" inherits="GameFontHighlightLarge" text="Events_title">
+						<Anchors>
+						<Anchor point="TOP" relativePoint="TOP" relativeTo="DugisMainframe">
+						<Offset>
+						<AbsDimension x="0" y="-17"/>
+						</Offset>
+						</Anchor>
+						</Anchors>
+				</FontString>
+				<FontString  name = "DugisTab2Desc" inherits="GameFontNormal" text="" >
+						<Anchors>
+						<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="DugisTab2Title">
+						<Offset>
+						<AbsDimension x="0" y="0"/>
+						</Offset>
+						</Anchor>
+						</Anchors>
+				</FontString>
+				<FontString  name = "DugisTab3Title" inherits="GameFontHighlightLarge" text="Dailies_title">
+						<Anchors>
+						<Anchor point="TOP" relativePoint="TOP" relativeTo="DugisMainframe">
+						<Offset>
+						<AbsDimension x="0" y="-17"/>
+						</Offset>
+						</Anchor>
+						</Anchors>
+				</FontString>
+				<FontString  name = "DugisTab3Desc" inherits="GameFontNormal" text="">
+						<Anchors>
+						<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="DugisTab3Title">
+						<Offset>
+						<AbsDimension x="0" y="0"/>
+						</Offset>
+						</Anchor>
+						</Anchors>
+				</FontString>
+				<FontString  name = "DugisTab4Title" inherits="GameFontHighlightLarge" text="Leveling_title">
+						<Anchors>
+						<Anchor point="TOP" relativePoint="TOP" relativeTo="DugisMainframe">
+						<Offset>
+						<AbsDimension x="0" y="-17"/>
+						</Offset>
+						</Anchor>
+						</Anchors>
+				</FontString>	
+				<FontString  name = "DugisTab4Desc" inherits="GameFontNormal" text="">
+						<Anchors>
+						<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="DugisTab4Title">
+						<Offset>
+						<AbsDimension x="0" y="0"/>
+						</Offset>
+						</Anchor>
+						</Anchors>
+				</FontString>	
+				<FontString  name = "DugisTab5Title" inherits="GameFontHighlightLarge" text="Dungeons_title">
+						<Anchors>
+						<Anchor point="TOP" relativePoint="TOP" relativeTo="DugisMainframe">
+						<Offset>
+						<AbsDimension x="0" y="-17"/>
+						</Offset>
+						</Anchor>
+						</Anchors>
+				</FontString>	
+				<FontString  name = "DugisTab5Desc" inherits="GameFontNormal" text="">
+						<Anchors>
+						<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="DugisTab5Title">
+						<Offset>
+						<AbsDimension x="0" y="0"/>
+						</Offset>
+						</Anchor>
+						</Anchors>
+				</FontString>
+				<FontString  name = "DugisTab6Title" inherits="GameFontHighlightLarge" text="DungeonsMap_title">
+						<Anchors>
+						<Anchor point="TOP" relativePoint="TOP" relativeTo="DugisMainframe">
+						<Offset>
+						<AbsDimension x="0" y="-17"/>
+						</Offset>
+						</Anchor>
+						</Anchors>
+				</FontString>	
+				<FontString  name = "DugisTab6Desc" inherits="GameFontNormal" text="">
+						<Anchors>
+						<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="DugisTab6Title">
+						<Offset>
+						<AbsDimension x="0" y="0"/>
+						</Offset>
+						</Anchor>
+						</Anchors>
+				</FontString>	
+				<FontString  name = "DugisTab7Title" inherits="GameFontHighlightLarge" text="Settings">
+						<Anchors>
+						<Anchor point="TOP" relativePoint="TOP" relativeTo="DugisMainframe">
+						<Offset>
+						<AbsDimension x="0" y="-17"/>
+						</Offset>
+						</Anchor>
+						</Anchors>
+				</FontString>	
+				<FontString  name = "DugisTab7Desc" inherits="GameFontNormal" text="" hidden = "true">
+						<Anchors>
+						<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="DugisTab7Title">
+						<Offset>
+						<AbsDimension x="0" y="0"/>
+						</Offset>
+						</Anchor>
+						</Anchors>
+				</FontString>					
+				<Texture setAllPoints="true">
+
+				</Texture>
+			</Layer>
+		</Layers>			
+		<Frames>
+			<!--<Slider name ="Dugis_HSlider" orientation="HORIZONTAL" minValue="0" maxValue="100" defaultValue="0" valueStep="1">
+				<Size x="150" y="25"/>
+				<Anchors>
+				<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="Dugis"/>
+				</Anchors>
+				<Backdrop edgeFile ="Interface\Buttons\UI-SliderBar-Border"
+					bgFile ="Interface\Buttons\UI-SliderBar-Background" tile ="true">
+				<EdgeSize>
+					<AbsValue val="8"/>
+				</EdgeSize>
+				<TileSize>
+					<AbsValue val ="8"/>
+				</TileSize>
+				<BackgroundInsets>
+					<AbsInset left="3" right="3" top ="6" bottom ="6"/>
+				</BackgroundInsets>
+				</Backdrop>
+				<Scripts>
+					<OnValueChanged>
+					Dugis:SetHorizontalScroll(-1*self:GetValue())
+					</OnValueChanged>
+				</Scripts>
+				<ThumbTexture name ="$parentThumbTexture" file="Interface\Buttons\UI-ScrollBar-Knob">
+				<Size x="25" y="25"/>
+				</ThumbTexture>
+			</Slider>-->
+			<Slider name ="Dugis_VSlider" orientation="VERTICAL" minValue="0" maxValue="10000" defaultValue="0" valueStep="1" inherits="UIPanelScrollBarTemplate" frameStrata="MEDIUM">
+			<!--	<Size x="25" y="150"/>-->
+			<Size x="25" y="260"/>	
+				
+				<Anchors>
+				<Anchor point ="RIGHT" relativePoint="RIGHT" relativeTo="DugisMainframe">
+					<Offset>
+						<AbsDimension x="-10" y="0"/>
+                    </Offset>
+				</Anchor>
+				</Anchors>
+				<Backdrop edgeFile ="Interface\Buttons\UI-SliderBar-Border"
+					bgFile ="Interface\Buttons\UI-SliderBar-Background" tile ="true">
+					<EdgeSize>
+						<AbsValue val="8"/>
+					</EdgeSize>
+					<TileSize>
+						<AbsValue val ="8"/>
+					</TileSize>
+					<BackgroundInsets>
+						<AbsInset left="3" right="3" top ="6" bottom ="6"/>
+					</BackgroundInsets>
+				</Backdrop>
+					<Scripts>				
+					<OnValueChanged>
+					Dugis:SetVerticalScroll(self:GetValue())
+					<!--Dugis_UpdateIcons(1)-->
+					</OnValueChanged>
+				</Scripts>
+				<ThumbTexture name ="$parentThumbTexture"
+				file="Interface\Buttons\UI-ScrollBar-Knob">
+				<Size x="25" y ="25"/>
+				</ThumbTexture>
+			</Slider>
+		
+		
+		<!--Tab1-->  
+			<Button name="DugisTab1" inherits="CharacterFrameTabButtonTemplate" SetFontObject="GameFontHighlightSmall" id="1" text="Current Guide">
+               <Anchors>
+                   <Anchor point="TOP" relativePoint="BOTTOMLEFT" relativeTo="DugisMainframe">
+                       <Offset>
+                         
+						<!--  <AbsDimension x="60" y="5"/>-->
+						<AbsDimension x="60" y="6"/>
+                       </Offset>
+                   </Anchor>
+               </Anchors>
+               <Scripts>
+                   <OnClick>
+						DugisGuideViewer:ShowTab(1)
+						PanelTemplates_SetTab(this:GetParent(), 1);
+						PlaySound("igCharacterInfoTab");
+                   </OnClick>
+
+               </Scripts>
+           </Button>
+		<!--Tab2-->  
+			<Button name="DugisTab2" inherits="CharacterFrameTabButtonTemplate" id="2" text="Leveling">
+               <Anchors>
+                   <Anchor point="LEFT" relativeTo="DugisTab1" relativePoint="RIGHT">
+                       <Offset>
+                           <AbsDimension x="-16" y="0"/>
+                       </Offset>
+                   </Anchor>
+               </Anchors>
+               <Scripts>
+                   <OnClick>
+						DugisGuideViewer:ShowTab(2)
+						PanelTemplates_SetTab(Dugis, 2);
+						PlaySound("igCharacterInfoTab");
+                   </OnClick>
+               </Scripts>
+           </Button>
+			<!--Tab3-->  
+			<Button name="DugisTab3" inherits="CharacterFrameTabButtonTemplate" id="3" text="Dungeon">
+               <Anchors>
+                   <Anchor point="LEFT" relativeTo="DugisTab2" relativePoint="RIGHT">
+                       <Offset>
+                           <AbsDimension x="-16" y="0"/>
+                       </Offset>
+                   </Anchor>
+               </Anchors>
+               <Scripts>
+                   <OnClick>
+						DugisGuideViewer:ShowTab(3)
+						
+						PanelTemplates_SetTab(Dugis, 3);
+						PlaySound("igCharacterInfoTab");
+                   </OnClick>
+               </Scripts>
+           </Button>
+			<Button name="DugisTab4" inherits="CharacterFrameTabButtonTemplate" id="4" text="Maps">
+               <Anchors>
+                   <Anchor point="LEFT" relativeTo="DugisTab3" relativePoint="RIGHT">
+                       <Offset>
+                           <AbsDimension x="-16" y="0"/>
+                       </Offset>
+                   </Anchor>
+               </Anchors>
+               <Scripts>
+                   <OnClick>
+                       DugisGuideViewer:ShowTab(4)
+						
+						PanelTemplates_SetTab(Dugis, 4);
+						PlaySound("igCharacterInfoTab");
+                   </OnClick>
+               </Scripts>
+           </Button>
+			<Button name="DugisTab5" inherits="CharacterFrameTabButtonTemplate" id="5" text="Daily/Event"  >
+               <Anchors>
+                   <Anchor point="LEFT" relativeTo="DugisTab4" relativePoint="RIGHT">
+                       <Offset>
+                           <AbsDimension x="-16" y="0"/>
+                       </Offset>
+                   </Anchor>
+               </Anchors>
+               <Scripts>
+                   <OnClick>
+						DugisGuideViewer:ShowTab(5)
+						PanelTemplates_SetTab(Dugis, 5);
+						PlaySound("igCharacterInfoTab");
+                   </OnClick>
+               </Scripts>
+           </Button>	
+			<Button name="DugisTab6" inherits="CharacterFrameTabButtonTemplate" id="6" text="Ach/Prof"  >
+               <Anchors>
+                   <Anchor point="LEFT" relativeTo="DugisTab5" relativePoint="RIGHT">
+                       <Offset>
+                           <AbsDimension x="-16" y="0"/>
+                       </Offset>
+                   </Anchor>
+               </Anchors>
+               <Scripts>
+                   <OnClick>
+						PanelTemplates_SetTab(Dugis, 6);
+						DugisGuideViewer:ShowTab(6)
+						PlaySound("igCharacterInfoTab");
+                   </OnClick>
+
+               </Scripts>
+           </Button>
+			<Button name="DugisTab7" inherits="CharacterFrameTabButtonTemplate" id="7" text="Settings"  >
+               <Anchors>
+                   <Anchor point="LEFT" relativeTo="DugisTab6" relativePoint="RIGHT">
+                       <Offset>
+                           <AbsDimension x="-16" y="0"/>
+                       </Offset>
+                   </Anchor>
+               </Anchors>
+               <Scripts>
+                   <OnClick>
+                       
+						DugisGuideViewer:ShowTab(7)
+						PanelTemplates_SetTab(Dugis, 7);
+						PlaySound("igCharacterInfoTab");
+                   </OnClick>
+
+               </Scripts>
+           </Button>					   
+			</Frames>
+			
+			
+			<ScrollChild name = "Scroller">
+				<!--<Frame name = "ViewTab">-->
+					<Frame name = "DGVTabFrame1">
+					<Size x="250" y="10000"/>
+					<Scripts>
+					   <OnLoad> 
+						
+						
+							self:RegisterEvent("ADDON_LOADED");							
+							self:RegisterEvent("PLAYER_LOGIN");
+							self:RegisterEvent("ZONE_CHANGED");
+							self:RegisterEvent("ZONE_CHANGED_NEW_AREA");
+							self:RegisterEvent("CHAT_MSG_SYSTEM");
+							self:RegisterEvent("QUEST_LOG_UPDATE")
+							self:RegisterEvent("UI_INFO_MESSAGE")
+							self:RegisterEvent("QUEST_QUERY_COMPLETE")
+							self:RegisterEvent("ZONE_CHANGED_INDOORS")
+							self:RegisterEvent("CHAT_MSG_LOOT")
+							self:RegisterEvent("ACHIEVEMENT_EARNED")
+						
+					   </OnLoad>
+					   <OnEvent function="DugisMainframe_OnEvent"/>
+					   
+					   
+					</Scripts>
+					
+					<Frames >
+						<Button name="RecapPanelDetail1" inherits="RecapPanelDetailTemplate" >
+							<Anchors>
+							<Anchor point="TOPLEFT" >
+							<Offset>
+							<AbsDimension x="20" y="-2"/>
+							</Offset>
+							</Anchor>
+							</Anchors>
+						</Button>
+						
+
+						
+					</Frames>
+				</Frame>
+		</ScrollChild>
+	</ScrollFrame><!--End View Scroll Frame-->
+	<!--
+		<ScrollFrame>
+		<ScrollChild name ="ViewFrame">
+			<Frame name ="DGVTabFrame1"  movable ="true"> 
+				<Size x="550" y="360"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="DugisMainframe"/>
+				</Anchors>
+
+			</Frame>	
+		</ScrollChild>
+	</ScrollFrame> End Leveling Scroll Frame-->		
+
+	<ScrollFrame>
+		<ScrollChild visible ="true">
+			<Frame name ="DGVTabFrame2"  movable ="true" visible="true"> 
+				<Size x="550" y="360"/>
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="DugisMainframe"/>
+				</Anchors>
+
+			</Frame>	
+		</ScrollChild>
+	</ScrollFrame> <!--End Dailies Scroll Frame-->
+
+	<ScrollFrame>
+		<ScrollChild name ="EventsFrame">
+			<Frame name ="DGVTabFrame3"  movable ="true"> 
+				<Size x="550" y="360"/>
+				
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="DugisMainframe"/>
+				</Anchors>
+
+			</Frame>	
+		</ScrollChild>
+	</ScrollFrame> <!--End Events Scroll Frame-->	
+	
+	<ScrollFrame>
+		<ScrollChild name ="DungeonsFrame">
+			<Frame name ="DGVTabFrame4"  movable ="true" > 
+				<Size x="550" y="360"/>
+				
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="DugisMainframe"/>
+				</Anchors>
+
+			</Frame>	
+		</ScrollChild>
+	</ScrollFrame> <!--End Dungeons Scroll Frame-->		
+	<ScrollFrame>
+		<ScrollChild name ="DungeonsMapFrame">
+			<Frame name ="DGVTabFrame5"  movable ="true" > 
+				<Size x="550" y="360"/>
+				
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="DugisMainframe"/>
+				</Anchors>
+
+			</Frame>	
+		</ScrollChild>		
+	</ScrollFrame> <!--End Dungeon map Scroll Frame-->	
+	
+	<ScrollFrame>
+		<ScrollChild name ="DungeonsMapFrame">
+			<Frame name ="DGVTabFrame6"  movable ="true" > 
+				<Size x="550" y="360"/>
+				
+				<Anchors>
+					<Anchor point="TOPLEFT" relativeTo="DugisMainframe"/>
+				</Anchors>
+
+			</Frame>	
+		</ScrollChild>		
+	</ScrollFrame> <!--End Dungeon map Scroll Frame-->	
+	
+	<ScrollFrame>
+		<ScrollChild name ="DGV_Settings">
+			<Frame name ="DGVTabFrame7"  movable ="true" visible="true"> 
+				<Size x="550" y="360"/>
+				
+				<Anchors>
+					<!--<Anchor point="TOPLEFT" relativeTo="DugisMainframe"/>-->
+					<Anchor point="CENTER"/>
+				</Anchors>
+								
+			</Frame>	
+		</ScrollChild>		
+	</ScrollFrame> <!--End Dungeon map Scroll Frame-->	
+	
+	
+	<Frame name ="Botframe" >
+		<Size x="550" y="10"/>
+		<Anchors>
+			<Anchor point="TOP" relativePoint="BOTTOM" relativeTo="Dugis"/>
+		</Anchors>
+		
+		<Frames>
+
+					  
+		</Frames>
+	</Frame> <!--End Bottom Frame-->
+	
+							
+	<Button name = "DugisResetButton" inherits="UIPanelButtonTemplate" text = "Reset" hidden="false">
+		 <Size>
+			<AbsDimension x="50" y="20"/>
+		</Size>
+		<Anchors>
+			<Anchor point="BOTTOMLEFT" relativeTo="DugisMainframe" >
+				<Offset>
+					<AbsDimension x="13" y="13"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnClick>DugisGuideViewer_Reset_ButtonClick();</OnClick>
+		</Scripts> 
+	</Button>
+	
+	<Button name = "DugisReloadButton" inherits="UIPanelButtonTemplate" text = "Reload" hidden="false">
+		 <Size>
+			<AbsDimension x="50" y="20"/>
+		</Size>
+		<Anchors>
+			<Anchor point="LEFT" relativeTo="DugisResetButton" relativePoint ="RIGHT" >
+				<Offset>
+					<AbsDimension x="10" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnClick>DugisGuideViewer_Reload_ButtonClick();</OnClick>
+		</Scripts> 
+	</Button>
+		
+	
+	<Button name = "DugisPercentButton"  hidden="false">
+		 <Size>
+			<AbsDimension x="100" y="20"/>
+		</Size>
+		<Layers>
+			<Layer >
+				<FontString name="$parentName" inherits="GameFontNormal" wraponspaces="false" justifyH="LEFT" > <!--GameFontHighlight-->
+					<Size>
+					<AbsDimension x="100" y="20"/>
+					</Size>
+					<Anchors>
+					<Anchor point="BOTTOMRIGHT" relativeTo="DugisMainframe" relativePoint ="BOTTOMRIGHT" >
+					<Offset>
+					<AbsDimension x="-25" y="20"/>
+					</Offset>
+					</Anchor>
+					</Anchors>
+				</FontString>
+			</Layer>
+		</Layers>
+	</Button>
+	
+	
+	
+	<Button name = "DugisCloseButton" inherits="UIPanelCloseButton">
+		<Anchors>
+			<Anchor point="TOPRIGHT" relativeTo="DugisMainframe" >
+			<Offset>
+					<AbsDimension x="-5" y="-5"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		
+		<Scripts>
+			<OnClick>DugisGuideViewer_Close_ButtonClick(); PlaySound("igMainMenuOptionCheckBoxOn"); </OnClick>
+			
+		</Scripts> 
+		
+	</Button>
+
+	</Frames> <!--End main Frames-->
+</Frame>  <!--End main Frame-->
+
+<Frame name ="DugisSmallFrame"  parent = "UIParent" movable="true" >
+		<Size x="300" y="50"/>
+		<Anchors>
+			<Anchor point="CENTER">
+            <Offset>
+                    <AbsDimension x="0" y="220"/>
+            </Offset>
+            </Anchor>
+			
+		</Anchors>
+<!--
+		<Backdrop 
+		bgFile ="Interface\Buttons\UI-SliderBar-Background" tile ="true">
+		<EdgeSize>
+		<AbsValue val="8"/>
+		</EdgeSize>
+		<TileSize>
+			<AbsValue val ="8"/>
+		</TileSize>
+		</Backdrop>	
+-->
+		<Scripts>
+			<OnLoad>
+			self:RegisterForDrag("LeftButton");
+			</OnLoad>
+			<OnMouseDown> 
+				PlaySound("igCharacterInfoTab");
+				SmallFrameClickHandler(self,arg1);
+			</OnMouseDown>
+			<!--<OnMouseUp>  
+				this:StopMovingOrSizing(); 
+			</OnMouseUp>
+			<OnDragStop> 
+				this:StopMovingOrSizing(); 
+				
+			</OnDragStop>-->
+			
+			<OnDragStart>
+				DugisGuideViewer:OnDragStart(self);
+			</OnDragStart>
+			<OnDragStop>
+				DugisGuideViewer:OnDragStop(self);
+			</OnDragStop>
+			
+			<OnEnter>
+				DugisGuideViewer:SmallWindowTooltip_OnEnter(self, event)
+			</OnEnter>
+			<OnLeave>
+				DugisGuideViewer:SmallWindowTooltip_OnLeave(self, event)		
+			</OnLeave>
+		</Scripts>
+	
+		<Frames>
+			<Button name="DugisSmallFrameLogo" frameStrata="LOW" hidden = "true">
+				<Size x="256" y="64"/>
+				<NormalTexture file ="Interface\AddOns\DugisGuideViewerZ\Artwork\logo.tga"/>
+				<Anchors>
+				<Anchor point="BOTTOM" relativeTo="DugisSmallFrame" relativePoint = "TOP" >
+				<Offset>
+				<AbsDimension x="-20" y="-10"/>
+				</Offset>
+				</Anchor>
+				</Anchors>
+				<Scripts>
+				<OnLoad>
+					tinsert(UISpecialFrames,this:GetName());		
+				</OnLoad>
+				</Scripts>
+			</Button>
+		
+			<Button name="SmallFrameDetail1" inherits="SmallWindowTemplate"  frameStrata="LOW" >
+				<!--<Size x="300" y="50"/>-->
+				<Size x="200" y="50"/>
+				
+				<Anchors>
+				<Anchor point="RIGHT" >
+				<Offset>
+				<AbsDimension x="0" y="-10"/>
+				</Offset>
+				</Anchor>
+				</Anchors>
+								
+			</Button>
+
+			<CheckButton name = "$parentChk" inherits ="UICheckButtonTemplate">
+				<Size x="18" y="18"/>
+				<Anchors>
+				<Anchor point="RIGHT" relativeTo="DugisSmallFrame" relativePoint="LEFT" >
+				<Offset>
+				<AbsDimension x="5" y="-1.5"/>
+				</Offset>
+				</Anchor>
+				</Anchors>
+				
+				<Scripts>
+				<OnClick function="SmallFrameCheckButton_OnEvent">
+				</OnClick>
+				</Scripts>
+			</CheckButton>		
+	
+			<Button name = "$parentMaximize" hidden = "true" frameStrata="MEDIUM" >
+				<Size x="21" y="42"/>
+				<NormalTexture file ="Interface\buttons\UI-MicroButton-World-Up"/>
+				<HighlightTexture alphaMode ="ADD" file ="Interface\BUTTONS\UI-MicroButton-Hilight"/>
+				<pushedtexture  file = "Interface\buttons\UI-MicroButton-World-Down"/>
+				<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parentChk" relativePoint="LEFT" >
+				<Offset>
+				<AbsDimension x="0" y="8"/>
+				</Offset>
+				</Anchor>
+				</Anchors>
+				
+				<Scripts>
+				<OnClick>UIFrameFadeIn(DGV_DungeonFrame, 0.5, 0, 1)</OnClick>
+				
+				</Scripts>
+				
+			</Button>		
+	</Frames>
+</Frame>	 
+ <!--===================================
+   Dungeon Frame
+   ====================================-->
+
+   <Frame name='DGV_DungeonFrame' inherits='DugisBorderFrame' parent='UIParent' movable='true' enableMouse='true' hidden='true' toplevel="true">
+
+      <Size> <AbsDimension x='820' y='554'/> </Size>
+      <Anchors> 
+         <Anchor point="CENTER"> <Offset> <AbsDimension x='0' y='0'/> </Offset> </Anchor>
+      </Anchors>
+      <Frames>
+		<Button name='$parentClose' inherits='UIPanelCloseButton'>
+            <Anchors> <Anchor point='TOPRIGHT' relativeTo='DGV_DungeonFrame'> <Offset> <AbsDimension x='-5' y='-4'/> </Offset> </Anchor> </Anchors>
+            <Scripts> <OnClick> self:GetParent():Hide() DugisSmallFrameMaximize:Hide()</OnClick> </Scripts>
+         </Button>
+		 <Button name='$parentMinimize' >
+			<Size> <AbsDimension x='32' y='32'/> </Size>
+			<NormalTexture file ="Interface\BUTTONS\UI-Panel-HideButton-Up"/>
+			<HighlightTexture alphaMode ="ADD" file ="Interface\BUTTONS\UI-Panel-MinimizeButton-Highlight"/>
+			<pushedtexture file = "Interface\BUTTONS\UI-Panel-HideButton-Down"/>
+            <Anchors> <Anchor point='RIGHT' relativeTo='$parentClose' relativePoint="LEFT" > <Offset> <AbsDimension x='10' y='0'/> </Offset> </Anchor> </Anchors>
+            <Scripts> <OnClick> DugisGuideViewer:MinimizeDungeonMap() </OnClick> </Scripts>
+         </Button>
+         <ScrollFrame name='WGEditScrollFrame' inherits='UIPanelScrollFrameTemplate'  >
+            <ScrollChild name='WGEditScrollChild'  >
+               <SimpleHTML name='WGEditBox'  >
+                  <Size> <AbsDimension x='820' y='512'/> </Size>
+                  <Scripts>
+                    <OnHyperlinkClick> DugisGuideViewer:OnHyperlinkClick(self, link) </OnHyperlinkClick>
+                    <OnHyperlinkEnter> DugisGuideViewer:OnHyperlinkEnter(self, link) </OnHyperlinkEnter>
+                    <OnHyperlinkLeave> DugisGuideViewer:OnHyperlinkLeave(self, link) </OnHyperlinkLeave>
+                  </Scripts>
+               </SimpleHTML>
+            </ScrollChild>
+		 </ScrollFrame>	
+      </Frames>
+      <Scripts>
+
+      </Scripts>
+   </Frame>
+	
+	<!--Test Frame -->
+	<Frame name='DGV_TestFrame' inherits='DugisBorderFrame' parent='UIParent' movable='true' resizable='true' enableMouse='true' hidden='true' toplevel="true">
+		<Size> <AbsDimension x='100' y='100'/> </Size>
+			<Anchors> 
+			<Anchor point="CENTER"> <Offset> <AbsDimension x='0' y='0'/> </Offset> </Anchor>
+			</Anchors>
+		<Frames>
+			<Button name='$parentButton' inherits='UIPanelButtonTemplate' text = 'test'>
+			<Size> <AbsDimension x='50' y='50'/> </Size>
+			<Anchors> <Anchor point='CENTER' > </Anchor> </Anchors>
+			<Scripts> <OnClick> DugisGuideViewer:Test() </OnClick> </Scripts>
+			</Button>
+		</Frames>
+	</Frame>
+	
+</Ui>

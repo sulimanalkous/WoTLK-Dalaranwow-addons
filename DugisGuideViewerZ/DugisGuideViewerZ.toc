@@ -1,0 +1,47 @@
+## Interface: 30300
+## Title: Dugi's Guide Viewer |cffffffffv4.19|r
+## Notes: Multi guide viewer created by Dugi of ultimatewowguide.com v4.19
+## Version: 4.19
+## X-Website: http://www.ultimatewowguide.com/
+## X-Email: webmaster@ultimatewowguide.com
+## X-Category: Quest
+## SavedVariablesPerCharacter: CurrentQuestIndex, CurrentTitle, CurrentZone, DugisGuideUser, DugisGuideViewerDB
+## OptionalDeps: TomTom
+## X-CompatibleLocales: enUS, enGB, deDE, frFR, esES, esMX, koKR, ruRU
+
+LibStub\LibStub.lua
+Localization\Localization.enUS.lua
+Localization\Localization.esMX.lua
+Localization\Localization.deDE.lua
+Localization\Localization.frFR.lua
+Localization\Localization.koKR.lua
+Localization\Localization.ruRU.lua
+Localization\LibBabble-Zone-3.0\Lib.xml
+Localization\LibBabble-Class-3.0\Lib.xml
+Localization\LibBabble-Race-3.0\Lib.xml
+AceDB-3.0\AceDB-3.0.xml
+AceAddon-3.0\AceAddon-3.0.xml
+
+DugisGuideViewer.lua
+Localization\Translator.lua
+DugisGuideViewer.xml
+ItemButton.lua
+UnlistedQuest.lua
+Chains.lua
+ReqLevel.lua
+Ants.lua
+
+DugisGuide_Alliance_En\Guides.xml
+DugisGuide_Horde_En\Guides.xml
+DugisGuide_Dungeons_Alliance_En\Guides.xml
+DugisGuide_Dungeons_Horde_En\Guides.xml
+DugisGuide_WOTLK_Dungeons_A\Guides.xml
+DugisGuide_WOTLK_Dungeons_H\Guides.xml
+DugisGuide_Outland_Dungeons_A\Guides.xml
+DugisGuide_Outland_Dungeons_H\Guides.xml
+DugisGuide_Maps_Horde_En\Guides.xml
+DugisGuide_Maps_Alliance_En\Guides.xml
+DugisGuide_Dailies_Horde_En\Guides.xml
+DugisGuide_Dailies_Alliance_En\Guides.xml
+DugisGuide_Events_Horde_En\Guides.xml
+DugisGuide_Events_Alliance_En\Guides.xml

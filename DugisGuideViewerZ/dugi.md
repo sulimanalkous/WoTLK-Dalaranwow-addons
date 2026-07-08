@@ -1,0 +1,434 @@
+# DugisGuideViewerZ Addon Analysis and Modifications
+
+This document summarizes the understanding of the `DugisGuideViewerZ` addon's functionality and the modifications attempted to integrate new dungeon guides.
+
+## Addon Structure and Key Functions
+
+The addon's core logic resides primarily in `DugisGuideViewer.lua`.
+
+### 1. Guide Registration (`DugisGuideViewer:RegisterGuide`)
+-   **Purpose:** This function is how guides are registered with the addon. It takes `title`, `nextguide`, `faction`, `guidetype`, and `rowinfo` (a function returning the guide content).
+-   **Loading Mechanism:** For guides to appear in the addon, `RegisterGuide` must be executed when the game loads the corresponding Lua file. Original leveling guides call this function directly at the top level of their files.
+-   **Data Storage:** Registered guides populate `self.guides` (mapping title to `rowinfo` function), `self.nextzones`, `self.gtype`, and `self.guidelist` (for UI display).
+
+### 2. Content Decoding (`DugisGuideViewer:Retxyz`)
+-   **Purpose:** This function decodes the "encrypted" guide content.
+-   **Mechanism:** It implements a Caesar cipher with a `+3` shift for printable ASCII characters. It also handles multi-byte characters.
+-   **Activation:** Decoding is activated by an `on` flag, which is set to `true` if `Retxyz` is called with `i=1` and `t="AAA"`. If `i=1` is not "AAA", decoding is disabled for that guide.
+
+### 3. Guide Parsing (`DugisGuideViewer:ParseRows`)
+-   **Purpose:** This function takes the raw (encoded) guide content, decodes it line by line, and populates internal tables (`DugisGuideViewer.actions`, `DugisGuideViewer.quests1`, `DugisGuideViewer.qid`, etc.).
+-   **Input:** It receives the guide content as varargs (`...`) from a `string.split` operation.
+-   **Line Processing:** For each line, it calls `Retxyz` to decode, then uses a regex (`"^(%a) ([^|]*)(.*)"`) to extract the action, quest name, and tags.
+-   **Filtering:** It filters steps based on class (`|C|`) and race (`|R|`) tags.
+
+### 4. State Management (`DugisGuideViewer:SetQuestsState`)
+-   **Purpose:** Determines the initial state of a guide when selected (which steps are complete, which is current).
+-   **Mechanism:**
+    -   It iterates through all steps, checking `DugisGuideViewer:HasQuestBeenTurnedIn(qid)` and `DugisGuideViewer:GetQuestLogIndexByQID(qid)` to mark steps as "C" (Complete).
+    -   It then uses a `while` loop to find the first step that is "U" (Unchecked) and not skippable by `CheckForOptionalLoot` or `CheckForLocation`.
+    -   The `CurrentQuestIndex` is set to this found step, and `DugisGuideViewer:SetToQuestNumber` is called to highlight it.
+
+## Problems Encountered and Hypotheses Tested
+
+### 1. Initial Content Encoding (Solved)
+-   **Problem:** New guides appeared as garbled text.
+-   **Hypothesis:** Incorrect encoding.
+-   **Solution:** Developed `correct_converter.py` to apply a `-3` Caesar cipher shift, reversing `Retxyz`.
+
+### 2. Incorrect Guide Titles (Solved)
+-   **Problem:** Titles showed IDs like "279(17-21)".
+-   **Hypothesis:** Missing mapping for dungeon IDs.
+-   **Solution:** Modified `correct_converter.py` to extract dungeon names and levels directly from filenames, making titles accurate.
+
+### 3. "Guide Complete" on Selection (Solved by Saved Variable Reset)
+-   **Problem:** Guides immediately showed "Complete" upon selection.
+-   **Hypothesis 1:** Missing "Next Guide" parameter. (Incorrect)
+-   **Hypothesis 2:** `|QID|` tags causing auto-completion due to `HasQuestBeenTurnedIn`. (Partially correct, but not the immediate cause of "complete" state).
+-   **Solution:** User confirmed this was due to persisted saved variables. Resetting `DugisGuideViewerZ.lua` in the WTF folder resolved this.
+
+### 4. Guides Not Appearing in List (Solved)
+-   **Problem:** After a script change, the entire guide list became empty.
+-   **Hypothesis:** Incompatible module structure.
+-   **Solution:** Modified `correct_converter.py` to extract the `RegisterGuide` call from within the `RegisterModule` structure and place it at the top level of the generated `.lua` file, mimicking original leveling guides.
+
+### 5. No Step Highlighted / Steps Not Advancing (Current Unresolved Issue)
+-   **Problem:** Guides appear in the list, but no step is highlighted, and steps do not advance automatically or manually.
+-   **Hypothesis 1 (Initial):** `ParseRows` failing due to `AAA` line being treated as a step. (Incorrect, `AAA` is skipped).
+-   **Hypothesis 2 (Current):** `ParseRows` failing to populate `DugisGuideViewer.actions` (and thus `LastGuideNumRows` is 0) because the regex `text:find("^(%a) ([^|]*)(.*)")` is failing on the *decoded* text.
+    -   **Evidence:** User's debug output `testtag=11.5` suggests `getCoords` is receiving malformed data, implying `quests2` (populated by `ParseRows`) is incorrect.
+    -   **Specific Suspect:** The `Retxyz` function's `on` flag logic combined with `string.split`'s behavior. The `string.split("
+", "
+" .. self.guides[title]())` call produces an initial empty string `""` as the first element. This causes `Retxyz` to be called with `i=1` and `t=""`, which prevents the `on` flag from being set to `true` when `AAA` is processed (as `AAA` is at `i=2`). Consequently, `Retxyz` never decodes the content, and `ParseRows` attempts to match its regex against *encoded* text, which fails.
+-   **Proposed Debugging:** Injecting `DebugPrint` statements into the generated Lua code to trace `ParseRows` execution, `Retxyz` output, and regex matching results.
+
+## Changes Made to Files
+
+### `correct_converter.py`
+-   **Initial Encoding:** Implemented Caesar cipher for content.
+-   **Title Generation:** Logic to extract dungeon names and levels from filenames.
+-   **Module Extraction:** Logic to find `RegisterGuide` call within `RegisterModule` structure and place it at the top level.
+-   **`AAA` Header:** Ensured `AAA` and a blank line are present after `return [[`.
+-   **`nextguide` parameter:** Correctly resolved and populated.
+-   **Debug Injection:** Added `DebugPrint` statements into the generated Lua code to trace `ParseRows` execution.
+
+### `DugisGuideViewer.lua`
+-   **Debug Flag:** Changed `local Debug = 0` to `local Debug = 1` to enable debug output in WoW.
+
+## IMPORTANT CORRECTION — the `"\n" ..` prefix theory below was WRONG
+
+An earlier pass through this session concluded the `"\n" .. self.guides[title]()` prefix at the
+`ParseRows`/`getGuideSize` call sites was an off-by-one bug, "fixed" by removing it, and this file
+briefly said so. **That was disproven and the change was reverted.** Removing the prefix broke
+guide display entirely (empty guide window, empty compact window) — confirmed by the user
+in-game. The prefix is correct **as shipped**; do not remove it again.
+
+Root cause of the earlier confusion: reasoning about `string.split`'s behavior was done with a
+hand-written Lua stand-in for WoW's real (C-implemented) `string.split`/`strsplit`, which does
+**not** behave the same way the offline stand-in did around a leading delimiter. Real in-game
+`Retxyz` debug captures (see below) prove `"AAA"` lands at split-index **1** exactly as the code
+expects, `on` activates correctly, and every subsequent row decodes into perfectly correct,
+readable guide text (verified end-to-end: action codes, `|N|` notes, coordinates, `|QID|`s all
+intact). **The parsing/decoding engine (`Retxyz` + `ParseRows`) is not broken and needs no fix.**
+
+Lesson: when a hypothesis about engine behavior can't be tested against the real WoW client
+directly, get real captured data from the client (e.g. write suspect values into an existing,
+already-working SavedVariable table, `/reload`, then read the resulting file) before changing
+"working" code based on an offline simulation. Also: the `Read` tool silently drops/renders
+non-printable bytes (e.g. the cipher's encoded-space byte `0x1D`) when displaying file content —
+always re-derive raw bytes via a script (`open(path, 'rb')`) rather than eyeballing/retyping
+Read-tool output when byte-exact data matters.
+
+## What was actually wrong (found via real in-game verification)
+
+The addon's guide **engine** works. The problem was always **bad guide content**:
+
+1. **Previously-converted classic dungeon guides reference quest/NPC IDs that don't exist on this
+   server.** Checked directly against the account's own `DungeonDrops/TDB_full_335.63_2017_04_18.7z`
+   SQL dump (the real Warmane/TrinityCore 3.3.5 world database). Example: `DugisGuide_Dungeons_
+   Alliance_En/15_17_The_Deadmines.lua` references quest IDs 27790/27756 and NPC IDs 46612/47162
+   ("The Foreman") — **none of these exist in `quest_template`/`creature_template`.** That data is
+   from a modern/Cataclysm-redesigned Deadmines (Vanessa VanCleef storyline), not the original
+   classic dungeon that exists in 3.3.5a. This affects the whole `DugisGuide_Dungeons_Alliance_En`
+   / `DugisGuide_Dungeons_Horde_En` folder — **not yet rebuilt, still broken**.
+2. **`DugisGuide_WOTLK_Dungeons_A` / `_H` (Wrath dungeon guides) are empty stub files** — literally
+   6 bytes (`return`), no `RegisterGuide` call at all. Never actually got real content.
+3. **One file crashes on load**: `DugisGuide_Dungeons_Alliance_En/51_58_Blackrock_Depths_Upper.lua`
+   still uses the modern `local Guide = DugisGuideViewer:RegisterModule(...)` wrapper. This
+   engine build (v4.19) has **no `RegisterModule` function at all** (confirmed: zero matches
+   grepping the live `DugisGuideViewer.lua`) — calling it is a hard Lua error
+   (`attempt to call method 'RegisterModule' (a nil value)`) every time this file loads.
+   **Fixed this session**: disabled its `<Script>` line in that folder's `Guides.xml` (commented
+   out, file left on disk for future proper conversion). Swept the whole addon folder for any
+   other stray `RegisterModule` usage — only one other hit, `test_conversion.lua` at the addon
+   root, which isn't referenced by any `Guides.xml`/`.toc` entry so it was never actually loaded
+   (harmless leftover, not fixed, not urgent).
+
+## Work completed this session: Outland (TBC) dungeon guides rebuilt from verified data
+
+Built fresh Outland (levels 58-70) dungeon guides from `Dugis Guide All/
+DugiGuides_TBCAnniversary_2.13.zip` (Blizzard's Burning Crusade Classic Anniversary package —
+period-correct quest/NPC IDs, unlike the modern MoP package which uses retrofitted IDs).
+
+**Verification method**: extracted the full `TDB_full_world_335.63_2017_04_18.sql` from the
+account's own TDB dump, built a set of every valid `quest_template` ID, and checked every single
+`|QID|` referenced in the source files against it before shipping anything.
+
+**Findings from that check**: 113 of 120 unique quest IDs across all 16 dungeons × 2 factions were
+valid. The other 7 — all in the level-70 "endgame" dungeons (Shattered Halls, Shadow Labyrinth,
+Botanica, Mechanar, Arcatraz, Magisters' Terrace, Black Morass) — referenced Anniversary-event-only
+quest content (e.g. fake NPC 55007, quests like "Severed Communications") that doesn't exist in
+real WotLK/3.3.5a data. Those specific lines were stripped programmatically (any line containing
+an invalid `|QID|N|` dropped entirely, not just cosmetically edited) — necessary, not just tidy,
+because a step referencing an untrackable quest would permanently stall `SetQuestsState`'s
+"find the first incomplete step" logic.
+
+**Conversion pipeline** (`convert_tbc.py`, written this session, not saved into the addon folder —
+lives in the session scratchpad only): parses the source files' modern
+`RegisterModule`/`Guide:Load()` wrapper (8-argument `RegisterGuide` call, tolerant of literal `nil`
+args), derives a unique per-dungeon title from the filename (source files share one generic title
+across the whole 58-70 Outland chain, which would silently collide/overwrite in `self.guides` if
+used as-is), resolves "next guide" references to another dungeon's title only when that ID is
+itself one of the 16 dungeons converted (cross-references to outdoor zone guides outside this
+batch resolve to empty), Caesar-shifts the (plaintext, not yet ciphered) source content into the
+form `Retxyz` expects, and emits old-style flat `RegisterGuide(title, nextguide, faction,
+guidetype, function() ... end)` calls matching what this engine build requires.
+
+**Note on scope of content**: these guide files are the *original* TBC Anniversary source
+material, which is really "quest through the outdoor zone, and the dungeon's own quest chain is
+at the end" content (e.g. Hellfire Ramparts' file is mostly Hellfire Peninsula outdoor quests,
+with the actual "enter dungeon → kill 3 bosses → turn in" chain only in its last ~15 lines,
+identifiable via the `|I|` "instance entry" tag and `|DMAP|` "in-dungeon objective" tags). This
+was **not trimmed down** to dungeon-only content — shipped as full files. Reasoning: the addon's
+own `HasQuestBeenTurnedIn`-based state detection should auto-skip whatever outdoor prerequisite
+quests the player has already completed and land on the real next actionable step, so a level-63+
+character should land close to the dungeon-relevant part anyway without needing manual trimming
+(which also risks cutting a chain that continues into the *next* sequential file — confirmed
+happening for at least Slave Pens, whose "Lost in Action" quest accept has no turn-in in that same
+file, it's presumably in the following zone's guide file, not converted here). If in-game testing
+shows this produces confusing/wrong results (e.g. it insists on outdoor prerequisites a
+tank/healer player skipped by queuing via LFD), revisit with a proper `|I|`/`|DMAP|`-based trim.
+
+**Shipped**: `DugisGuideViewerZ/DugisGuide_Outland_Dungeons_A/` and `_H/`, one file per dungeon
+(Hellfire Ramparts through Magisters' Terrace, 16 each), plus `Guides.xml` in each folder, both
+registered in `DugisGuideViewerZ.toc`. All 32 files pass `luac -p` syntax validation. One data typo
+fixed by hand: both `68_70_The_Steamvault.lua` files had `guidetype = "i"` (lowercase) in the
+source, which would silently exclude Steamvault from the engine's `guidelist["I"]` instance-tab
+grouping (case-sensitive equality check) — corrected to `"I"` in both.
+
+## Also fixed this session (both confirmed real, unrelated to the above)
+
+### `SmallWindowTooltip_OnEnter` nil-error
+**Symptom**: hovering the compact/mini guide window threw `attempt to index a nil value` at
+`DugisGuideViewer.lua:1707`.
+**Root cause**: it read `getglobal("RecapPanelDetail" .. CurrentQuestIndex .. "Desc"):GetText()`,
+but `RecapPanelDetailN` frames are created dynamically, one per row, only when the *large* guide
+window renders its step list. If a guide is only ever viewed in the compact/mini window, that
+frame for the current step number may never have been created.
+**Fix**: read the step text directly from `DugisGuideViewer.quests2[CurrentQuestIndex]` (the same
+table `PopulateSmallFrame` already sources the compact window's own label from) instead of relying
+on a frame that may not exist for that UI mode. Still in place, not reverted.
+
+## Bug found and fixed this session: `ContToUse` nil-concat crash in `MapCurrentObjective`
+
+**Symptom** (from in-game test after the Outland-guide work above): selecting a step in one of the
+new Outland guides threw `attempt to concatenate local 'ContToUse' (a nil value)` at
+`DugisGuideViewer.lua:733`, called via `MapCurrentObjective` ← `SetToQuestNumber` ←
+`SetQuestsState` ← `DisplayViewTab`.
+
+**Root cause**: classic Lua variable-shadowing bug, pre-existing in the shipped engine (not
+introduced by the Outland conversion). `MapCurrentObjective` (around line 686) declares
+`local ZoneToUse` (line 689) and, inside the TomTom-waypoint block, `local ContToUse` (line 701) in
+the outer function scope. It then picks one of three branches to populate them: a `|Zone=|` note
+tag, the guide's own stated zone (`IsZoneNameValid(CurrentZone)`), or a fallback default — and that
+fallback branch read:
+```lua
+else
+  local ZoneToUse, ContToUse = GetCurrentMapZone(), GetCurrentMapContinent()
+```
+The `local` here declares *brand new* variables scoped only to that `else` block, shadowing the
+outer ones instead of assigning to them. The outer `ContToUse` stays `nil` forever, and every later
+use of it (lines 731/733/734, building/adding the TomTom waypoint) crashes.
+
+This branch is only reached when neither of the first two zone-resolution paths succeeds — i.e.
+when a guide's title-derived zone name isn't present in the engine's internal `zonei`/`zonec`
+lookup tables (checked via `IsZoneNameValid`/`GetZoneNumberFromZoneName`/
+`GetContinentNumberFromZoneName`, all simple table lookups keyed by zone name). The new Outland
+guides are apparently the first content this engine build has ever loaded whose zone name isn't in
+that table, which is why this dormant bug had never fired before.
+
+**Fix applied (part 1)**: removed the `local` keyword so the assignment writes to the existing
+outer-scope variables instead of shadowing them:
+```lua
+else
+  ZoneToUse, ContToUse = GetCurrentMapZone(), GetCurrentMapContinent()
+```
+
+**Second occurrence, different root cause, confirmed via a level-33 mage doing Razorfen Kraul (a
+classic dungeon guide, unrelated to the Outland batch)**: same crash, same line, *after* the part-1
+fix was already in the file (verified by reading the file back — the `local` was gone). This proved
+the shadowing wasn't the only problem: `GetCurrentMapContinent()`/`GetCurrentMapZone()` reflect
+whichever zone the World Map UI is currently "looking at," not necessarily the player's real
+location — they only reliably reflect the player's actual position after `SetMapToCurrentZone()`
+has been called at least once. Since a normal player never opens the world map before triggering
+this code path, the API can return `nil`, and `ContToUse` crashes again for an unrelated reason.
+
+**Fix applied (part 2)**: call `SetMapToCurrentZone()` immediately before reading the two values in
+that fallback branch, plus an added guard right after the if/elseif/else that returns early
+(skipping just the waypoint for this step, not the whole guide) if `ZoneToUse`/`ContToUse` still
+came back nil from any branch — this is a boundary against an external Blizzard API whose behavior
+isn't fully controlled by this addon, so defensive handling here is warranted (unlike elsewhere in
+the codebase):
+```lua
+else
+  SetMapToCurrentZone()
+  ZoneToUse, ContToUse = GetCurrentMapZone(), GetCurrentMapContinent()
+  DebugPrint("Default zone" .. ZoneToUse)
+end
+if not ZoneToUse or not ContToUse then
+  DebugPrint("MapCurrentObjective: could not resolve zone/continent, skipping waypoint")
+  return
+end
+```
+`luac -p` passes on the modified file. Not yet re-tested in-game.
+
+**Follow-up worth checking**: this fallback branch fires whenever a guide's title-derived zone name
+doesn't match an entry in `zonei`/`zonec` (populated from `GetMapContinents()`/`GetMapZones()` at
+file load, so these are real Blizzard zone-name strings). Worth checking, once testing resumes,
+whether the guide's declared zone name is simply wrong/missing (e.g. a mismatch introduced by
+`convert_tbc.py` or the earlier `correct_converter.py`) rather than always relying on the
+current-position fallback — the fallback now works without crashing, but a `|Zone=|` tag or a
+correct title zone name would give more accurate waypoints than "wherever the player happens to be
+standing right now."
+
+## Work completed this session: classic dungeon guides (13-58) rebuilt from verified data
+
+Same treatment as the Outland rebuild. Root cause (documented above under "What was actually
+wrong"): the previously-shipped classic dungeon guides in `DugisGuide_Dungeons_Alliance_En`/
+`_Horde_En` came from a source that used Cataclysm-redesigned quest/NPC content — this is also
+almost certainly the explanation for the user's separate observation ("guides say go to the
+dungeon first, before collecting quests") since Cataclysm's revamp of old dungeons commonly moved
+quest givers inside the instance, unlike the original design of gathering quests outside first.
+
+**Source**: `Dugis Guide All/DugiGuides_ClassicEra_1.89.zip` (Blizzard's Classic Anniversary
+package) → `DugisGuideViewerZ/DugisGuide_Dungeon_Alliance_En/` and `_Horde_En/`, 15 dungeon files
+each, same modern `RegisterModule`/`Guide:Load()` 8-arg `RegisterGuide` wrapper format as the TBC
+Anniversary source used for Outland.
+
+**Verification**: extracted `quest_template` (9,464 IDs) and `creature_template` (29,923 IDs) from
+the account's own TDB dump (same one used for Outland and for `DungeonDrops`). Checked every single
+`|QID|` and NPC reference (`|NPC|`/`(npc:N)`) across all 30 source files (15 dungeons × 2 factions)
+against these sets. **Result: 100% valid — 276/276 unique quest IDs, 306/306 unique NPC IDs. Zero
+lines needed stripping.** Notably cleaner than Outland (which had 7 invalid IDs from
+Anniversary-event-only endgame content) — the classic 13-58 source apparently has no such
+event-exclusive content mixed in.
+
+**Conversion pipeline**: `convert_classic.py`, written this session and saved into the addon folder
+(unlike the Outland session's `convert_tbc.py`, which was left in scratchpad only and is now lost —
+lesson applied). Also saved `valid_quest_ids.txt` and `valid_creature_ids.txt` (the verified ID
+sets extracted from the TDB dump) into the addon folder alongside it, so a future Wrath-guide
+rebuild can reuse both the script and the ID sets without re-extracting the 7z/SQL dump. Unlike the
+Outland source (which reused one generic title across the whole chain, requiring the converter to
+derive unique titles from filenames), the ClassicEra source already gives each dungeon a unique,
+correctly formatted title in its own `RegisterGuide` call — simpler case, titles used as-is.
+Handles one format wrinkle Outland's source didn't have: the last dungeon in each faction's chain
+passes a literal `nil` (not a quoted string) for the "next guide" argument.
+
+**Scope note — coverage gap, not a bug**: the ClassicEra source does not include every dungeon the
+previous (broken) conversion attempted. Missing from both factions: **Dire Maul** (East/West/North)
+entirely. Missing from Alliance only: **Shadowfang Keep** (Horde's copy exists; Alliance's own quest
+path to it apparently isn't covered by this dungeon-guide package, likely folded into an outdoor
+Duskwood/Silverpine guide instead). **Blackrock Depths** is one consolidated file here (matching
+the source), replacing the old broken two-file split (`..._Detention.lua` / `..._Upper.lua`). This
+means the old `51_58_Blackrock_Depths_Upper.lua` — the file that used the incompatible
+`RegisterModule` wrapper and crashed this engine build, previously just disabled via a commented-out
+`Guides.xml` line — no longer exists at all; that fix is now moot rather than pending. If Dire Maul
+/ Alliance Shadowfang Keep guides matter, they'd need sourcing and converting separately (no
+verified Blizzard Classic-Anniversary source for them found yet).
+
+**Also cleaned up in passing**: the old `Guides.xml` in both folders carried `<Script>` references
+to `..\DugisGuide_Cata_Dungeon_A\*.lua` / `_H\*.lua` — those folders **don't exist on disk at all**,
+so these were already-dead references predating this session (not something this session broke).
+Regenerating `Guides.xml` from the new file list dropped them; also dropped the (harmless, since
+they're 6-byte `return`-only stubs per item 4 below) references to `DugisGuide_WOTLK_Dungeons_A/_H`
+that lived in the same file — those stub files are untouched on disk, just no longer referenced
+from this particular `Guides.xml`. Neither change should affect current behavior since both
+referenced nothing that actually registered a guide.
+
+**Shipped**: `DugisGuideViewerZ/DugisGuide_Dungeons_Alliance_En/` and `_Horde_En/`, 15 files each,
+old broken files and `.lua.backup` leftovers removed, fresh `Guides.xml` per folder. All 30 files
+pass `luac -p`. Round-trip decode spot-checked by hand (simulating the engine's `+3` Retxyz shift
+against the encoded output) — confirmed byte-exact match to the original plaintext source line.
+`DugisGuideViewerZ.toc` needed no changes (same folder/file names as before).
+
+## Bug found and fixed this session: `.toc` manifest needs a full client restart, not just relog
+
+**Symptom**: after the classic dungeon rebuild, user debug-printed `#DugisGuideViewer.guidelist["I"]`
+and got 17 (16 Outland + only 1 classic entry), with the guide-browsing experience jumping straight
+from an early classic dungeon to Outland content, nothing in between. A full relog (log out to
+character select and back in) did **not** fix it.
+
+**Root cause**: this was stale addon-manifest state, not a bug in the new files — confirmed because
+running the actual `RegisterGuide` function (copied verbatim) through a standalone Lua interpreter
+against all 15 shipped files, in the exact `.toc` load order, correctly registers all 15 in order
+every time. **A full client exit and restart** (not just `/reload` or relog-to-character-select)
+was required before the fresh file list actually took effect. Whatever caches the addon's `.toc`-
+declared file list on this client apparently survives a character-select relog but not a full
+process restart. Confirmed fixed by the user after a full exit/restart.
+
+**Takeaway for future sessions**: when shipping changes to a `Guides.xml`/`.toc` file list (as
+opposed to editing an already-loaded file's contents), tell the user up front that a full client
+restart may be needed to verify, not just `/reload`.
+
+## Bug found and fixed this session: wrong TomTom waypoints (guide's title zone used for every step)
+
+**Symptom**: reported by user testing a classic dungeon chain — a step whose actual location was
+Undercity got a waypoint in Hillsbrad Foothills instead (the character walked to the wrong place
+entirely).
+
+**Root cause**: found by comparing the Anniversary-sourced dungeon content (Outland + this
+session's classic rebuild) against the addon's own original, presumably-correct leveling guides.
+In the original leveling guides, the `|Z|` tag stores a real zone **name** string, e.g.
+`|Z|Stormwind City|` — exactly what `MapCurrentObjective`'s call to
+`GetZoneNumberFromZoneName`/`GetContinentNumberFromZoneName` (both simple `zonei`/`zonec` table
+lookups keyed by real Blizzard zone-name strings, populated from the live `GetMapContinents()`/
+`GetMapZones()` API) expects, and it resolves correctly there. But the Anniversary source package
+encodes that same tag as a raw **numeric ID** instead (e.g. `|Z|1413|`, `|Z|1458|` for Undercity) —
+a completely different addressing scheme (almost certainly a Blizzard AreaID) that this old
+3.3.5a-era engine has no live API to resolve by number, only by name. So `zonei["1458"]` always
+silently returns `nil`, `MapCurrentObjective` falls through to using **the guide's own title zone**
+for that waypoint (e.g. "Uldaman" or whatever dungeon guide is open) regardless of the step's real
+location — wrong for any step that sends the player back to a capital city or a different zone
+mid-chain, which is common in this source content (many classic quest chains detour through
+Undercity/Orgrimmar/Stormwind for class-quest turn-ins).
+
+This is a **pre-existing engine limitation exposed by new content**, not a bug introduced by this
+session's conversions — it would affect any guide (mine or otherwise) that ever ships an Anniversary-
+style numeric `|Z|` tag. It stayed invisible before because (a) the original leveling guides always
+use name-string `|Z|` tags, and (b) dungeon guides previously crashed before ever reaching this code.
+
+**Fix**: the real zone name is already present as plain, human-readable `{ZoneName}` markup in the
+same line's note text (e.g. `{Undercity}`, `{Ratchet}`) — used only for cosmetic display previously
+(`SetQuestText` prints it as literal text, nothing parses it). Added a new, highest-priority branch
+in `MapCurrentObjective` (`DugisGuideViewer.lua` around line 700) that extracts `{([^}]+)}` from
+`DugisGuideViewer.quests2[CurrentQuestIndex]` and, if it names a zone `IsZoneNameValid` recognizes,
+resolves the waypoint's zone/continent from that instead of the (broken) numeric `|Z|` tag or the
+guide's title-zone fallback. Verified this curly-brace markup is exclusive to the Anniversary-
+sourced content — grepped all main leveling guide files and found zero `{...}` usage there, so this
+new branch can never fire for guides that were already working correctly; the existing name-based
+`|Z|` tag path and the title-zone fallback are both left untouched as lower-priority fallbacks.
+`luac -p` passes. Not yet re-tested in-game (fix just applied).
+
+## Remaining work / next steps
+
+1. **Get user confirmation the `MapCurrentObjective` fixes resolve the crash and that guides
+   actually work in-game** (step highlighting/advancement, waypoints pointing somewhere sensible)
+   for both the Outland guides and the newly-rebuilt classic guides — this is the immediate next
+   thing to check. The classic guides have not been tested in-game yet at all (converted and
+   syntax-validated this session, but zero in-game confirmation so far).
+2. If step-advancement still doesn't work even though the engine is proven sound and content is
+   verified, the next suspects (in order of likelihood) are: (a) something about how
+   `SetQuestsState`/`HasQuestBeenTurnedIn` interacts with a *fresh* (never-visited) guide's initial
+   state, (b) the guide-list UI itself (where the user is looking, e.g. a specific tab/category
+   filter), not the data — worth asking exactly where in the UI they're looking when they say
+   "only classic dungeons show."
+3. ~~Rebuild `DugisGuide_Dungeons_Alliance_En` / `_Horde_En` (classic, levels 13-58)~~ — **done this
+   session**, see above. Not yet in-game tested. Known gap: no Dire Maul (either faction) or
+   Alliance Shadowfang Keep — no verified Anniversary source found for those; would need separate
+   sourcing if wanted.
+4. **Build Wrath dungeon guides (68-80)** — `DugisGuide_WOTLK_Dungeons_A/_H` are empty stubs.
+   Only available source found so far is `DugiGuides_MoP_5.19.zip`, which uses modern retrofitted
+   NPC IDs (confirmed, e.g. NPC 54667) and "use your dungeon finder" text not applicable to a
+   3.3.5a launch-era client — would need the same TDB-verification-and-strip treatment as Outland,
+   likely losing more content than Outland did since Wrath dungeons may have more Anniversary/
+   Cataclysm-only retrofit content mixed in. No Wrath-Classic/Anniversary Blizzard package exists
+   (as of this session) to use as a cleaner source instead. `convert_classic.py` and the
+   `valid_quest_ids.txt`/`valid_creature_ids.txt` TDB extracts (now saved in the addon folder) can
+   likely be reused/adapted for this rather than starting from scratch.
+5. ~~Fix or properly convert `51_58_Blackrock_Depths_Upper.lua`~~ — **moot**: that file (and its
+   broken sibling `47_52_Blackrock_Depths_Detention.lua`) no longer exists; the classic rebuild
+   replaced both with a single verified `52_55_Blackrock_Depths.lua`.
+6. `convert_tbc.py` (the Outland converter) still only exists in that earlier session's temp
+   scratchpad directory, still not saved anywhere permanent — unlike `convert_classic.py` (this
+   session's classic-dungeon converter), which *was* saved into the addon folder. If a Wrath
+   rebuild reuses `convert_tbc.py`'s title-deriving-from-filename logic (needed because that
+   source reused one generic title per chain, unlike ClassicEra's source), it needs rewriting from
+   scratch or adapting from `convert_classic.py` instead.
+
+### BUG (follow-up) — `SmallWindowTooltip_OnEnter` nil-error once steps actually advance
+**Symptom**: After the fix above, hovering the compact/mini guide window ("SmallFrame") threw
+`attempt to index a nil value` at `DugisGuideViewer.lua:1707`.
+**Root cause**: `SmallWindowTooltip_OnEnter` read `getglobal("RecapPanelDetail" .. CurrentQuestIndex
+.. "Desc"):GetText()`. But `RecapPanelDetailN` frames are created dynamically, one per row, only
+when the *large* guide window renders its step list (see the loop around line 2096-2121). If a
+guide is only ever viewed in the compact/mini window (`DugisSmallFrame` / `SmallFrameDetail1`),
+that per-row frame for the current step number may never have been created, so `getglobal(...)`
+returns `nil` and `:GetText()` errors. This was dormant before the fix above because
+`CurrentQuestIndex` never meaningfully advanced, so the code path was never exercised with a
+realistic index.
+**Fix**: Read the step text directly from `DugisGuideViewer.quests2[CurrentQuestIndex]` (the same
+parsed-data table `PopulateSmallFrame` already sources the compact window's name label from),
+instead of depending on a `RecapPanelDetailN` frame that may not exist in compact-only usage.
+**Rule**: When a UI element is populated from a parsed-data table elsewhere in the same file, read
+that table directly rather than reading back text from a dynamically-created sibling frame that
+may not exist for every UI mode.

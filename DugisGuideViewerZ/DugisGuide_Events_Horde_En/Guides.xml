@@ -1,0 +1,22 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+	
+	<Script file="LunarFestival_H.lua"/>
+	
+	<Script file="Childrens_Week_Azeroth_H.lua"/>
+	<Script file="Childrens_Week_Outland_H.lua"/>
+	<Script file="Childrens_Week_Northrend_F.lua"/>
+	<Script file="Childrens_Week_Northrend_O.lua"/>
+
+	<Script file="Midsummer_Festival_H.lua"/>
+	<Script file="Midsummer_Festival_Outland_H.lua"/>
+	<Script file="Midsummer_Festival_Northrend_H.lua"/>
+	<Script file="Midsummer_Festival_Chain_H.lua"/>
+	
+	<Script file="Hallows_End_Azeroth_H.lua"/>
+	<Script file="Hallows_End_Outland_H.lua"/>
+
+	<Script file="Cooking_Quests_H.lua"/>
+	
+	<Script file="WinterVeil_Quests_H.lua"/>
+	<Script file="Ogrila_Chain_H.lua"/>
+</Ui>

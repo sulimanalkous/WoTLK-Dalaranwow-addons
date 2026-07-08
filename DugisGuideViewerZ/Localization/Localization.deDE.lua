@@ -1,0 +1,73 @@
+﻿
+
+if ( GetLocale() == "deDE" ) then
+
+DugisLocals = {
+	PART_TEXT = "Teil",	
+	["|cffff4500This quest is not listed in your current guide"] = "|cffff4500Diese Quest ist nicht in deinem Guide",
+	["(.*) is now your home."] = "(.*) ist jetzt Euer Zuhause.",
+	["^You .*Hitem:(%d+).*(%[.+%])"] = "^Ihr .*Hitem:(%d+).*(%[.+%])",
+	
+
+	["Accept Quest"] = "Quest annehmen",
+--	["Accept Daily"] = "",
+--	["Ach/Prof"] = "",
+--	["Achievements and Professions Guides"] = "",	
+--	["Automatic Waypoints"] = "", 
+	["Boat to"] = "Schiff nach",
+	["Buy Item"] =  "Gegenstand kaufen",
+	["Complete"] = "Komplett",
+	["Complete Quest"] = "Quest abschlie\195\159en",
+--	["Configuration Settings for DugisGuideViewer"] = "",
+	["Current Guide"] = "Aktuellen Leitfaden",
+--	["Dailies/Events"] = "",
+--	["Dailies and Events Guides"] = "",	
+	["Desecrate this Fire!"] = "Entweiht dieses Feuer!",
+--	["Display Quest Level"] = "",
+	["Dungeons"] = "Dungeons",
+	["Dungeon Guides"] = "Dungeons Leitfaden",	
+--	["Dungeon Maps"] = "",
+	["Fly to"] = "Fliege zu",
+	["Get Flight Point"] = "Flugpunkt holen",
+	["Honor the Flame"] = "Ehrt die Flamme",
+--	["Item Button"] = "",
+	["Kill NPC"] = "Gegner t\195\182ten",
+--	["Leveling"] = "",
+--	["Leveling Guides"] = "",	
+--	["Lock Large Frame"] = "",
+--	["Lock Small Frame"] = "",
+--	["Lock small frame into place"] = "",
+--	["Lock large frame into place"] = "",
+--	["Manual Mode"] = "",
+--	["Maps"] = "",
+--	["Map each destination with TomTom"] = "",
+	["No Guide Loaded"] = "Kein Guide ausgew\195\164hlt",
+	["No Guide Loaded. Click Here To Select One"] = "Kein Guide ausgew\195\164hlt. Klicken Sie hier, um ein vorzuwählen",
+	["Note"] = "Hinweis",
+	["Optional"] = "Fakultativ",
+	["Quest accepted: (.*)"] = "Quest angenommen: (.*)",	
+	["Reload"] = "Umladen",	
+	["Reset"] = "Zurückstellen",
+--	["Reset Frames Position"] = "",
+--	["Select a Dungeon Map"] = "",	
+--	["Select a leveling guide closest to your current level"] = "",
+	["Set Hearthstone"] = "Ruhestein setzen",
+--	["Settings"] = "",
+--	["Settings for Dugis Guide Viewer"] = "",
+--	["Shows a small window to click when an item is needed for a quest"] = "",
+--	["Show Small Frame"] = "",
+--	["Show the quest level on the large and small frames"] = "",
+--	["This mode lets the user individually complete or skip quests. When unchecked, the guide will skip all quests in the quest sequence"] = "",
+--	["Too High Level"] = "",
+--	["Travel to"] = "",
+--	["Turn in Daily"] = "",
+	["Turn in Quest"] = "Quest abgeben",
+--	["Use Dungeon Finder"] = "",
+	["Use Hearthstone"] = "Ruhestein benutzen",	
+	["Use Item"] = "Gegenstand benutzen",
+	
+}
+
+setmetatable(DugisLocals, {__index=function(t,k) rawset(t, k, k); return k; end})
+	
+end

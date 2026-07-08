@@ -1,0 +1,19 @@
+<Ui xmlns="http://www.blizzard.com/wow/ui/">
+
+	<Script file="15_20_The_Deadmines.lua"/>
+	<Script file="15_21_Wailing_Caverns.lua"/>
+	<Script file="20_24_Blackfathom_Deeps.lua"/>
+	<Script file="21_25_The_Stockade.lua"/>
+	<Script file="25_29_Gnomeregan.lua"/>
+	<Script file="27_33_Scarlet_Monestary_Graveyard_Library.lua"/>
+	<Script file="29_35_Razorfen_Kraul.lua"/>
+	<Script file="33_38_Razorfen_Downs.lua"/>
+	<Script file="34_39_Scarlet_Monestary_Armory_Cathedral.lua"/>
+	<Script file="39_45_Uldaman.lua"/>
+	<Script file="42_47_ZulFarrak.lua"/>
+	<Script file="45_49_Maraudon.lua"/>
+	<Script file="48_52_Sunken_Temple.lua"/>
+	<Script file="52_55_Blackrock_Depths.lua"/>
+	<Script file="55_58_Scholomance_Stratholme.lua"/>
+
+</Ui>

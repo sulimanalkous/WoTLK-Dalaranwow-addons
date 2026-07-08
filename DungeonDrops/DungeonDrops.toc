@@ -1,0 +1,14 @@
+## Interface: 30300
+## Title: DungeonDrops
+## Notes: Smart dungeon loot advisor - scans your gear, detects your spec, and recommends the best dungeon items for your level
+## Author: DungeonDrops Team
+## Version: 2.0.0
+## OptionalDeps: AtlasLoot, Pawn
+## SavedVariables: DungeonDropsDB
+## SavedVariablesPerCharacter: DungeonDropsCharDB
+
+Core.lua
+Data.lua
+Scanner.lua
+Config.lua
+UI.lua

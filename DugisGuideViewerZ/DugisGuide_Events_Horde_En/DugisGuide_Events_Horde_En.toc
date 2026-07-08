@@ -1,0 +1,14 @@
+## Interface: 30300
+## Title: Dugi's Guide - Events|cffd32b1eHorde|r En v4.14
+## Notes: Events Guide by Dugi of UltimateWoWGuide.com v4.14
+## Author: Dave Farrell 
+## Version: 4.14
+## X-Category: Quest
+## RequiredDeps: DugisGuide_Leveling
+## LoadManagers: AddonLoader
+## X-LoadOn-Always: delayed
+
+
+Guides.xml
+
+

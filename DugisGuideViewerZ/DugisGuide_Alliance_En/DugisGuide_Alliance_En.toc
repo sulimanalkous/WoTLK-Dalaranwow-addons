@@ -1,0 +1,13 @@
+## Interface: 30300
+## Title: Dugi's Guide - |cff2a5ac7Alliance|r En v4.15
+## Notes: English |cff2a5ac7Alliance|r 1-80 Leveling Guide by Dugi of UlimateWoWGuide.com v4.15
+## Author: Dave Farrell 
+## Version: 4.13
+## X-Category: Quest
+## RequiredDeps: DugisGuideViewerZ
+## LoadManagers: AddonLoader
+## X-LoadOn-Always: delayed
+
+Guides.xml
+
+

@@ -1,0 +1,410 @@
+===============================
+
+4.092
+
+===============================
+Added graphic pushed textures to minimize button and dungeon map icon
+Made a new tag "E" for midsummer festival event "Honor the flame" which has an accept and complete in one step.
+
+
+===============================
+
+4.090
+
+===============================
+Made it faster switching tab to tab
+
+
+===============================
+
+4.089
+
+===============================
+Fixed percentage displaying incorrectly on guide listing pages
+
+===============================
+
+4.088
+
+===============================
+Made encryption compatible with french language 
+
+===============================
+
+4.087
+
+===============================
+Icon reference table
+
+===============================
+
+4.086
+
+===============================
+Added Spanish localization to settings page
+Fixed localization bug when clicking dungeon maps
+
+===============================
+
+4.085
+
+===============================
+If CurrentGuide saved is no longer available, no guide loaded message appears.
+Added localization support for settings tab.
+Added french localization for settings.
+/dg fix command to clear saved variables and screen view initialized
+resize settings frame "reset button" to fit width to localized text
+Make tooltip in setting frame available for whole width of button
+Icon_references to settings tab
+
+
+===============================
+
+4.084
+
+===============================
+Accepting a quest with breadcrumbs, would automatically skip quest.  Fixed bug.
+
+===============================
+
+4.082
+
+===============================
+Added itembutton option in settings.
+Made small window frame check with yellow check in manual mode
+Made large frame do quest chain skipping when X toggled in manual mode
+Added tooltip text to settings menu options 
+===============================
+
+4.081
+
+===============================
+Saved variables with AceDB so that lua error won't occur with existing users.
+Added in all check functions, working out bugs with lock frames being repositioned. 
+Fixed bug where logo frame was too large, causing a locked frame in the normal screen section
+Photoshopped logo to smaller size
+
+===============================
+
+4.080
+
+===============================
+Minimized gap between tabs and bottom of frame
+Settings menu layout finished (hidden)
+Changed small frame tooltip positioning to be right aligned
+
+===============================
+
+4.079
+
+===============================
+Only ACT actions have colors on small frame also
+Make current title verified before guide loaded in case guide was removed.
+
+===============================
+
+4.078
+
+===============================
+Only A/C/T actions have color.  Others have no color and no level numbers [XX]
+Detect 'Required' Quest level feature and replace icons with greyed icons if not at req level
+Make dungeon map frame at 35% opacity until mouse hover
+
+===============================
+
+4.077
+
+===============================
+Quest level colors and number added.
+
+===============================
+
+4.076
+
+===============================
+Added "I" tag for dungeon icon
+
+===============================
+
+4.074
+
+===============================
+Added dungeon map tab
+
+===============================
+
+4.073
+
+===============================
+Added dungeon map frame
+
+===============================
+
+4.072
+
+===============================
+Made quest turnin compatible with Carbonite and quest guru
+===============================
+
+4.071
+
+===============================
+
+Fixed error that happens when abandoning dailies quest that is the first quest. 
+
+
+===============================
+
+4.070
+
+===============================
+Only Quest Chain for A/C/T steps.
+Make compatible with QuestGuru.
+Fixed error that happens when abandoning quest without loading a guide first.
+
+===============================
+===============================
+
+4.069
+
+===============================
+still working on Quest Chain feature.
+
+
+===============================
+===============================
+
+4.068	
+
+===============================
+Quest chain feature added.  If user skips a quest, then all the quests that depend on that quest will get skipped also.
+
+
+===============================
+
+4.067	
+
+===============================
+
+When right clicking on small frame, large frame opens and current quest is in the center
+Make reset button also untick all 'yellow' ticks
+Add Notlisted feature, if the quest is not listed in our current guide, it will show a notification
+Make optional Objective name grey in colour, set to normal font when it is the active quest
+fixed loot autocomplete bug in CompleteLOOTorQO() to make sure loot tags are checked only if optional and inlog or not optional
+Dungeon guide tab added
+
+===============================
+
+4.066	
+
+===============================
+%complete right align and highlight
+
+===============================
+
+4.065	
+
+===============================
+% complete on guide tabs
+
+===============================
+
+4.064	
+
+===============================
+make chat message loot check for items picked up from previous optional quests and go to that quest if item is received
+
+===============================
+
+4.063	
+
+===============================
+added spanish/french/german translation for guide selection
+test carbonite spanish conflict. Saw conflict in 4.060 and then loaded 4.063 and I don't see it anymore.
+display "A" quest (even if not in log) with |U| or |L| if item is in backpack.
+% complete feature added
+
+
+===============================
+
+4.062	
+
+===============================
+updated french, german classes & races
+Guide tabs translations for spanish, german, french
+Part (X,X) now shows up for guide title
+Translated quests need to have time to load into cache, so quests now repeatedly queried for translation
+tabs: no guide loaded localization, guide titles localized, default no guide loaded message, guide listings localized 
+===============================
+
+4.061	
+
+===============================
+	Localized quest names for A/C/T actions and zones for all other actions
+	Moved Babble libraries to localization folder
+	Added female races for esMX
+	Make female names capitalized in the dictionary
+
+
+===============================
+
+
+4.060	
+
+===============================
+	Added localization functionality
+
+===============================
+
+4.059	
+
+===============================
+	Added Dugis logo to small frame
+
+===============================
+
+4.058	
+
+===============================
+	Again--Continue to fix bug where turning in a quest unchecks the completed state
+	Added dailies |D| tag and blue icons
+
+===============================
+
+4.057	
+
+===============================
+	Continue to fix bug where turning in a quest unchecks the completed state
+	Added loot detection to CHAT_MSG_LOOT
+
+===============================
+
+4.056	
+
+===============================
+	Fixed bug where turning in a quest unchecks the completed state
+
+===============================
+
+4.055	
+
+===============================
+277	Added feature where if a dailies quest is abandoned and there is no previous quest, the guide will uncheck the previous note tag 
+
+
+292	-local questtext = DugisGuideViewer:ReturnTag("QuestObjective")	
+	+local questtext = DugisGuideViewer:ReturnTag("QO")	
+
+
+303	Fixed bug where a quest that is not the current quest completes and is undetected.  Also if a quest is uncompleted, this is detected.
+
+
+389	Fixed Skipping Note tags if they are complete
+	-elseif DugisGuideViewer.actions[i] == "C" and isComplete == 1 then
+	+DugisGuideViewer.actions[i] ~= "T" and isComplete == 1
+
+398	Make sure that quests previously complete are checked on startup
+
+758	CheckForOptionalLoot function always skips an optional that is not in quest log.
+	If an optional quest is in the log with an accept action and loot quantity is too
+	low, quest is skipped.  If loot quantity is sufficient, quest is checked off.
+
+780	function added
+
+810/822	Location detection even if there is no event
+
+1028	Added mousewheel scroll
+
+	OnClick hookscript added to detect use item
+
+	Escape closes window
+
+	Cleaned up some commenting
+===============================
+
+4.054  
+
+===============================
+
+fix guide to prevent it from moving back to previous optional quest that wasn't accepted, JC and Zuldrak dailes should work better now. 
+
+432 	- if DugisGuideUser.QuestState[CurrentTitle..':'..i] == "U" then
+	+ if DugisGuideUser.QuestState[CurrentTitle..':'..i] == "U" and DugisGuideViewer:CheckForOptionalLoot(i) == false then
+ 	
+
+===============================
+
+4.053	
+
+===============================
+
+fixed scroll not going all the way down for large guides.
+
+1459 	-    local rowheight = 33
+	+    local rowheight = 34.4 
+
+
+===============================
+
+4.052	
+
+===============================
+
+fixed tag error for |O| , |Z|, |L|
+
+
+329 	- local lootitem, lootqty   = DugisGuideViewer:ReturnTag("Loot", CurrentQuestIndex) --new
+	+ local lootitem, lootqty   = DugisGuideViewer:ReturnTag("L", CurrentQuestIndex) --new 
+
+470 	-  if tag == "Optional" then return tags:find("|Optional|")
+	+  if tag == "O" then return tags:find("|O|") 
+
+473 	-  elseif tag == "Loot" then
+	-    local _, _, lootitem, lootqty = tags:find("|Loot=(%d+)%s?(%d*)|")
+472 	+  elseif tag == "L" then
+473 	+    local _, _, lootitem, lootqty = tags:find("|L|(%d+)%s?(%d*)|") 
+
+
+477 	-  return select(3, tags:find("|"..tag.."=([^|]*)|?"))
+	+  return select(3, tags:find("|"..tag.."|([^|]*)|?")) 
+
+488 	-    local zonefromnotetag = DugisGuideViewer:ReturnTag("Zone", CurrentQuestIndex)
+	+    local zonefromnotetag = DugisGuideViewer:ReturnTag("Z", CurrentQuestIndex) 
+
+
+4.051	
+
+===============================
+
+fixed error message when accepting / turnin quest with "No guides loaded"
+
+163 	-  elseif accept then  --Quest accept
+	+  elseif accept and CurrentTitle ~= nil then  --Quest accept 
+
+180 	-  elseif turnin then  --Turning in a quest '!'
+	+  elseif turnin and CurrentTitle ~= nil then  --Turning in a quest '!' 
+
+
+===============================
+
+Changed Default frame position, being anchored to the minimap can make the frame dissapear if users are playing with an addon that modify the position of the minimap. 
+
+929  	-  frame3:SetPoint("TOPRIGHT", Minimap, "BOTTOMLEFT", -230, -50)
+	+  frame3:SetPoint("CENTER", 0, 255) 
+
+===============================
+
+fixed detection of quest completion when it is not the current complete step. 
+there is still a bug that if the complete state is somehow lost, the addon doesn't addon untick the complete state
+
+
+354 	+      -- DugisGuideViewer:DisplayViewTab(title)
+	+      if CurrentTitle ~= nil then 
+355 	+      DugisGuideViewer:SetQuestsState()
+356 	+      end 
+
+===============================
+
+
+4.05	Ignore parenthesis in title name when determining hearth, quest accept, and quest turnin
+	Added /dg reset command to initialize frame positions (Small frame, main frame and item frame)
