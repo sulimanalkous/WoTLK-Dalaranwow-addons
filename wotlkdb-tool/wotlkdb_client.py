@@ -178,6 +178,14 @@ def fetch_quest(qid, force=False):
                 replacement_id = sib["id"]
                 break
 
+    chain = _parse_series(html)
+    prereq_id = None
+    if chain:
+        for idx, step in enumerate(chain):
+            if step["is_current"] and idx > 0:
+                prereq_id = chain[idx - 1]["id"]
+                break
+
     data = {
         "id": qid,
         "name": name,
@@ -191,9 +199,34 @@ def fetch_quest(qid, force=False):
         "end_object": int(end_obj[0]) if end_obj else None,
         "replacement_id": replacement_id,
         "siblings": siblings,
+        "chain": chain,
+        "prereq_id": prereq_id,
     }
     _cache_parsed("quest", qid, data)
     return data
+
+
+def _parse_series(html):
+    """Parse the "Series" infobox table (quest chain) if present. Returns an ordered
+    list of {position, id, name, is_current} - id is None for the current quest's own
+    row (wotlkdb shows it bolded/unlinked rather than as a link to itself)."""
+    m = re.search(r'infobox-series.*?<table class="series">(.*?)</table>', html, re.DOTALL)
+    if not m:
+        return []
+    rows = re.findall(
+        r'<tr><th>(\d+)</th><td><div>.*?(?:<a href="\?quest=(\d+)">([^<]+)</a>|<b>([^<]+)</b>).*?</div></td></tr>',
+        m.group(1)
+    )
+    chain = []
+    for pos, qid_str, linked_name, current_name in rows:
+        is_current = qid_str == ""
+        chain.append({
+            "position": int(pos),
+            "id": int(qid_str) if qid_str else None,
+            "name": linked_name or current_name,
+            "is_current": is_current,
+        })
+    return chain
 
 
 def fetch_item(itemid, force=False):

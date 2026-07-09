@@ -550,6 +550,38 @@ often already correct even when the code can't confirm its name. Should turn "no
 all" into "usually-correct waypoint" for whatever's still hitting the zone-resolution gap.
 `luac -p` passes. Not yet re-tested in-game.
 
+## Bug found and fixed this session: guide referenced a quest without its required prerequisite
+
+**Symptom**: user reported reaching the NPC the Underbog guide names for "Observing the
+Sporelings" and finding no quest available, despite the NPC and location being correct - a
+higher-level character confirmed the quest genuinely exists and is obtainable.
+
+**Root cause**: quest verification so far (existence, availability/historical status) doesn't
+check quest **chains** - "Observing the Sporelings" (QID 9701) requires prerequisite quest
+**9697** ("Watcher Leesa'oh") to be turned in first, and the guide never included that step at
+all; it jumps straight from an unrelated earlier objective to accepting 9701 directly. Any
+character who hadn't independently done 9697 through some other means would hit exactly this
+wall. Confirmed via `wotlkdb-tool`'s new chain-parsing (see below): `fetch_quest(9701)` returns
+`prereq_id: 9697`.
+
+**Fix**: extended `wotlkdb_client.fetch_quest()` to parse wotlkdb's "Series" infobox table
+(present on any quest that's part of a chain) into an ordered `chain` list and a direct
+`prereq_id` field. Looked up 9697's own quest-giver location via the same page's embedded
+`Mapper` objective data (gives exact NPC IDs/coordinates, not just zone name) - start NPC 17834
+"Lethyn Moonfire" at (78.5, 63.1) in Zangarmarsh, turned in to NPC 17831 "Watcher Leesa'oh" at
+(23.3, 66.2) - the same NPC/location the guide's existing (correct) step for 9701 already uses,
+confirming turning in 9697 there is what unlocks 9701 from that same NPC. Verified both NPCs
+and the quest ID against the TDB reference lists. Inserted three new lines (R/A/T for the
+missing 9697 chain) immediately before the existing "Cenarion Watchpost" step, in both
+`DugisGuide_Outland_Dungeons_A/63_65_The_Underbog.lua` and the Horde copy (identical content,
+same gap in both). `luac -p` passes both files; decoded content spot-checked.
+
+**Scope note**: this was found and fixed for one specific quest the user happened to hit -
+**not** a systematic check across all 368 guide quest IDs. The chain-parsing capability now
+exists in the tool to do that broader pass (check every guide's `|QID|` for a `prereq_id`, and
+flag any whose prerequisite doesn't appear as an earlier step in the same guide/chain), but
+that full sweep hasn't been run yet - see next steps.
+
 ## Remaining work / next steps
 
 0. **`Debug = 1` is still enabled** (`DugisGuideViewer.lua` line 87) from this session's
