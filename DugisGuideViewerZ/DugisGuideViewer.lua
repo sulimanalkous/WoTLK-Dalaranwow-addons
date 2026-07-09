@@ -2058,6 +2058,22 @@ function DugisGuideViewer:Retxyz(t, i)
 end
 
 --Parse rows and fill up 3 items: Objective type (actions), Quest name, Note Tag (actions, quests, tags)
+-- Replaces every "(npc:ID)" placeholder in text with the NPC's real name (from
+-- NPCData.lua), since this engine has no built-in mechanism to resolve those - the source
+-- content's raw IDs would otherwise be shown to the player as-is, in step text and tooltips
+-- alike (both are sourced from quests1/quests2, populated by ParseRows below). Leaves the
+-- placeholder untouched if the ID isn't in the table (e.g. an NPC outside the 495 IDs
+-- collected across the rebuilt guides) rather than showing a blank.
+function DugisGuideViewer:ResolveNPCNames(text)
+  if not text or not DugisGuideViewer.NPCNames then
+    return text
+  end
+  return (text:gsub("%(npc:(%d+)%)", function(idstr)
+    local name = DugisGuideViewer.NPCNames[tonumber(idstr)]
+    return name or ("(npc:" .. idstr .. ")")
+  end))
+end
+
 function DugisGuideViewer:ParseRows(guidetitle, rowinfo, ...)
   local index
   local tmp
@@ -2117,6 +2133,8 @@ function DugisGuideViewer:ParseRows(guidetitle, rowinfo, ...)
         qid = math.floor(qid)
       end
       --DebugPrint("action:"..action.."quest:"..quest)
+      quest = DugisGuideViewer:ResolveNPCNames(quest)
+      quest2 = DugisGuideViewer:ResolveNPCNames(quest2)
       DugisGuideViewer.actions[indx] = action:trim()
       DugisGuideViewer.quests1[indx] = quest:trim()
       DugisGuideViewer.quests1L[indx] = quest:trim()

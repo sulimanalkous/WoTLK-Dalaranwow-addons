@@ -772,6 +772,22 @@ client restart `NPCData.lua`/`PrereqData.lua` (new `.toc` entries) need, per the
 manifest-caching lesson this session. Not otherwise changed; ask the user to confirm after a
 full restart.
 
+## New feature this session: resolve (npc:ID) placeholders to real names everywhere
+
+At the user's request - the raw `(npc:ID)` placeholders from the source content (already
+identified as a gap when building the Target button) were showing up as literal IDs in guide
+step text and tooltips, not just being unusable for targeting.
+
+**Fix**: added `DugisGuideViewer:ResolveNPCNames(text)` (right before `ParseRows`, using the
+same `NPCData.lua` table built for the Target button) and call it on both the row's name field
+and its note text *inside* `ParseRows`, before they're stored into `quests1`/`quests2`. Since
+every other piece of UI - the large window, the compact window, tooltips - all read from these
+same two tables, this fixes it everywhere at once rather than needing separate fixes per UI
+element. Leaves the placeholder untouched (doesn't blank it out) if the ID isn't in the table,
+e.g. an NPC outside the 495 collected across the rebuilt guides. Verified directly against real
+guide content: `"Collect (item:7146) from (npc:6487) the final boss"` → `"...from Arcanist Doan
+the final boss"`. `luac -p` passes.
+
 ## Remaining work / next steps
 
 0. **`Debug = 1` is still enabled** (`DugisGuideViewer.lua` line 87) from this session's
