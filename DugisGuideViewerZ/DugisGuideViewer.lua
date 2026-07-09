@@ -752,9 +752,15 @@ function DugisGuideViewer:MapCurrentObjective()
         ZoneToUse, ContToUse = GetCurrentMapZone(), GetCurrentMapContinent()
         DebugPrint("Default zone" .. ZoneToUse)
       end
-      if not ZoneToUse or not ContToUse then
-        DebugPrint("MapCurrentObjective: could not resolve zone/continent, skipping waypoint")
-        return
+      -- If no zone name candidate above could be resolved, fall back to placing the
+      -- waypoint in whatever zone the player is currently standing in (TomTom:AddWaypoint,
+      -- no continent/zone needed) rather than giving up. These steps are usually reached by
+      -- first traveling to the right outdoor zone via flight path/etc., then walking to a
+      -- specific sub-location within it per the guide's coordinates - so "current zone" is
+      -- very often already the correct one even when we can't confirm its name/index.
+      local useCurrentZoneFallback = not ZoneToUse or not ContToUse
+      if useCurrentZoneFallback then
+        DebugPrint("MapCurrentObjective: could not resolve zone/continent, using current-zone waypoint fallback")
       end
       self.XVals, self.YVals = DugisGuideViewer:getCoords(CurrentQuestIndex)
       --Remove previous objective's mapping
@@ -770,10 +776,17 @@ function DugisGuideViewer:MapCurrentObjective()
         for i = #self.XVals, 1, -1 do
           --local ZoneToUse2, ContToUse2 = GetCurrentMapZone(), GetCurrentMapContinent()
           --DebugPrint("Zonetouse="..ZoneToUse.."ZoneToUse2="..ZoneToUse2.."Conttouse="..ContToUse.."ContToUse2="..ContToUse2)
-          UID = TomTom:AddZWaypoint(ContToUse, ZoneToUse, self.XVals[i], self.YVals[i], desc, false)
-          DebugPrint("self.XVals[i]=" ..
-            self.XVals[i] .. "self.YVals[i]=" .. self.YVals[i] .. "UID=" .. UID .. "ContToUse=" .. ContToUse .. desc)
-          self:addPoint(ContToUse, ZoneToUse, self.XVals[i], self.YVals[i], UID, desc)
+          if useCurrentZoneFallback then
+            UID = TomTom:AddWaypoint(self.XVals[i], self.YVals[i], desc, false)
+            DebugPrint("self.XVals[i]=" .. self.XVals[i] .. "self.YVals[i]=" .. self.YVals[i] ..
+              "UID=" .. UID .. "(current-zone fallback)" .. desc)
+            self:addPoint(0, 0, self.XVals[i], self.YVals[i], UID, desc)
+          else
+            UID = TomTom:AddZWaypoint(ContToUse, ZoneToUse, self.XVals[i], self.YVals[i], desc, false)
+            DebugPrint("self.XVals[i]=" ..
+              self.XVals[i] .. "self.YVals[i]=" .. self.YVals[i] .. "UID=" .. UID .. "ContToUse=" .. ContToUse .. desc)
+            self:addPoint(ContToUse, ZoneToUse, self.XVals[i], self.YVals[i], UID, desc)
+          end
         end
       end
     end --If DugisGuideViewer.Flag_Waypoints == 1

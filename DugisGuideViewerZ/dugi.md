@@ -532,7 +532,29 @@ engine, just not previously reused for waypoint placement. Falls through gracefu
 a travel destination that's a subzone/POI rather than a full mappable zone) - purely additive,
 doesn't change behavior for rows that were already resolving correctly. `luac -p` passes.
 
+## Improvement this session: current-zone waypoint fallback instead of giving up
+
+Underbog's waypoint was still not working after the row-name-as-zone fix, and live debug output
+(`Debug = 1`, temporarily enabled - **still on**, not reverted, see next-steps) couldn't be
+captured at the right moment to diagnose further (the user pressed a different, unrelated "Test"
+button in the settings panel by mistake, which only prints Blizzard's own auto-quest-tracking
+checkbox state - not connected to `MapCurrentObjective` at all). Rather than keep chasing the
+exact zone-name mismatch for this specific step, changed the failure mode itself: previously,
+when no zone-name candidate resolved, `MapCurrentObjective` just skipped the waypoint entirely
+(the defensive guard from earlier this session). Now it falls back to
+`TomTom:AddWaypoint(x, y, desc)` - places the marker at the guide's coordinates in **whatever
+zone the player is currently in**, without needing to resolve a zone name/index at all. This
+works because these problematic steps are reached by first traveling to the right outdoor zone
+(flight path, etc.), then walking to a specific coordinate within it - so "current zone" is very
+often already correct even when the code can't confirm its name. Should turn "no waypoint at
+all" into "usually-correct waypoint" for whatever's still hitting the zone-resolution gap.
+`luac -p` passes. Not yet re-tested in-game.
+
 ## Remaining work / next steps
+
+0. **`Debug = 1` is still enabled** (`DugisGuideViewer.lua` line 87) from this session's
+   diagnostic attempt - very chatty (prints on nearly everything). Revert to `Debug = 0` once
+   the Underbog waypoint fix above is confirmed working and no further live debugging is needed.
 
 1. **Get user confirmation the `MapCurrentObjective` fixes resolve the crash and that guides
    actually work in-game** (step highlighting/advancement, waypoints pointing somewhere sensible)
