@@ -362,6 +362,17 @@ function DugisMainframe_OnEvent(self, event, msg, ...)
           guideIndex = guideIndex + 1
         end
       end
+      -- Accept detection above (and in ChatMessage()) relies on CurrentQuestIndex already
+      -- sitting on this quest's "A" row at the moment it happens. Dungeon guides commonly
+      -- insert a separate "R" (travel) row ahead of the "A" row for the same quest -
+      -- something leveling guides rarely do - so that's often not the case, and the
+      -- checks above can miss it. SetQuestsState() is the same full-resync the guide's own
+      -- "Reload" button calls (DisplayViewTab -> ... -> SetQuestsState) - it re-derives
+      -- every row's state from the quest log directly (position-independent) and moves
+      -- CurrentQuestIndex to the first genuinely incomplete row. Calling it here makes
+      -- every quest-log change behave like clicking Reload automatically, matching how
+      -- leveling guides are perceived to "just work".
+      DugisGuideViewer:SetQuestsState()
       DugisGuideViewer:ViewFrameUpdate()
     end
   elseif event == "UI_INFO_MESSAGE" then

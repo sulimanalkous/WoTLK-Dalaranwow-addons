@@ -379,6 +379,132 @@ new branch can never fire for guides that were already working correctly; the ex
 `|Z|` tag path and the title-zone fallback are both left untouched as lower-priority fallbacks.
 `luac -p` passes. Not yet re-tested in-game (fix just applied).
 
+## Bug found and fixed this session: quest-accept not auto-detected on dungeon guides
+
+**Symptom**: reported by user after waypoints were confirmed working - accepting a quest the
+guide pointed them at did not tick the checkbox or advance to the next step in the compact
+guide window, even though the same behavior works fine on the original leveling guides.
+Requested: dungeon guides should behave identically to leveling guides here.
+
+**Root cause**: real-time "quest accepted" detection lives in `ChatMessage()` (around line 126),
+which parses the client's own `"Quest accepted: X"` system chat message, resolves it to a real
+QID via the quest log, and only acts if `CurrentAction == "A"` - i.e. only if the guide's
+currently-displayed row is literally the "A" (accept) row for that quest at the exact moment the
+accept happens. Dungeon guide content (this session's classic rebuild and the earlier Outland
+rebuild both) very commonly inserts a separate `R` (travel-to-NPC) row immediately before the `A`
+row for the same quest, e.g. `R Ratchet |QID|1221|...` then `A Blueleaf Tubers |QID|1221|...` -
+a structure the original leveling guides rarely use. `R` rows only advance via a *different*,
+independent mechanism (`CheckForLocation`, comparing `GetZoneText()`/`GetSubZoneText()` against
+the row's own destination text, checked only on `ZONE_CHANGED*` events) - so if that hasn't fired
+yet when the player accepts the quest, `CurrentQuestIndex` is still parked on the `R` row, and the
+chat-message-based accept detection silently misses it. It doesn't error - `CompleteQID()` still
+marks the (not-currently-displayed) `A` row's saved state as complete in the background - but
+nothing moves `CurrentQuestIndex` forward, so the compact window visibly never changes.
+
+**Fix, first attempt (superseded)**: initially added a parallel `elseif` branch to the existing
+`QUEST_LOG_UPDATE` incremental scan (which already handled `"C"` completion rows position-
+independently) to also catch `"A"` accept rows the same way. Worked, but the user pointed out
+something better: each guide panel already has a **"Reload" button**
+(`DugisGuideViewer_Reload_ButtonClick`, line 102) that re-derives the *entire* row state from the
+quest log and correctly figures out accepted/completed/abandoned regardless of which row was
+showing - and asked why live quest events don't just trigger the same thing automatically. They
+were right.
+
+**Actual fix**: Reload calls `DisplayViewTab(CurrentTitle)`, whose real work (for state purposes)
+is `SetQuestsState()` (line 516) - it loops every row, checks `GetQuestLogIndexByQID`/
+`HasQuestBeenTurnedIn` directly (fully position-independent), marks `"A"` rows complete the moment
+their quest is in the log (even walking backward to also complete earlier rows sharing the same
+qid - handles the `R`-then-`A` case even better than the first attempt did), and then moves
+`CurrentQuestIndex` to the first genuinely incomplete row from scratch. Removed the first-attempt
+branch and instead just call `DugisGuideViewer:SetQuestsState()` once at the end of the
+`QUEST_LOG_UPDATE` handler (after the existing incremental logic, which still separately handles
+reverting a step if a quest becomes un-completed - `SetQuestsState()` doesn't cover that case).
+Net effect: every quest-log change now automatically does what clicking "Reload" already did
+manually, closing the gap with how leveling guides are perceived to behave. `SetQuestsState()` is
+pre-existing, already-exercised code (runs on every guide open/reload); calling it more often
+carries the same safety profile it already had. `luac -p` passes. Not yet re-tested in-game.
+
+**Not touched, believed already correct**: quest-abandon detection (`AbandonQID`, set from a hook
+on the in-game abandon-quest button around line 2504) already scans all `LastGuideNumRows` rows
+by qid regardless of position and adjusts `CurrentQuestIndex` backward if needed - this doesn't
+have the same "wrong row displayed" dependency the accept path had, so it should already work the
+same for dungeon guides as it does for leveling guides. Flagged here rather than assumed silently
+in case in-game testing shows otherwise.
+
+## Bug found and fixed this session: two quest IDs were stale (server updated, dump didn't)
+
+**Symptom**: user reported that even the guide's own "Reload" button (which calls
+`SetQuestsState()`, verified sound by direct simulation against this exact guide's parsed
+content) never detected an already-accepted quest as complete.
+
+**Root cause**: not a code bug at all. The quest was "Into The Scarlet Monastery" - the guide's
+`|QID|1048|` is a real, valid `quest_template` row in the account's TDB dump
+(`TDB_full_335.63_2017_04_18.7z`, dated April 2017), with the right name, right NPC (2425,
+"Bragor Bloodfist" in Undercity), right level range - it passed every check this session's
+TDB-based verification could perform. But **existence in a quest_template dump proves an ID
+is/was valid data, not that it's the ID the live server currently hands out** - Warmane has
+evidently patched their world database since 2017, and quest 1048 is now `historical` (dead
+data, kept for compatibility) while a duplicate, `14355`, is what NPC-driven quest-giving
+actually issues today. The player's real quest log confirmed this directly: `GetQuestLogTitle`
+reported QID **14355** for a quest textually identical to what the guide called 1048 - proving
+the API/detection logic was fine all along, the data was just stale.
+
+**Verification method**: cross-checked against [wotlkdb.com](https://wotlkdb.com), a
+3.3.5a-specific community quest/item/NPC database that embeds structured JSON directly in its
+pages (not just rendered text) - notably a `"historical":true` flag on deprecated quest
+entries, and a `"Not available to players"` string in the infobox, plus a same-page "see-also"
+listview pointing straight at the replacement ID. Wrote a small reusable tool for this
+(`AddOns/wotlkdb-tool/`, see below) rather than checking by hand, and ran it against **every
+unique QID across every rebuilt dungeon guide (368 total, both Outland and classic, both
+factions)**. Result: **only these two were affected**, both tied to the same Undercity NPC:
+
+| Old QID | Name | New QID | Old NPC | New NPC |
+|---|---|---|---|---|
+| 1048 | Into The Scarlet Monastery | **14355** | 2425 | **36273** |
+| 5725 | The Power to Destroy... | **14356** | 2425 | **36273** |
+
+Both replacement quests are confirmed `available:true` on wotlkdb, same name, same level/
+reqlevel, same "Bragor Bloodfist" quest giver - just a different underlying NPC entity
+(36273, presumably added when Blizzard's later Undercity revamp duplicated this NPC) and a new
+quest ID. Everything else (all 366 other QIDs, spanning both Outland and classic guides) came
+back `available:true` with no replacement suggested - the TDB dump is stale in general, not
+uniformly wrong, and this appears to be an isolated case (both hits share one NPC/questline).
+
+**Fix applied**: `13_18_Ragefire_Chasm.lua`, `27_33_Scarlet_Monestary_Graveyard_Library.lua`,
+and `34_39_Scarlet_Monestary_Armory_Cathedral.lua` (all `DugisGuide_Dungeons_Horde_En` - this
+is Horde-only content, no Alliance guide references either quest) had every `|QID|1048|` /
+`|QID|5725|`, `(npc:2425)`, and `|NPC|2425|` occurrence on the affected lines updated to
+`14355`/`14356` and `36273` respectively (8 lines total, exact match counts confirmed before
+writing). Done via direct substitution on the encoded bytes (encoding just the search/replace
+substrings with the same `-3` cipher and doing a plain string replace on the raw file) rather
+than a full decode/re-encode round-trip, to avoid the cipher's special-cased space-byte
+(`0x1D`) complicating a manual re-implementation. All three files pass `luac -p`; decoded
+content spot-checked and confirmed correct.
+
+## New tool built this session: `AddOns/wotlkdb-tool/`
+
+A small, reusable, **general-purpose** (not DugisGuideViewerZ-specific) client + local cache for
+[wotlkdb.com](https://wotlkdb.com), built at the user's request as infrastructure for *any*
+future 3.3.5a addon work, not just this fix:
+
+- `wotlkdb_client.py` - fetches and parses `?quest=`, `?item=`, and `?npc=` pages. Extracts the
+  structured JSON these pages embed (`g_quests`/`g_items` objects, `Mapper` objective/NPC data,
+  `Listview` "see-also"/"reward-from-quest" blocks) rather than scraping rendered text, since
+  that's both more reliable and how the "historical" flag and replacement-ID lookup were found.
+  Every fetch is cached in `cache.sqlite` (both raw HTML and parsed fields) so repeat runs/tools
+  never re-hit the site for the same ID. Rate-limited to 1.5s between requests - this is a
+  low-volume verification tool for the IDs a specific guide/addon actually references (a few
+  hundred), explicitly **not** a bulk scraper of the whole site.
+- `verify_guide_quests.py` - batch-checks a list of quest IDs (one per line) and reports which
+  are unavailable/historical, with their replacement ID. Used this session to check all 368
+  guide QIDs in one pass instead of discovering mismatches one bug report at a time.
+- Confirmed working: `curl`/`urllib` with a normal browser `User-Agent` gets a clean HTTP 200
+  from wotlkdb.com (Cloudflare-fronted, but not blocking scripted clients outright - the
+  `WebFetch` tool's own request got a 403, likely from its specific request signature, not a
+  blanket anti-bot measure).
+- Lives in `AddOns/wotlkdb-tool/`, not inside `DugisGuideViewerZ/`, specifically so it's
+  discoverable and reusable for whatever addon is worked on next.
+
 ## Remaining work / next steps
 
 1. **Get user confirmation the `MapCurrentObjective` fixes resolve the crash and that guides
