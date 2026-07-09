@@ -103,6 +103,38 @@ function DugisGuideViewer_Reload_ButtonClick()
   DugisGuideViewer:DisplayViewTab(DugisGuideViewer:revlocalize(CurrentTitle, "GUIDE"))
 end
 
+-- Targets the NPC involved in the current guide step via TargetByName(). Prefers the row's
+-- own |NPC| tag (resolved through NPCData.lua, since this engine has no built-in way to turn
+-- the source content's (npc:ID) placeholders into a real name) over the row's displayed name
+-- field, since that field holds the *quest* name for "A"/"T" rows, not an NPC name - it's only
+-- usable directly for "K" (kill) rows that don't have an |NPC| tag of their own.
+function DugisGuideViewer_Target_ButtonClick()
+  if not CurrentQuestIndex or not DugisGuideViewer.actions[CurrentQuestIndex] then
+    print("|cffff0000[DG Target]|r No guide step is currently active.")
+    return
+  end
+  local name
+  local npctag = DugisGuideViewer:ReturnTag("NPC", CurrentQuestIndex)
+  if npctag then
+    local firstid = npctag:match("(%d+)")
+    if firstid and DugisGuideViewer.NPCNames then
+      name = DugisGuideViewer.NPCNames[tonumber(firstid)]
+    end
+  end
+  if not name and DugisGuideViewer.actions[CurrentQuestIndex] == "K" then
+    local rowname = DugisGuideViewer.quests1[CurrentQuestIndex]
+    if rowname and rowname ~= "" and not rowname:match("^%(npc:") then
+      name = rowname
+    end
+  end
+  if name and name ~= "" then
+    TargetByName(name, false)
+    print("|cff00ff00[DG Target]|r Targeting \"" .. name .. "\"")
+  else
+    print("|cffff0000[DG Target]|r Could not determine an NPC name for this step.")
+  end
+end
+
 -- Checks every "accept" row in the currently open guide against PrereqData.lua (a static
 -- table built offline from wotlkdb.com's quest-chain data, since WoW's API doesn't expose
 -- quest prerequisites for quests not already in your log) and reports any whose required

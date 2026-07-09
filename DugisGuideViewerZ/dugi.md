@@ -710,6 +710,39 @@ content became clearly visible.
 
 `luac -p` passes on `DugisGuideViewer.lua` and all 5 modified guide files.
 
+## New feature this session: "Target" button on the compact guide window
+
+At the user's request - a button that targets the NPC/enemy involved in the current guide
+step, equivalent to typing `/target NPCName`, without having to read the name and type it or
+find/click the NPC in the world first.
+
+**Why a name lookup table was needed**: many rows' displayed name is the *quest* name (e.g.
+"Blueleaf Tubers" for an accept row), not the NPC's name, so it can't be used directly for most
+rows - only "K" (kill) rows commonly show a plain mob name in that field. The reliable signal
+is each row's own `|NPC|id[,id2,...]|` tag, but that only stores the numeric creature ID, and
+this old engine has **no existing mechanism at all** to resolve `(npc:ID)` placeholders from
+the source content into real names (the guide text itself sometimes shows the raw ID to the
+player already, for the same reason). So a static ID-to-name table was needed, same approach as
+`PrereqData.lua`.
+
+**Built**:
+- `DugisGuideViewerZ/NPCData.lua` (new, added to `.toc` after `PrereqData.lua`) -
+  `DugisGuideViewer.NPCNames[npcID] = "name"` for all 495 unique creature IDs referenced via
+  `|NPC|` tags across every rebuilt dungeon guide (Outland + classic, both factions). Fetched
+  via a new `wotlkdb-tool/fetch_npc_names.py` batch script (same rate-limited/cached approach as
+  the quest batches). All 495 resolved successfully, zero failures.
+- New **"Target"** icon button on the compact/small guide window (`DugisSmallFrame`, next to
+  the existing maximize button), wired to `DugisGuideViewer_Target_ButtonClick()` (new function
+  in `DugisGuideViewer.lua`, next to the other button handlers): reads the current row's
+  `|NPC|` tag, takes the first listed ID (some rows list several, e.g. "kill either of these"),
+  looks it up in `NPCNames`, and calls `TargetByName(name, false)`. Falls back to the row's own
+  displayed name only for "K" rows without an `|NPC|` tag at all, and only if that name isn't
+  itself an unresolved `(npc:ID)` placeholder. Prints a colored chat confirmation either way.
+
+`luac -p` and `xmllint` both pass. Not yet tested in-game (new `.toc` file - needs a full
+client restart, not just `/reload`, same caveat as `PrereqData.lua` and the earlier Guides.xml
+manifest lesson this session).
+
 ## Remaining work / next steps
 
 0. **`Debug = 1` is still enabled** (`DugisGuideViewer.lua` line 87) from this session's

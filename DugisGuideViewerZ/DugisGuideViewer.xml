@@ -1032,15 +1032,35 @@ http://wowprogramming.com/FrameXML/UI.xsd">
 				</Offset>
 				</Anchor>
 				</Anchors>
-				
+
 				<Scripts>
 				<OnClick>UIFrameFadeIn(DGV_DungeonFrame, 0.5, 0, 1)</OnClick>
-				
+
 				</Scripts>
-				
-			</Button>		
+
+			</Button>
+
+			<Button name = "$parentTarget" hidden = "false" frameStrata="MEDIUM" >
+				<Size x="20" y="20"/>
+				<NormalTexture file ="Interface\Icons\Ability_Hunter_SniperShot"/>
+				<HighlightTexture alphaMode ="ADD" file ="Interface\BUTTONS\UI-MicroButton-Hilight"/>
+				<Anchors>
+				<Anchor point="RIGHT" relativeTo="$parentMaximize" relativePoint="LEFT" >
+				<Offset>
+				<AbsDimension x="0" y="0"/>
+				</Offset>
+				</Anchor>
+				</Anchors>
+
+				<Scripts>
+				<OnClick>DugisGuideViewer_Target_ButtonClick()</OnClick>
+				<OnEnter>GameTooltip:SetOwner(self, "ANCHOR_LEFT") GameTooltip:SetText("Target this step's NPC") GameTooltip:Show()</OnEnter>
+				<OnLeave>GameTooltip:Hide()</OnLeave>
+				</Scripts>
+
+			</Button>
 	</Frames>
-</Frame>	 
+</Frame>
  <!--===================================
    Dungeon Frame
    ====================================-->

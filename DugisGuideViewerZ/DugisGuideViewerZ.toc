@@ -24,6 +24,7 @@ AceAddon-3.0\AceAddon-3.0.xml
 
 DugisGuideViewer.lua
 PrereqData.lua
+NPCData.lua
 Localization\Translator.lua
 DugisGuideViewer.xml
 ItemButton.lua
