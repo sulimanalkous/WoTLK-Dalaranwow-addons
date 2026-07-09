@@ -23,6 +23,7 @@ AceDB-3.0\AceDB-3.0.xml
 AceAddon-3.0\AceAddon-3.0.xml
 
 DugisGuideViewer.lua
+PrereqData.lua
 Localization\Translator.lua
 DugisGuideViewer.xml
 ItemButton.lua

@@ -857,10 +857,26 @@ http://wowprogramming.com/FrameXML/UI.xsd">
 		</Anchors>
 		<Scripts>
 			<OnClick>DugisGuideViewer_Reload_ButtonClick();</OnClick>
-		</Scripts> 
+		</Scripts>
 	</Button>
-		
-	
+
+	<Button name = "DugisCheckChainsButton" inherits="UIPanelButtonTemplate" text = "Check Chains" hidden="false">
+		 <Size>
+			<AbsDimension x="90" y="20"/>
+		</Size>
+		<Anchors>
+			<Anchor point="LEFT" relativeTo="DugisReloadButton" relativePoint ="RIGHT" >
+				<Offset>
+					<AbsDimension x="10" y="0"/>
+				</Offset>
+			</Anchor>
+		</Anchors>
+		<Scripts>
+			<OnClick>DugisGuideViewer_CheckChains_ButtonClick();</OnClick>
+		</Scripts>
+	</Button>
+
+
 	<Button name = "DugisPercentButton"  hidden="false">
 		 <Size>
 			<AbsDimension x="100" y="20"/>

@@ -103,6 +103,50 @@ function DugisGuideViewer_Reload_ButtonClick()
   DugisGuideViewer:DisplayViewTab(DugisGuideViewer:revlocalize(CurrentTitle, "GUIDE"))
 end
 
+-- Checks every "accept" row in the currently open guide against PrereqData.lua (a static
+-- table built offline from wotlkdb.com's quest-chain data, since WoW's API doesn't expose
+-- quest prerequisites for quests not already in your log) and reports any whose required
+-- prerequisite quest isn't satisfied yet, distinguishing "the guide includes it, keep going"
+-- from "this guide never covers it - the NPC won't offer it until you get it elsewhere".
+function DugisGuideViewer_CheckChains_ButtonClick()
+  if not CurrentTitle or LastGuideNumRows == 0 then
+    print("|cffff0000[DG Chain]|r No guide is currently open.")
+    return
+  end
+  local fileQids = {}
+  for i = 1, LastGuideNumRows do
+    if DugisGuideViewer.qid[i] then
+      fileQids[DugisGuideViewer.qid[i]] = true
+    end
+  end
+  local checked, flagged = 0, 0
+  for i = 1, LastGuideNumRows do
+    if DugisGuideViewer.actions[i] == "A" then
+      local qid = DugisGuideViewer.qid[i]
+      local prereq = qid and DugisGuideViewer.QuestPrereqs[qid]
+      if prereq then
+        checked = checked + 1
+        local satisfied = DugisGuideViewer:HasQuestBeenTurnedIn(prereq)
+            or DugisGuideViewer:GetQuestLogIndexByQID(prereq) ~= nil
+        if not satisfied then
+          flagged = flagged + 1
+          local qname = DugisGuideViewer.QuestNames[qid] or ("QID " .. qid)
+          local pname = DugisGuideViewer.QuestNames[prereq] or ("QID " .. prereq)
+          if fileQids[prereq] then
+            print("|cffffff00[DG Chain]|r \"" .. qname .. "\" needs \"" .. pname ..
+              "\" first - this guide includes it, make sure you reach that step first.")
+          else
+            print("|cffff0000[DG Chain]|r \"" .. qname .. "\" needs \"" .. pname ..
+              "\" first - NOT included in this guide! The NPC may not offer it yet.")
+          end
+        end
+      end
+    end
+  end
+  print("|cff00ff00[DG Chain]|r Checked " .. checked .. " quest(s) with a known prerequisite, " ..
+    flagged .. " not yet satisfied.")
+end
+
 function DugisGuideViewer_Reset_ButtonClick()
   for i = 1, LastGuideNumRows do
     local IsEnabled = getglobal("RecapPanelDetail" .. i .. "Chk"):IsEnabled()
@@ -566,14 +610,15 @@ function DugisGuideViewer:SetQuestsState()
 end
 
 function DugisGuideViewer:HasQuestBeenTurnedIn(qid)
-  for v, _ in pairs(DugisGuideUser.turnedinquests) do
-    --DebugPrint("v="..v.."qid="..qid)
-    if v == qid then
-      --DebugPrint("return true")
+  -- turnedinquests is populated two different ways depending on code path: overwritten
+  -- wholesale from GetQuestsCompleted() as {[questID]=true, ...} (keyed by ID), or appended
+  -- to via table.insert(...) elsewhere in this file as a plain array (value = questID,
+  -- key = insertion index) - check both the key and the value so this works either way.
+  for k, v in pairs(DugisGuideUser.turnedinquests) do
+    if k == qid or v == qid then
       return true
     end
   end
-  --DebugPrint("return false")
   return false
 end
 
