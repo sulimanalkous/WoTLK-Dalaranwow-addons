@@ -743,6 +743,35 @@ player already, for the same reason). So a static ID-to-name table was needed, s
 client restart, not just `/reload`, same caveat as `PrereqData.lua` and the earlier Guides.xml
 manifest lesson this session).
 
+## Bug found and fixed this session: current-zone waypoint fallback could itself crash
+
+**Symptom**: `attempt to concatenate upvalue 'UID' (a nil value)` at `MapCurrentObjective()`
+line 859, on a plain `/reload` (not tied to any button click).
+
+**Root cause**: the current-zone waypoint fallback added earlier this session
+(`TomTom:AddWaypoint(...)`) can itself return `nil` - its own implementation (`TomTom.lua`
+line 730) does `local c,z = GetCurrentMapContinent(), GetCurrentMapZone(); if not c or not z or
+c<1 then return end` before placing anything. Since this fallback only activates *after* this
+same engine's own "Default zone" branch already tried `SetMapToCurrentZone()` +
+`GetCurrentMapContinent()/GetCurrentMapZone()` and got nothing usable, `TomTom:AddWaypoint`
+doing the same underlying lookup (minus the `SetMapToCurrentZone()` call) can plausibly fail
+the exact same way - a case the debug-print line wasn't guarding against.
+
+**Fix**: wrapped the debug print with `tostring(UID)` so a nil UID no longer crashes the
+concatenation, and skip storing the point (`addPoint`) entirely when `UID` comes back nil,
+since there's nothing real to track in that case - degrades to "no waypoint placed" rather
+than a crash, consistent with how the rest of this fallback chain is meant to fail safely.
+`luac -p` passes.
+
+**Also reported**: `attempt to call global 'DugisGuideViewer_Target_ButtonClick' (a nil
+value)` when clicking the new Target button. The function is correctly defined in
+`DugisGuideViewer.lua` (verified present, correctly spelled, matching the XML's `OnClick`
+reference exactly) and `luac -p` finds no syntax errors anywhere in the file that could have
+aborted its execution partway through - almost certainly this was tested before the full
+client restart `NPCData.lua`/`PrereqData.lua` (new `.toc` entries) need, per the established
+manifest-caching lesson this session. Not otherwise changed; ask the user to confirm after a
+full restart.
+
 ## Remaining work / next steps
 
 0. **`Debug = 1` is still enabled** (`DugisGuideViewer.lua` line 87) from this session's

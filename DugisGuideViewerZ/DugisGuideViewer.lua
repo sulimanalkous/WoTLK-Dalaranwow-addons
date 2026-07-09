@@ -856,12 +856,18 @@ function DugisGuideViewer:MapCurrentObjective()
           if useCurrentZoneFallback then
             UID = TomTom:AddWaypoint(self.XVals[i], self.YVals[i], desc, false)
             DebugPrint("self.XVals[i]=" .. self.XVals[i] .. "self.YVals[i]=" .. self.YVals[i] ..
-              "UID=" .. UID .. "(current-zone fallback)" .. desc)
-            self:addPoint(0, 0, self.XVals[i], self.YVals[i], UID, desc)
+              "UID=" .. tostring(UID) .. "(current-zone fallback)" .. desc)
+            -- AddWaypoint needs GetCurrentMapContinent()/GetCurrentMapZone() to already
+            -- resolve (same call the "Default zone" branch above already tried and failed
+            -- at, if we got here) - it can still come back nil in that case. Nothing to
+            -- track if so; skip rather than store a bogus point.
+            if UID then
+              self:addPoint(0, 0, self.XVals[i], self.YVals[i], UID, desc)
+            end
           else
             UID = TomTom:AddZWaypoint(ContToUse, ZoneToUse, self.XVals[i], self.YVals[i], desc, false)
             DebugPrint("self.XVals[i]=" ..
-              self.XVals[i] .. "self.YVals[i]=" .. self.YVals[i] .. "UID=" .. UID .. "ContToUse=" .. ContToUse .. desc)
+              self.XVals[i] .. "self.YVals[i]=" .. self.YVals[i] .. "UID=" .. tostring(UID) .. "ContToUse=" .. ContToUse .. desc)
             self:addPoint(ContToUse, ZoneToUse, self.XVals[i], self.YVals[i], UID, desc)
           end
         end
