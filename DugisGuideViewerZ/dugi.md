@@ -665,6 +665,51 @@ tell whether a player would already have that prerequisite from normal leveling 
 Check Chains button handles that nuance; this list doesn't). Some of these may turn out to be
 non-issues in practice; treat as candidates to verify, not confirmed bugs like Underbog was.
 
+## Bug found and fixed this session: crash on lines carried through as disabled source content
+
+**Symptom**: level 42 Warlock got `attempt to index local 'action' (a nil value)` at
+`ParseRows()` line 2054, triggered from `DisplayViewTab()` when opening a guide.
+
+**Root cause**: some lines in the original Anniversary source packages (both TBC and Classic
+era, used for the Outland and this session's classic dungeon rebuilds) start with `--` (e.g.
+`--A Featherbeard's Endorsement |QID|9469|...`). In the *source* Lua files this looked like an
+ordinary comment, but by the time it's embedded inside the `return [[ ... ]]` string literal
+that actually ships in the guide, `--` is just two literal dash characters, not a comment
+marker - strings don't have comments. `ParseRows`'s `text:find("^(%a) ...")` requires the first
+character to be a letter, so it doesn't match a line starting with `-`, leaving `action` as
+`nil`, and the very next line (`action:trim()`) crashes trying to call a method on nil. Not
+something introduced by this session's conversions specifically - it was latent in the source
+material both times, just never hit because these particular lines only apply to certain
+classes/dungeons/scenarios that hadn't been tested yet (this one needed a Warlock specifically,
+via a `|C|Warlock|` tag elsewhere on one of the surrounding lines making the whole batch of
+lines around them get parsed for the first time).
+
+**Investigation note**: took a couple of false starts to find, because my own exploration
+script (used throughout this session to eyeball decoded guide content) had a boundary-detection
+bug of its own - it kept decoding a couple of trailing lines *past* the real `]]` closing
+marker (which appears literally, unencoded, in the raw file, not as an encoded byte sequence),
+so it flashed some real Lua code/dead `--[[ ]]` comment blocks as if they were garbled content.
+Once the boundary detection was fixed to stop at a literal `]]` line, the actual `--`-prefixed
+content became clearly visible.
+
+**Fix (two parts)**:
+1. **Defensive**: `ParseRows` now checks `if not action then` and skips the line (with a
+   `DebugPrint`) instead of crashing, regardless of *why* a line failed to parse - this
+   protects against this whole class of bug for any future content, not just these specific
+   lines.
+2. **Root cause**: removed all 21 `--`-prefixed lines found across 5 files (
+   `DugisGuide_Dungeons_Alliance_En/42_47_ZulFarrak.lua` x14,
+   `DugisGuide_Dungeons_Horde_En/42_47_ZulFarrak.lua` x2,
+   `DugisGuide_Dungeons_Horde_En/52_55_Blackrock_Depths.lua` x1,
+   `DugisGuide_Outland_Dungeons_A/65_67_Auchenai_Crypts.lua` x2,
+   `DugisGuide_Outland_Dungeons_H/65_67_Auchenai_Crypts.lua` x2) - a full sweep of *every* guide
+   file (all folders, not just these 5) with the boundary-fixed script found zero remaining
+   occurrences afterward. Chose to remove rather than "activate" these lines (stripping the
+   `--` and keeping the content) since we don't know why the original source author disabled
+   them - safer to match their apparent intent than to guess.
+
+`luac -p` passes on `DugisGuideViewer.lua` and all 5 modified guide files.
+
 ## Remaining work / next steps
 
 0. **`Debug = 1` is still enabled** (`DugisGuideViewer.lua` line 87) from this session's

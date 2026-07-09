@@ -2051,6 +2051,13 @@ function DugisGuideViewer:ParseRows(guidetitle, rowinfo, ...)
     local _, _, daily = text:find("(|D|)")
     if text ~= "" and (not classes or classes:find(myClass)) and (not races or races:find(myRace)) then
       local _, _, action, quest, tag = text:find("^(%a) ([^|]*)(.*)") --local _, _, action, quest, tag = text:find("([^ ]*) - ([^|]*)(.*)")
+      -- Some source content has stray lines that don't start with a single action letter
+      -- (e.g. a leading "--" left over from the original source data, which isn't a Lua
+      -- comment here since it's inside the encoded string, so it's literal text) - skip
+      -- rather than crash on action:trim() with a nil action.
+      if not action then
+        DebugPrint("ParseRows: skipping unparseable line " .. i .. ": " .. text)
+      else
       action = action:trim()
       quest = quest:trim()
       --Find Use items
@@ -2080,6 +2087,7 @@ function DugisGuideViewer:ParseRows(guidetitle, rowinfo, ...)
       DugisGuideViewer.qid[indx] = qid
       DugisGuideViewer.daily[indx] = daily
       indx = indx + 1
+      end
     end
   end
 end
