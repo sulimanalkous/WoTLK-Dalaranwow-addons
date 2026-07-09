@@ -711,14 +711,29 @@ function DugisGuideViewer:MapCurrentObjective()
       local zonefromnotetag = DugisGuideViewer:ReturnTag("Z", CurrentQuestIndex)
       local ContToUse
       -- Some source content (Anniversary-package dungeon guides) encodes |Z| as a numeric
-      -- ID this old engine can't resolve by name, but the same line's note text usually
-      -- carries the real zone name as literal {ZoneName} markup - prefer that when it
-      -- names a zone different from the guide's own, since it reflects the step's actual
-      -- location (e.g. a capital-city turn-in) rather than the guide's title zone.
+      -- ID this old engine can't resolve by name, but two other, more reliable name-based
+      -- signals are usually available instead:
+      --  1. For "R"/"F"/"b"/"H" (travel) rows, the row's own name field IS the destination
+      --     zone name (e.g. "R Sporeggar |N|Travel to Sporeggar...") - the exact same
+      --     convention CheckForLocation() already relies on (comparing quests1L[indx]
+      --     against GetZoneText()/GetSubZoneText()) for its own zone-arrival detection, so
+      --     it's the most trustworthy signal available for these rows - and some travel
+      --     rows in this source content omit the {ZoneName} note markup below entirely.
+      --  2. The line's note text often also carries the real zone name as literal
+      --     {ZoneName} markup (e.g. "{Sporeggar}") - useful for non-travel rows like a
+      --     capital-city turn-in mid-guide, where the row name itself isn't a zone.
+      local action = DugisGuideViewer.actions[CurrentQuestIndex]
+      local zonefromrowname
+      if action == "R" or action == "F" or action == "b" or action == "H" then
+        zonefromrowname = DugisGuideViewer.quests1[CurrentQuestIndex]
+      end
       local notetext = DugisGuideViewer.quests2[CurrentQuestIndex]
       local zonefromcurlytag = notetext and notetext:match("{([^}]+)}")
-      --If there is a |Zone= Darnassus| tag
-      if zonefromcurlytag and DugisGuideViewer:IsZoneNameValid(zonefromcurlytag) then
+      if zonefromrowname and DugisGuideViewer:IsZoneNameValid(zonefromrowname) then
+        DebugPrint("Row-name zone" .. zonefromrowname)
+        ZoneToUse = DugisGuideViewer:GetZoneNumberFromZoneName(zonefromrowname)
+        ContToUse = DugisGuideViewer:GetContinentNumberFromZoneName(zonefromrowname)
+      elseif zonefromcurlytag and DugisGuideViewer:IsZoneNameValid(zonefromcurlytag) then
         DebugPrint("Curly zone" .. zonefromcurlytag)
         ZoneToUse = DugisGuideViewer:GetZoneNumberFromZoneName(zonefromcurlytag)
         ContToUse = DugisGuideViewer:GetContinentNumberFromZoneName(zonefromcurlytag)

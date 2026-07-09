@@ -505,6 +505,33 @@ future 3.3.5a addon work, not just this fix:
 - Lives in `AddOns/wotlkdb-tool/`, not inside `DugisGuideViewerZ/`, specifically so it's
   discoverable and reusable for whatever addon is worked on next.
 
+## Bug found and fixed this session: waypoint zone detection missed rows without {ZoneName} markup
+
+**Symptom**: user reported "The Underbog (63-65)" guide's waypoint "not working".
+
+**Root cause**: the `{ZoneName}` curly-brace fix from earlier this session only helps when a
+row's note text actually contains that markup - and several "R" (travel) rows in this specific
+file's source don't have it, e.g. `R Sporeggar |N|Travel to Sporeggar (19.5,50.1)| |Z|1946|`
+(no `{Sporeggar}` anywhere) vs. other rows in the same file like
+`R Sporeggar |N|Travel to {Sporeggar} (19.6,52)| |Z|1946|` (has it). Inconsistent even within
+one file - looks like an authoring quirk in the source, not something specific to one line
+type. Affected rows (checked this file specifically): the "Sporeggar" travel step at row 6,
+"Sporeggar" again at row 27, "Coilfang Reservoir" at rows 32 and 44, and another "Sporeggar" at
+row 47 (which also happens to use a different, equally-unusable numeric `|Z|467|` instead of
+the `|Z|1946|` every other row in the file uses - harmless given neither numeric tag resolves
+anyway, but noted as a further sign this source data isn't fully consistent).
+
+**Fix**: added a *higher-priority* check ahead of the `{ZoneName}` one - for "R"/"F"/"b"/"H"
+(travel-type) rows specifically, try the row's own name field (`quests1[CurrentQuestIndex]`,
+e.g. literally "Sporeggar") as the zone name first. This isn't a new invention - it's the exact
+same convention `CheckForLocation()` (the *separate* function that detects zone-arrival to
+auto-advance a travel row) already relies on, comparing `GetZoneText()`/`GetSubZoneText()`
+against that same field - so it's already a supported, working assumption elsewhere in this
+engine, just not previously reused for waypoint placement. Falls through gracefully to the
+`{ZoneName}` check (and beyond) if the row's name isn't a valid zone (e.g. non-travel rows, or
+a travel destination that's a subzone/POI rather than a full mappable zone) - purely additive,
+doesn't change behavior for rows that were already resolving correctly. `luac -p` passes.
+
 ## Remaining work / next steps
 
 1. **Get user confirmation the `MapCurrentObjective` fixes resolve the crash and that guides
