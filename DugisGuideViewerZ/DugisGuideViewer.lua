@@ -103,11 +103,11 @@ function DugisGuideViewer_Reload_ButtonClick()
   DugisGuideViewer:DisplayViewTab(DugisGuideViewer:revlocalize(CurrentTitle, "GUIDE"))
 end
 
--- Targets the NPC involved in the current guide step via TargetByName(). Prefers the row's
--- own |NPC| tag (resolved through NPCData.lua, since this engine has no built-in way to turn
--- the source content's (npc:ID) placeholders into a real name) over the row's displayed name
--- field, since that field holds the *quest* name for "A"/"T" rows, not an NPC name - it's only
--- usable directly for "K" (kill) rows that don't have an |NPC| tag of their own.
+-- Targets the NPC involved in the current guide step, equivalent to typing "/target Name".
+-- Prefers the row's own |NPC| tag (resolved through NPCData.lua, since this engine has no
+-- built-in way to turn the source content's (npc:ID) placeholders into a real name) over the
+-- row's displayed name field, since that field holds the *quest* name for "A"/"T" rows, not an
+-- NPC name - it's only usable directly for "K" (kill) rows that don't have an |NPC| tag.
 function DugisGuideViewer_Target_ButtonClick()
   if not CurrentQuestIndex or not DugisGuideViewer.actions[CurrentQuestIndex] then
     print("|cffff0000[DG Target]|r No guide step is currently active.")
@@ -128,8 +128,17 @@ function DugisGuideViewer_Target_ButtonClick()
     end
   end
   if name and name ~= "" then
-    TargetByName(name, false)
-    print("|cff00ff00[DG Target]|r Targeting \"" .. name .. "\"")
+    -- TargetByName isn't available as a global on this client - go through the chat edit
+    -- box instead, the same path used when a player types a slash command themselves. This
+    -- works regardless of whatever internal API /target itself happens to be built on.
+    local editbox = DEFAULT_CHAT_FRAME and DEFAULT_CHAT_FRAME.editBox
+    if editbox then
+      editbox:SetText("/target " .. name)
+      ChatEdit_SendText(editbox, 0)
+      print("|cff00ff00[DG Target]|r Targeting \"" .. name .. "\"")
+    else
+      print("|cffff0000[DG Target]|r Could not access the chat edit box to run /target.")
+    end
   else
     print("|cffff0000[DG Target]|r Could not determine an NPC name for this step.")
   end

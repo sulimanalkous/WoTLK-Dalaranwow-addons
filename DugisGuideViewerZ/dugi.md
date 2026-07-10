@@ -788,6 +788,23 @@ e.g. an NPC outside the 495 collected across the rebuilt guides. Verified direct
 guide content: `"Collect (item:7146) from (npc:6487) the final boss"` → `"...from Arcanist Doan
 the final boss"`. `luac -p` passes.
 
+## Bug found and fixed this session: Target button used a nonexistent API function
+
+**Symptom**: `attempt to call global 'TargetByName' (a nil value)` when clicking the Target
+button (this session's earlier suspicion that the "nil function" error was just a stale-load
+issue was wrong - confirmed by testing after a proper restart).
+
+**Root cause**: `TargetByName` isn't available as a global function on this client - assumed
+it existed based on general WoW API knowledge without verifying against this specific 3.3.5a
+client build.
+
+**Fix**: instead of relying on a specific targeting API function, go through the chat edit box
+the same way a player typing `/target Name` themselves would -
+`DEFAULT_CHAT_FRAME.editBox:SetText("/target " .. name)` then `ChatEdit_SendText(editbox, 0)`.
+This works regardless of whatever `/target` is internally implemented with, since it's the
+exact same path the client already guarantees works. `luac -p` passes. Not yet re-tested
+in-game.
+
 ## Remaining work / next steps
 
 0. **`Debug = 1` is still enabled** (`DugisGuideViewer.lua` line 87) from this session's
