@@ -805,6 +805,38 @@ This works regardless of whatever `/target` is internally implemented with, sinc
 exact same path the client already guarantees works. `luac -p` passes. Not yet re-tested
 in-game.
 
+## Bug found and fixed this session: targeting is a protected action, needed a secure button
+
+**Symptom**: `Error: AddOn DugisGuideViewerZ attempted to call a forbidden function (UNKNOWN())
+from a tainted execution path`, with `TargetUnit()` in the call stack, triggered via
+`ChatEdit_SendText` from the Target button's plain `OnClick` handler.
+
+**Root cause**: targeting is a WoW-protected action. It can only be invoked from a "secure"
+execution path (a real hardware event handled directly by a secure button/frame) - the instant
+a call stack passes through *any* regular addon Lua function (like an ordinary button's
+`OnClick` script, even one triggered by a genuine click), it becomes "tainted", and any
+protected API call further down that stack gets blocked, regardless of which specific function
+or method is used to reach it. This means the earlier `TargetByName()` attempt would have hit
+the exact same wall had that function actually existed - the previous fix addressed the wrong
+layer of the problem.
+
+**Fix**: converted the button to `inherits="SecureActionButtonTemplate"` and removed its
+`OnClick` script entirely - secure buttons perform their action (a macro, in this case) via
+protected click-dispatch driven by attributes (`type`="macro", `macrotext`="/target Name"),
+which runs the actual targeting directly without ever passing through insecure Lua, so no
+taint occurs. Since the button can no longer compute *which* NPC to target at click time (that
+logic is regular Lua, still tainted), `DugisGuideViewer_Target_ButtonClick` was replaced with
+`DugisGuideViewer:UpdateTargetButton(currquest)`, which sets those two attributes ahead of
+time. Hooked into `PopulateSmallFrame` (the one function all three places that change the
+current step - `SetToQuestNumber`, `MoveToNextQuest`, `MoveToPrevQuest` - already call to
+refresh the compact window), so the button's target stays current automatically as the guide
+progresses, with no extra call sites to maintain. Guarded with `InCombatLockdown()`, since
+secure button attributes also can't be changed during combat - degrades to "points at whatever
+NPC was current when combat started" until combat ends, matching how Blizzard's own action
+bars behave under the same restriction.
+
+`luac -p` and `xmllint` both pass. Not yet re-tested in-game.
+
 ## Remaining work / next steps
 
 0. **`Debug = 1` is still enabled** (`DugisGuideViewer.lua` line 87) from this session's

@@ -103,44 +103,41 @@ function DugisGuideViewer_Reload_ButtonClick()
   DugisGuideViewer:DisplayViewTab(DugisGuideViewer:revlocalize(CurrentTitle, "GUIDE"))
 end
 
--- Targets the NPC involved in the current guide step, equivalent to typing "/target Name".
--- Prefers the row's own |NPC| tag (resolved through NPCData.lua, since this engine has no
--- built-in way to turn the source content's (npc:ID) placeholders into a real name) over the
--- row's displayed name field, since that field holds the *quest* name for "A"/"T" rows, not an
--- NPC name - it's only usable directly for "K" (kill) rows that don't have an |NPC| tag.
-function DugisGuideViewer_Target_ButtonClick()
-  if not CurrentQuestIndex or not DugisGuideViewer.actions[CurrentQuestIndex] then
-    print("|cffff0000[DG Target]|r No guide step is currently active.")
+-- Keeps the compact window's secure Target button pointed at the NPC involved in the given
+-- step. Targeting is a protected action - it can't be triggered from a plain Lua OnClick
+-- handler at all (confirmed in-game: "attempted to call a forbidden function... tainted
+-- execution path", which would happen with *any* targeting API called this way, not just the
+-- TargetByName attempt tried earlier). The only way to do this from an addon is a
+-- SecureActionButtonTemplate button whose "macrotext" attribute is pre-set to "/target Name" -
+-- the secure click-dispatch runs that directly, bypassing the taint issue entirely. Since the
+-- button can't compute the name at click time anymore, this refreshes the attribute instead,
+-- every time the compact window itself refreshes (PopulateSmallFrame, below), so it's always
+-- current by the time the player actually clicks.
+function DugisGuideViewer:UpdateTargetButton(currquest)
+  local button = getglobal("DugisSmallFrameTarget")
+  if not button or InCombatLockdown() then
     return
   end
   local name
-  local npctag = DugisGuideViewer:ReturnTag("NPC", CurrentQuestIndex)
+  local npctag = DugisGuideViewer:ReturnTag("NPC", currquest)
   if npctag then
     local firstid = npctag:match("(%d+)")
     if firstid and DugisGuideViewer.NPCNames then
       name = DugisGuideViewer.NPCNames[tonumber(firstid)]
     end
   end
-  if not name and DugisGuideViewer.actions[CurrentQuestIndex] == "K" then
-    local rowname = DugisGuideViewer.quests1[CurrentQuestIndex]
+  if not name and DugisGuideViewer.actions[currquest] == "K" then
+    local rowname = DugisGuideViewer.quests1[currquest]
     if rowname and rowname ~= "" and not rowname:match("^%(npc:") then
       name = rowname
     end
   end
   if name and name ~= "" then
-    -- TargetByName isn't available as a global on this client - go through the chat edit
-    -- box instead, the same path used when a player types a slash command themselves. This
-    -- works regardless of whatever internal API /target itself happens to be built on.
-    local editbox = DEFAULT_CHAT_FRAME and DEFAULT_CHAT_FRAME.editBox
-    if editbox then
-      editbox:SetText("/target " .. name)
-      ChatEdit_SendText(editbox, 0)
-      print("|cff00ff00[DG Target]|r Targeting \"" .. name .. "\"")
-    else
-      print("|cffff0000[DG Target]|r Could not access the chat edit box to run /target.")
-    end
+    button:SetAttribute("type", "macro")
+    button:SetAttribute("macrotext", "/target " .. name)
   else
-    print("|cffff0000[DG Target]|r Could not determine an NPC name for this step.")
+    button:SetAttribute("type", nil)
+    button:SetAttribute("macrotext", nil)
   end
 end
 
@@ -1381,6 +1378,7 @@ function DugisGuideViewer:PopulateSmallFrame(currquest)
     else
       text:SetTextColor(1, 0.82, 0, 1)
     end
+    DugisGuideViewer:UpdateTargetButton(currquest)
   end
 end
 

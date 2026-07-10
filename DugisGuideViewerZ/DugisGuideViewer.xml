@@ -1040,7 +1040,7 @@ http://wowprogramming.com/FrameXML/UI.xsd">
 
 			</Button>
 
-			<Button name = "$parentTarget" hidden = "false" frameStrata="MEDIUM" >
+			<Button name = "$parentTarget" inherits="SecureActionButtonTemplate" hidden = "false" frameStrata="MEDIUM" >
 				<Size x="20" y="20"/>
 				<NormalTexture file ="Interface\Icons\Ability_Hunter_SniperShot"/>
 				<HighlightTexture alphaMode ="ADD" file ="Interface\BUTTONS\UI-MicroButton-Hilight"/>
@@ -1053,7 +1053,6 @@ http://wowprogramming.com/FrameXML/UI.xsd">
 				</Anchors>
 
 				<Scripts>
-				<OnClick>DugisGuideViewer_Target_ButtonClick()</OnClick>
 				<OnEnter>GameTooltip:SetOwner(self, "ANCHOR_LEFT") GameTooltip:SetText("Target this step's NPC") GameTooltip:Show()</OnEnter>
 				<OnLeave>GameTooltip:Hide()</OnLeave>
 				</Scripts>
