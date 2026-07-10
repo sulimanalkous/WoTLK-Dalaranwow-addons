@@ -855,6 +855,27 @@ text is normally a free-form description ("Kill 8 Kobold Vermin...") rather than
 bad `/target` there would just silently do nothing in-game (no crash risk), but there's no
 value in trying. `luac -p` passes. Not yet re-tested in-game.
 
+## Paused mid-session: Target button still not working on leveling guides
+
+User reports the note-text-extraction fallback (previous section) still doesn't make the
+Target button work on leveling guides, even though the note-text format was verified directly
+against real content (`"Deputy Willem (48, 43.5)"` etc., matching the extraction pattern
+exactly) and the code read-back looked correct. Root cause not yet found - was mid-investigation
+(re-reading the deployed code for a subtle bug) when paused.
+
+**User's suggestion for next session**: newer/modern versions of Dugi's Guide (the actively
+maintained one, not this old v4.19 build) have apparently already solved NPC-name-in-tooltip
+and targeting for their guide content. Worth checking whatever newer Dugi's Guide package(s)
+exist in `Dugis Guide All/` (zip archives) for how they actually implement this, rather than
+re-deriving the approach from scratch - may reveal either a better data convention this old
+engine could adopt, or confirm this old engine's architecture just can't support it the way
+the modern one does (in which case worth knowing that before sinking more time into it).
+
+**Not yet done, for whoever picks this up**: get the exact guide/step the user was testing
+(quest name, action type) to reproduce precisely rather than continuing to guess from static
+code reading - the extraction logic works correctly in isolated testing (see prior section) but
+evidently doesn't produce a working target in the actual client for at least one real case.
+
 ## Remaining work / next steps
 
 0. **`Debug = 1` is still enabled** (`DugisGuideViewer.lua` line 87) from this session's
