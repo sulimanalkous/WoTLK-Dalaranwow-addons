@@ -837,6 +837,24 @@ bars behave under the same restriction.
 
 `luac -p` and `xmllint` both pass. Not yet re-tested in-game.
 
+## Improvement this session: Target button now works on leveling/daily/event guides too
+
+At the user's request, since they noticed it only worked on dungeon guides. The button and
+`UpdateTargetButton`/`PopulateSmallFrame` hook were never actually dungeon-specific in code -
+both live on the shared compact window used by every guide type. The real gap was data: the
+original leveling/daily/event guides don't use `|NPC|` tags at all (that convention is specific
+to the Anniversary-sourced dungeon content this session rebuilt), so the first lookup always
+came back empty for them.
+
+**Fix**: added a second-priority fallback for "A"/"T"/"h" (accept/turn-in/hearth) rows that
+extracts a name directly from the note text, which conventionally reads `"Name (x, y)"` or
+`"Name in {Zone} (x, y)"` in the original guide format - verified against real content:
+`"Deputy Willem (48, 43.5)"` → `"Deputy Willem"`, `"Marshal McBride (48.9, 41.6)"` →
+`"Marshal McBride"`. Deliberately not attempted for "C" (objective progress) rows, whose note
+text is normally a free-form description ("Kill 8 Kobold Vermin...") rather than a name - a
+bad `/target` there would just silently do nothing in-game (no crash risk), but there's no
+value in trying. `luac -p` passes. Not yet re-tested in-game.
+
 ## Remaining work / next steps
 
 0. **`Debug = 1` is still enabled** (`DugisGuideViewer.lua` line 87) from this session's

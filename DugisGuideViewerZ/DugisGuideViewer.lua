@@ -126,7 +126,25 @@ function DugisGuideViewer:UpdateTargetButton(currquest)
       name = DugisGuideViewer.NPCNames[tonumber(firstid)]
     end
   end
-  if not name and DugisGuideViewer.actions[currquest] == "K" then
+  local action = DugisGuideViewer.actions[currquest]
+  if not name and (action == "A" or action == "T" or action == "h") then
+    -- The original leveling/daily/event guides don't use |NPC| tags at all - that's specific
+    -- to the Anniversary-sourced dungeon content. Instead they write the NPC's name directly
+    -- in the note text, conventionally as "Name (x, y)" or "Name in {Zone} (x, y)" - reliable
+    -- for accept/turn-in/hearth rows specifically. Not attempted for "C" (objective progress)
+    -- rows, whose note text is normally a free-form description ("Kill 8 Kobold Vermin...")
+    -- rather than a name.
+    local notetext = DugisGuideViewer.quests2[currquest]
+    if notetext and notetext ~= "" then
+      local candidate = notetext:match("^(.-)%s*%(") or notetext
+      candidate = candidate:match("^(.-)%s+in%s+{") or candidate
+      candidate = candidate:trim()
+      if candidate ~= "" and not candidate:match("^%(npc:") then
+        name = candidate
+      end
+    end
+  end
+  if not name and action == "K" then
     local rowname = DugisGuideViewer.quests1[currquest]
     if rowname and rowname ~= "" and not rowname:match("^%(npc:") then
       name = rowname
