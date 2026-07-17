@@ -36,7 +36,7 @@ Talented.importers["/%??talent#"] = function (self, url, dst)
 	return dst
 end
 
-Talented.exporters[L["Wowhead Talent Calculator"]] = function (self, template)
+Talented.exporters[L["Wotlkdb Talent Calculator"]] = function (self, template)
 	if not RAID_CLASS_COLORS[template.class] then return self:ExportWhpetTemplate(template) end
-	return L["http://www.wowhead.com/talent#%s"]:format(self:TemplateToString(template, "0zMcmVokRsaqbdrfwihuGINALpTjnyxtgevE"))
+	return L["https://wotlkdb.com/?talent#%s"]:format(self:TemplateToString(template, "0zMcmVokRsaqbdrfwihuGINALpTjnyxtgevE"))
 end

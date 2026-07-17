@@ -356,6 +356,20 @@ function Talented:CreateActionMenu()
 	}
 
 	menu[#menu + 1] = {
+		text = L["Copy as Text"],
+		func = function ()
+			Talented:ShowTextExport(Talented:BuildTalentText(Talented.template))
+		end,
+	}
+
+	menu[#menu + 1] = {
+		text = L["Copy Full Tree as Text"],
+		func = function ()
+			Talented:ShowTextExport(Talented:BuildTalentText(Talented.template, true))
+		end,
+	}
+
+	menu[#menu + 1] = {
 		text = L["Send to ..."],
 		func = function ()
 			StaticPopup_Show"TALENTED_EXPORT_TO"

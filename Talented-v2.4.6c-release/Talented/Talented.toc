@@ -58,6 +58,7 @@ inspectui.lua
 wowhead.lua
 wowdb.lua
 mmochamp.lua
+textexport.lua
 
 ui\pool.lua
 ui\base.lua

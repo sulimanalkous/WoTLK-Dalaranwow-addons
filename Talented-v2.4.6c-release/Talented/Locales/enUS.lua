@@ -98,13 +98,20 @@ L["Enter the complete URL of a template from Blizzard talent calculator or wowhe
 
 L["Export template"] = true
 L["Blizzard Talent Calculator"] = true
-L["Wowhead Talent Calculator"] = true
+L["Wotlkdb Talent Calculator"] = true
 L["Wowdb Talent Calculator"] = true
 L["MMO Champion Talent Calculator"] = true
 --~ L["http://www.worldofwarcraft.com/info/classes/%s/talents.html?tal=%s"] = true
 L["http://www.wowarmory.com/talent-calc.xml?%s=%s&tal=%s"] = true
-L["http://www.wowhead.com/talent#%s"] = true
+L["https://wotlkdb.com/?talent#%s"] = true
 L["http://www.wowhead.com/petcalc#%s"] = true
+L["Copy as Text"] = true
+L["Copy Full Tree as Text"] = true
+L["Talent Build"] = true
+L["Select All (Ctrl+A) and copy (Ctrl+C)"] = true
+L["Select All"] = true
+L["Total points: %d"] = true
+
 L["Send to ..."] = true
 L["Enter the name of the character you want to send the template to."] = true
 L["Do you want to add the template \"%s\" that %s sent you ?"] = true
